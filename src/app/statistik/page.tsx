@@ -2,10 +2,11 @@ import Brand from "@/components/Brand";
 import NavPill from "@/components/NavPill";
 
 const dataStatistik = [
-  { angka: 12, label: "Aplikasi Informatika (Aptika)" },
-  { angka: 8, label: "Informasi dan Komunikasi Publik" },
-  { angka: 5, label: "Statistik dan Persandian" },
-  { angka: 10, label: "Sekretariat" },
+  { angka: 12, label: "Bidang Aplikasi & Informatika" },
+  { angka: 6, label: "Bidang Infrastruktur Teknologi Informasi dan Komunikasi" },
+  { angka: 8, label: "Bidang Informasi dan Komunikasi Publik" },
+  { angka: 5, label: "Bidang Statistik" },
+  { angka: 4, label: "Bidang Persandian" },
 ];
 
 export default function StatistikPage() {
