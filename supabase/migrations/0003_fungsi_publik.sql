@@ -1,14 +1,3 @@
--- ============================================================
--- MIGRASI 0003: Fungsi untuk akses publik yang aman
--- (cek status mandiri + statistik agregat)
--- ============================================================
-
--- ------------------------------------------------------------
--- GENERATE NOMOR PENDAFTARAN OTOMATIS
--- Format SEMENTARA: MGG-2026-0001 (tahun + urutan).
--- BELUM DIKONFIRMASI ke Bang Irawan — mudah diganti di sini saja
--- kalau formatnya ternyata harus beda.
--- ------------------------------------------------------------
 create sequence if not exists nomor_pendaftaran_seq start 1;
 
 create or replace function generate_nomor_pendaftaran()
@@ -27,15 +16,6 @@ create trigger trg_generate_nomor
   before insert on pendaftar
   for each row execute function generate_nomor_pendaftaran();
 
--- ------------------------------------------------------------
--- CEK STATUS MANDIRI
--- Wajib cocokkan nomor_pendaftaran DAN email, supaya orang lain
--- tidak bisa menebak-nebak nomor pendaftaran urut (MGG-2026-0001,
--- 0002, dst mudah ditebak) untuk mengintip status orang lain.
--- SECURITY DEFINER supaya bisa baca tabel meski RLS membatasi
--- SELECT publik, tapi hanya kolom yang di-return di sini yang
--- terekspos — bukan seluruh baris.
--- ------------------------------------------------------------
 create or replace function cek_status_pendaftaran(
   p_nomor_pendaftaran text,
   p_email text
@@ -61,15 +41,8 @@ returns table (
     and lower(p.email) = lower(p_email);
 $$ language sql stable security definer;
 
--- Batasi siapa yang boleh panggil fungsi ini (anon + authenticated)
 grant execute on function cek_status_pendaftaran(text, text) to anon, authenticated;
 
--- ------------------------------------------------------------
--- STATISTIK PUBLIK: hitung peserta AKTIF per bidang
--- Aktif = status diverifikasi DAN hari ini ada di antara
--- tanggal_mulai dan tanggal_selesai.
--- Hanya angka agregat yang diexpose, bukan baris individu.
--- ------------------------------------------------------------
 create or replace function statistik_peserta_aktif()
 returns table (
   bidang_nama text,
