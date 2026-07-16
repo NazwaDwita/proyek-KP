@@ -1,19 +1,3 @@
--- ============================================================
--- MIGRASI 0007: Fungsi pendaftaran aman (security definer)
---
--- Masalah yang diperbaiki: form memanggil .insert().select().single(),
--- tapi RLS pendaftar_select_admin hanya izinkan admin membaca tabel
--- pendaftar. Akibatnya proses "baca balik" otomatis setelah insert
--- gagal karena RLS, walau baris insert-nya sendiri kemungkinan besar
--- berhasil -- sehingga form salah menampilkan "gagal" padahal data
--- sudah tersimpan.
---
--- Solusi: bungkus insert dalam fungsi security definer, sama seperti
--- pola cek_status_pendaftaran(). Fungsi ini yang melakukan insert atas
--- nama sistem, lalu mengembalikan HANYA id + nomor_pendaftaran --
--- tanpa perlu membuka akses SELECT publik ke seluruh tabel.
--- ============================================================
-
 create or replace function daftar_magang(
   p_nama_lengkap text,
   p_email text,
@@ -51,7 +35,6 @@ begin
 end;
 $$;
 
--- Hanya boleh dipanggil, tidak bisa "dibaca" strukturnya sembarangan
 grant execute on function daftar_magang(
   text, text, text, text, text, text, uuid, date, date
 ) to anon, authenticated;

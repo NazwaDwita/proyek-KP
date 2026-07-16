@@ -289,6 +289,44 @@ select.form-input option {
   letter-spacing: 0.04em;
 }
 
+.status-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.status-menunggu {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--teks-muted);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.status-diverifikasi {
+  background: rgba(212, 169, 79, 0.12);
+  color: var(--emas-terang);
+  border: 1px solid rgba(212, 169, 79, 0.4);
+}
+.status-ditolak {
+  background: rgba(240, 120, 120, 0.08);
+  color: #f5b8b8;
+  border: 1px solid rgba(240, 120, 120, 0.4);
+}
+
+.hasil-status-baris {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+}
+.hasil-status-baris:last-child {
+  border-bottom: none;
+}
+.hasil-status-label {
+  color: var(--teks-muted);
+}
+
 .tombol:disabled {
   opacity: 0.6;
   cursor: not-allowed;

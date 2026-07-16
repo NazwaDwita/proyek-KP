@@ -62,9 +62,6 @@ export default function DaftarPage() {
       : DAFTAR_SMK_PEKANBARU;
 
   useEffect(() => {
-    // Ditulis sebagai fungsi async terpisah (bukan langsung di badan
-    // effect) supaya try/catch bekerja dengan benar untuk error jaringan,
-    // dan supaya setState tidak dipanggil sinkron langsung di badan effect.
     let komponenMasihTerpasang = true;
 
     async function muatBidang() {
@@ -161,8 +158,6 @@ export default function DaftarPage() {
         }
       );
 
-      // rpc() dengan fungsi yang RETURNS TABLE mengembalikan array baris,
-      // walau di sini kita tahu isinya cuma akan berisi 1 baris.
       const pendaftarBaru = hasilDaftar?.[0];
 
       if (errorInsert || !pendaftarBaru) {
@@ -286,15 +281,15 @@ export default function DaftarPage() {
               />
             </div>
             <div className="form-grup">
-              <label htmlFor="jenis_institusi">Jenjang institusi</label>
+              <label htmlFor="jenis_institusi">Jenjang pendidikan</label>
               <select
                 id="jenis_institusi"
                 className="form-input"
                 value={form.jenis_institusi}
                 onChange={(e) => {
                   ubahField("jenis_institusi", e.target.value);
-                  ubahField("asal_institusi", "");        
-                  ubahField("asal_institusi_lainnya", ""); 
+                  ubahField("asal_institusi", "");
+                  ubahField("asal_institusi_lainnya", "");
                 }}
               >
                 <option value="kampus">Perguruan tinggi</option>
