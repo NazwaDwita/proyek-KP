@@ -75,6 +75,27 @@ body {
 }
 
 /* Navigasi pill / folder tab */
+.nav-wrapper {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+.nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--gading);
+  cursor: pointer;
+}
+.nav-hamburger svg {
+  width: 20px;
+  height: 20px;
+}
 .nav-pill {
   display: flex;
   gap: 6px;
@@ -85,7 +106,6 @@ body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   flex-wrap: wrap;
-  margin-bottom: 2.5rem;
 }
 .nav-pill a {
   display: flex;
@@ -388,5 +408,33 @@ select.form-input option {
   }
   .item-statistik:nth-child(2n) {
     border-right: none;
+  }
+
+  /* Nav-pill: sembunyikan menu penuh di layar sempit, ganti dengan
+     tombol hamburger yang membuka dropdown panel dari kanan atas. */
+  .nav-hamburger {
+    display: flex;
+  }
+  .nav-pill {
+    display: none;
+  }
+  .nav-pill.nav-pill-terbuka {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: min(280px, 80vw);
+    border-radius: 16px;
+    padding: 10px;
+    z-index: 20;
+    background: rgba(15, 46, 40, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+  .nav-pill.nav-pill-terbuka a {
+    justify-content: flex-start;
+    border-radius: 10px;
+    padding: 12px 14px;
   }
 }
