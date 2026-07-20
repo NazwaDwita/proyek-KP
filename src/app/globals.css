@@ -332,6 +332,50 @@ select.form-input option {
   cursor: not-allowed;
 }
 
+/* Halaman Info & Ketentuan */
+.info-section {
+  margin-bottom: 2rem;
+}
+.info-section:last-child {
+  margin-bottom: 0;
+}
+.info-section h2 {
+  font-family: var(--font-judul);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--emas-terang);
+  margin: 0 0 0.75rem;
+}
+.info-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--gading);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.info-list li {
+  margin-bottom: 6px;
+}
+.info-teks {
+  font-size: 14px;
+  color: var(--teks-muted);
+  line-height: 1.75;
+  margin: 0 0 0.5rem;
+}
+.info-placeholder {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px dashed rgba(212, 169, 79, 0.5);
+  background: rgba(212, 169, 79, 0.06);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--emas-terang);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
 @media (max-width: 640px) {
   h1.judul-hero {
     font-size: 26px;
