@@ -75,6 +75,27 @@ body {
 }
 
 /* Navigasi pill / folder tab */
+.nav-wrapper {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+.nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--gading);
+  cursor: pointer;
+}
+.nav-hamburger svg {
+  width: 20px;
+  height: 20px;
+}
 .nav-pill {
   display: flex;
   gap: 6px;
@@ -85,7 +106,6 @@ body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   flex-wrap: wrap;
-  margin-bottom: 2.5rem;
 }
 .nav-pill a {
   display: flex;
@@ -388,5 +408,174 @@ select.form-input option {
   }
   .item-statistik:nth-child(2n) {
     border-right: none;
+  }
+
+  /* Nav-pill: sembunyikan menu penuh di layar sempit, ganti dengan
+     tombol hamburger yang membuka dropdown panel dari kanan atas. */
+  .nav-hamburger {
+    display: flex;
+  }
+  .nav-pill {
+    display: none;
+  }
+  .nav-pill.nav-pill-terbuka {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: min(280px, 80vw);
+    border-radius: 16px;
+    padding: 10px;
+    z-index: 20;
+    background: rgba(15, 46, 40, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+  .nav-pill.nav-pill-terbuka a {
+    justify-content: flex-start;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+}
+
+/* Dashboard admin: tabel padat */
+.tabel-admin {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  table-layout: fixed;
+}
+.tabel-admin th {
+  text-align: left;
+  padding: 10px 12px;
+  color: var(--teks-muted);
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+.tabel-admin td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  word-wrap: break-word;
+}
+/* Lebar kolom proporsional supaya nama bidang yang panjang bisa
+   melipat ke baris baru, bukan memaksa tabel melebar dan perlu
+   digeser kanan-kiri. */
+.tabel-admin th:nth-child(1),
+.tabel-admin td:nth-child(1) {
+  width: 12%;
+}
+.tabel-admin th:nth-child(2),
+.tabel-admin td:nth-child(2) {
+  width: 16%;
+}
+.tabel-admin th:nth-child(3),
+.tabel-admin td:nth-child(3) {
+  width: 28%;
+}
+.tabel-admin th:nth-child(4),
+.tabel-admin td:nth-child(4) {
+  width: 20%;
+}
+.tabel-admin th:nth-child(5),
+.tabel-admin td:nth-child(5) {
+  width: 14%;
+}
+.tabel-admin th:nth-child(6),
+.tabel-admin td:nth-child(6) {
+  width: 10%;
+}
+.tabel-admin tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tombol-kecil {
+  padding: 7px 14px;
+  font-size: 12.5px;
+}
+
+/* Modal detail pendaftar */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 50;
+}
+.modal-isi {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(15, 46, 40, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.modal-tutup {
+  background: none;
+  border: none;
+  color: var(--gading);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 1.25rem 0;
+  font-size: 13.5px;
+}
+.modal-grid p {
+  margin: 2px 0 0;
+}
+@media (max-width: 480px) {
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tombol ikon bulat (refresh, keluar) */
+.tombol-ikon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--gading);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tombol-ikon:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.tombol-ikon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.tombol-ikon svg {
+  width: 18px;
+  height: 18px;
+}
+.tombol-ikon.memuat svg {
+  animation: putar-ikon 0.8s linear infinite;
+}
+@keyframes putar-ikon {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

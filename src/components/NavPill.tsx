@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const menuItems = [
   {
@@ -60,21 +61,55 @@ const menuItems = [
 
 export default function NavPill() {
   const pathname = usePathname();
+  const [terbuka, setTerbuka] = useState(false);
+  const [pathnameSebelumnya, setPathnameSebelumnya] = useState(pathname);
+
+  // Tutup menu otomatis setiap kali pindah halaman. Ditulis sebagai
+  // penyesuaian state saat render (bukan di useEffect terpisah) —
+  // ini pola yang direkomendasikan React untuk "reset state ketika
+  // sebuah nilai berubah", supaya tidak memicu render tambahan yang
+  // tidak perlu.
+  if (pathname !== pathnameSebelumnya) {
+    setPathnameSebelumnya(pathname);
+    setTerbuka(false);
+  }
 
   return (
-    <nav className="nav-pill">
-      {menuItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={pathname === item.href ? "aktif" : ""}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            {item.icon}
-          </svg>
-          {item.label}
-        </Link>
-      ))}
-    </nav>
+    <div className="nav-wrapper">
+      <button
+        type="button"
+        className="nav-hamburger"
+        aria-label={terbuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
+        aria-expanded={terbuka}
+        onClick={() => setTerbuka((t) => !t)}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          {terbuka ? (
+            <path d="M18 6L6 18M6 6l12 12" />
+          ) : (
+            <>
+              <path d="M3 6h18" />
+              <path d="M3 12h18" />
+              <path d="M3 18h18" />
+            </>
+          )}
+        </svg>
+      </button>
+
+      <nav className={`nav-pill${terbuka ? " nav-pill-terbuka" : ""}`}>
+        {menuItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={pathname === item.href ? "aktif" : ""}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              {item.icon}
+            </svg>
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+    </div>
   );
 }

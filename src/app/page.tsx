@@ -20,16 +20,14 @@ export default function BerandaPage() {
             pendaftaranmu tanpa perlu bolak-balik ke kantor atau menghubungi
             staf secara personal.
           </p>
-          <Link href="/daftar" className="tombol">
-            Mulai daftar
-          </Link>
-          <Link
-            href="/statistik"
-            className="tombol sekunder"
-            style={{ marginLeft: 10 }}
-          >
-            Lihat statistik peserta
-          </Link>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            <Link href="/daftar" className="tombol">
+              Mulai daftar
+            </Link>
+            <Link href="/statistik" className="tombol sekunder">
+              Lihat statistik peserta
+            </Link>
+          </div>
         </div>
 
         <p className="keterangan-halaman">
