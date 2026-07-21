@@ -409,9 +409,6 @@ select.form-input option {
   .item-statistik:nth-child(2n) {
     border-right: none;
   }
-
-  /* Nav-pill: sembunyikan menu penuh di layar sempit, ganti dengan
-     tombol hamburger yang membuka dropdown panel dari kanan atas. */
   .nav-hamburger {
     display: flex;
   }
@@ -438,8 +435,6 @@ select.form-input option {
     padding: 12px 14px;
   }
 }
-
-/* Dashboard admin: tabel padat */
 .tabel-admin {
   width: 100%;
   border-collapse: collapse;
@@ -461,9 +456,6 @@ select.form-input option {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   word-wrap: break-word;
 }
-/* Lebar kolom proporsional supaya nama bidang yang panjang bisa
-   melipat ke baris baru, bukan memaksa tabel melebar dan perlu
-   digeser kanan-kiri. */
 .tabel-admin th:nth-child(1),
 .tabel-admin td:nth-child(1) {
   width: 12%;
@@ -542,8 +534,6 @@ select.form-input option {
     grid-template-columns: 1fr;
   }
 }
-
-/* Tombol ikon bulat (refresh, keluar) */
 .tombol-ikon {
   display: inline-flex;
   align-items: center;
