@@ -24,7 +24,7 @@ type Pendaftar = {
   asal_institusi: string;
   jenis_institusi: string;
   jurusan_prodi: string | null;
-  bidang_id: string;
+  bidang_id: string | null;
   bidang: { nama: string } | null;
   tanggal_mulai: string;
   tanggal_selesai: string;
@@ -142,7 +142,6 @@ export default function AdminDashboardPage() {
       }
     }, 30000);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ditolakAkses, memuat]);
 
   const daftarTersaring = useMemo(() => {
@@ -366,7 +365,7 @@ function ModalDetail({
   onSelesai: () => void;
 }) {
   const [catatan, setCatatan] = useState(pendaftar.catatan_admin ?? "");
-  const [bidangId, setBidangId] = useState(pendaftar.bidang_id);
+  const [bidangId, setBidangId] = useState(pendaftar.bidang_id ?? "");
   const [menyimpan, setMenyimpan] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
   const [dokumen, setDokumen] = useState<Dokumen[]>([]);
@@ -399,6 +398,10 @@ function ModalDetail({
       setPesanError("Catatan wajib diisi kalau menolak pendaftaran.");
       return;
     }
+    if (statusBaru === "diverifikasi" && !bidangId) {
+      setPesanError("Pilih bidang penempatan dulu sebelum memverifikasi.");
+      return;
+    }
     setMenyimpan(true);
     setPesanError(null);
 
@@ -409,7 +412,7 @@ function ModalDetail({
       .update({
         status: statusBaru,
         catatan_admin: catatan.trim() || null,
-        bidang_id: bidangId,
+        bidang_id: bidangId || null,
         diverifikasi_oleh: sesi.session?.user.id ?? null,
         diverifikasi_pada: new Date().toISOString(),
       })
@@ -517,6 +520,9 @@ function ModalDetail({
             value={bidangId}
             onChange={(e) => setBidangId(e.target.value)}
           >
+            <option value="" disabled>
+              Belum ditentukan
+            </option>
             {daftarBidang.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.nama}

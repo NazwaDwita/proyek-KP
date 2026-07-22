@@ -3,7 +3,7 @@ import "./globals.css";
 import { ModalMasukProvider } from "@/lib/ModalMasukContext";
 
 export const metadata: Metadata = {
-  title: "Portal Magang Diskominfotik Provinsi Riau",
+  title: "SIMAKRI — Sistem Magang Diskominfotik Provinsi Riau",
   description:
     "Sistem pendaftaran dan informasi magang Dinas Komunikasi, Informatika dan Statistik Provinsi Riau",
 };

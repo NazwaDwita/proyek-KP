@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import HeaderSticky from "@/components/HeaderSticky";
 import { supabase } from "@/lib/supabase";
 import { useSesi } from "@/lib/useSesi";
 import { useModalMasuk } from "@/lib/ModalMasukContext";
-
-type Bidang = { id: string; nama: string };
 
 const UKURAN_MAKS_BYTE = 5 * 1024 * 1024; 
 const TIPE_FILE_DIIZINKAN = ["application/pdf"];
@@ -38,8 +36,6 @@ const DAFTAR_SMK_PEKANBARU = [
 export default function DaftarPage() {
   const { sesi, memuat } = useSesi();
   const { bukaModalMasuk } = useModalMasuk();
-  const [daftarBidang, setDaftarBidang] = useState<Bidang[]>([]);
-  const [errorBidang, setErrorBidang] = useState<string | null>(null);
   const [mengirim, setMengirim] = useState(false);
   const [pesanGagal, setPesanGagal] = useState<string | null>(null);
   const [nomorPendaftaran, setNomorPendaftaran] = useState<string | null>(null);
@@ -52,7 +48,6 @@ export default function DaftarPage() {
     asal_institusi: "",
     asal_institusi_lainnya: "",
     jurusan_prodi: "",
-    bidang_id: "",
     tanggal_mulai: "",
     tanggal_selesai: "",
   });
@@ -63,46 +58,6 @@ export default function DaftarPage() {
     form.jenis_institusi === "kampus"
       ? DAFTAR_KAMPUS_PEKANBARU
       : DAFTAR_SMK_PEKANBARU;
-
-  useEffect(() => {
-    if (sesi?.user.email) {
-      setForm((f) => (f.email ? f : { ...f, email: sesi.user.email! }));
-    }
-  }, [sesi]);
-
-  useEffect(() => {
-    let komponenMasihTerpasang = true;
-
-    async function muatBidang() {
-      try {
-        const { data, error } = await supabase
-          .from("bidang")
-          .select("id, nama")
-          .eq("aktif", true)
-          .order("nama");
-
-        if (!komponenMasihTerpasang) return;
-
-        if (error) {
-          console.error("Gagal memuat daftar bidang:", error);
-          setErrorBidang(
-            "Gagal memuat daftar bidang. Coba muat ulang halaman ini, atau hubungi staf kalau masih gagal."
-          );
-          return;
-        }
-        setDaftarBidang(data ?? []);
-      } catch (err) {
-        if (!komponenMasihTerpasang) return;
-        console.error("Gagal terhubung ke server saat memuat bidang:", err);
-        setErrorBidang("Terjadi kesalahan tak terduga saat memuat bidang.");
-      }
-    }
-
-    muatBidang();
-    return () => {
-      komponenMasihTerpasang = false;
-    };
-  }, []);
 
   function ubahField(field: keyof typeof form, nilai: string) {
     setForm((f) => ({ ...f, [field]: nilai }));
@@ -131,6 +86,10 @@ export default function DaftarPage() {
     e.preventDefault();
     setPesanGagal(null);
 
+    if (!sesi) {
+      setPesanGagal("Sesi kamu sudah berakhir, silakan masuk lagi.");
+      return;
+    }
     if (!fileSurat) {
       setErrorFile("Surat pengantar wajib diunggah.");
       return;
@@ -156,12 +115,11 @@ export default function DaftarPage() {
         "daftar_magang",
         {
           p_nama_lengkap: form.nama_lengkap,
-          p_email: form.email,
+          p_email: form.email || sesi.user.email,
           p_no_hp: form.no_hp,
           p_jenis_institusi: form.jenis_institusi,
           p_asal_institusi: asalInstitusiFinal,
           p_jurusan_prodi: form.jurusan_prodi || null,
-          p_bidang_id: form.bidang_id,
           p_tanggal_mulai: form.tanggal_mulai,
           p_tanggal_selesai: form.tanggal_selesai,
         }
@@ -303,7 +261,7 @@ export default function DaftarPage() {
                 type="email"
                 className="form-input"
                 required
-                value={form.email}
+                value={form.email || sesi.user.email || ""}
                 onChange={(e) => ubahField("email", e.target.value)}
               />
             </div>
@@ -382,27 +340,6 @@ export default function DaftarPage() {
                 onChange={(e) => ubahField("jurusan_prodi", e.target.value)}
               />
             </div>
-          </div>
-
-          <div className="form-grup">
-            <label htmlFor="bidang_id">Bidang yang diminati</label>
-            <select
-              id="bidang_id"
-              className="form-input"
-              required
-              value={form.bidang_id}
-              onChange={(e) => ubahField("bidang_id", e.target.value)}
-            >
-              <option value="" disabled>
-                Pilih salah satu bidang
-              </option>
-              {daftarBidang.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.nama}
-                </option>
-              ))}
-            </select>
-            {errorBidang && <p className="form-error-teks">{errorBidang}</p>}
           </div>
 
           <div className="form-baris">

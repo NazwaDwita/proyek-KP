@@ -215,8 +215,8 @@ function BerandaSudahLogin({ userId, email }: { userId: string; email: string })
                 <strong>{p.nomor_pendaftaran}</strong>
               </div>
               <div className="hasil-status-baris">
-                <span className="hasil-status-label">Bidang diminati</span>
-                <span>{p.bidang?.nama ?? "-"}</span>
+                <span className="hasil-status-label">Bidang penempatan</span>
+                <span>{p.bidang?.nama ?? "Menunggu penempatan"}</span>
               </div>
               <div className="hasil-status-baris">
                 <span className="hasil-status-label">Periode magang</span>

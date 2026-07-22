@@ -1,12 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --hijau-tua: #0f2e28;
-  --hijau-sekunder: #1a4a3e;
-  --emas: #d4a94f;
-  --emas-terang: #e8c876;
-  --gading: #f7f5f0;
-  --teks-muted: rgba(247, 245, 240, 0.65);
+  --dasar: #f7f3e8;
+  --navy: #0f2a4a;
+  --navy-sekunder: #1c3f66;
+  --emas: #c9962f;
+  --emas-tua: #8a611c;
+  --teks-utama: #1c2b3d;
+  --teks-muted: rgba(28, 43, 61, 0.62);
+  --teks-terang: #f7f3e8;
+  --teks-muted-terang: rgba(247, 243, 232, 0.65);
   --radius: 16px;
   --font-judul: "Fraunces", Georgia, serif;
   --font-teks: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
@@ -19,18 +22,18 @@
 body {
   margin: 0;
   font-family: var(--font-teks);
-  background: var(--hijau-tua);
-  color: var(--gading);
+  background: var(--dasar);
+  color: var(--teks-utama);
 }
 
 .halaman {
   min-height: 100vh;
   background-image: linear-gradient(
       180deg,
-      rgba(15, 46, 40, 0.88),
-      rgba(15, 46, 40, 0.94)
+      rgba(247, 243, 232, 0.9),
+      rgba(247, 243, 232, 0.96)
     ),
-    url("/assets/motif.svg");
+    url("/assets/motif-terang.svg");
   background-size: cover, 220px;
   background-position: center, center;
   background-repeat: no-repeat, repeat;
@@ -54,7 +57,7 @@ body {
   height: 30px;
   border-radius: 50%;
   background: var(--emas);
-  color: var(--hijau-tua);
+  color: var(--navy);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,7 +72,7 @@ body {
 }
 .brand-teks strong {
   display: block;
-  color: var(--gading);
+  color: var(--navy);
   font-size: 13px;
   font-weight: 500;
 }
@@ -80,8 +83,8 @@ body {
   padding: 4px;
   margin: 1.25rem 0 1.5rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 42, 74, 0.05);
+  border: 1px solid rgba(15, 42, 74, 0.12);
 }
 .toggle-mode button {
   flex: 1;
@@ -106,13 +109,13 @@ body {
   flex-shrink: 0;
 }
 .toggle-mode button:hover:not(.aktif) {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--gading);
+  background: rgba(15, 42, 74, 0.06);
+  color: var(--teks-utama);
 }
 .toggle-mode button.aktif {
   background: var(--emas);
-  color: var(--hijau-tua);
-  box-shadow: 0 2px 10px rgba(212, 169, 79, 0.35);
+  color: var(--navy);
+  box-shadow: 0 2px 10px rgba(201, 150, 47, 0.35);
 }
 
 .header-baris-atas {
@@ -133,14 +136,14 @@ body {
   gap: 10px;
   font-size: 13px;
   text-decoration: none;
-  color: var(--gading);
+  color: var(--teks-utama);
 }
 
 button.akun-indikator {
   padding: 8px 16px;
   border-radius: 999px;
   background: var(--emas);
-  color: var(--hijau-tua);
+  color: var(--navy);
   font-weight: 500;
   border: none;
   cursor: pointer;
@@ -159,14 +162,14 @@ button.akun-indikator {
 .akun-indikator-keluar {
   padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(15, 42, 74, 0.25);
   background: transparent;
-  color: var(--gading);
+  color: var(--teks-utama);
   font-size: 12.5px;
   cursor: pointer;
 }
 .akun-indikator-keluar:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(15, 42, 74, 0.06);
 }
 
 @media (max-width: 640px) {
@@ -174,16 +177,10 @@ button.akun-indikator {
     display: none;
   }
 }
-
-/* Navigasi pill / folder tab — ini yang sticky, tetap nempel di atas
-   saat halaman di-scroll. top:0 (bukan pakai offset top:12px) supaya
-   backgroundnya nutup rapat sampai ke ujung atas viewport, tidak ada
-   celah yang bikin konten di belakangnya keliatan "bolong". */
 .nav-wrapper {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: var(--hijau-tua);
   padding-top: 8px;
   padding-bottom: 8px;
   margin-bottom: 1rem;
@@ -196,10 +193,12 @@ button.akun-indikator {
   height: 44px;
   margin-left: auto;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--gading);
+  background: rgba(15, 42, 74, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--teks-terang);
   cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .nav-hamburger svg {
   width: 20px;
@@ -210,8 +209,8 @@ button.akun-indikator {
   gap: 6px;
   padding: 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 42, 74, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   flex-wrap: wrap;
@@ -225,26 +224,27 @@ button.akun-indikator {
   text-decoration: none;
   font-size: 12px;
   font-weight: 500;
-  color: var(--teks-muted);
+  color: var(--teks-muted-terang);
   transition: background 0.15s ease, color 0.15s ease;
 }
 .nav-pill a:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--gading);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--teks-terang);
 }
 .nav-pill a.aktif {
   background: var(--emas);
-  color: var(--hijau-tua);
+  color: var(--navy);
 }
 .nav-pill svg {
   width: 16px;
   height: 16px;
 }
 
-/* Panel glass utama */
+/* Panel glass utama — kartu terang yang sedikit lebih putih dari latar
+   halaman, supaya kelihatan "terangkat" di atas motif belakangnya. */
 .panel-glass {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(15, 42, 74, 0.08);
   border-radius: var(--radius);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -255,7 +255,7 @@ button.akun-indikator {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 12px;
-  color: var(--emas-terang);
+  color: var(--emas-tua);
   margin: 0 0 0.75rem;
 }
 
@@ -283,7 +283,7 @@ p.sub-hero {
   padding: 12px 22px;
   border-radius: 999px;
   background: var(--emas);
-  color: var(--hijau-tua);
+  color: var(--navy);
   font-weight: 500;
   font-size: 14px;
   text-decoration: none;
@@ -292,8 +292,8 @@ p.sub-hero {
 }
 .tombol.sekunder {
   background: transparent;
-  color: var(--gading);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--teks-utama);
+  border: 1px solid rgba(15, 42, 74, 0.25);
 }
 
 /* Halaman statistik: angka besar, tanpa card terpisah */
@@ -305,8 +305,8 @@ p.sub-hero {
 }
 .item-statistik {
   padding: 1.5rem 1rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-right: 1px solid rgba(15, 42, 74, 0.14);
+  border-top: 1px solid rgba(15, 42, 74, 0.14);
 }
 .item-statistik:nth-child(4n) {
   border-right: none;
@@ -315,7 +315,7 @@ p.sub-hero {
   font-family: var(--font-judul);
   font-size: 40px;
   font-weight: 600;
-  color: var(--emas-terang);
+  color: var(--emas-tua);
   line-height: 1;
 }
 .label-statistik {
@@ -332,7 +332,7 @@ p.sub-hero {
 
 /* Form pendaftaran */
 input, select, textarea {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 .form-grup {
@@ -354,23 +354,23 @@ input, select, textarea {
   width: 100%;
   padding: 11px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--gading);
+  border: 1px solid rgba(15, 42, 74, 0.18);
+  background: #ffffff;
+  color: var(--teks-utama);
   font-family: var(--font-teks);
   font-size: 14px;
 }
 .form-input::placeholder {
-  color: rgba(247, 245, 240, 0.35);
+  color: rgba(28, 43, 61, 0.35);
 }
 .form-input:focus {
   outline: none;
   border-color: var(--emas);
-  background: rgba(255, 255, 255, 0.08);
+  background: #ffffff;
 }
 select.form-input option {
-  background: var(--hijau-tua);
-  color: var(--gading);
+  background: #ffffff;
+  color: var(--teks-utama);
 }
 
 .form-baris {
@@ -386,17 +386,17 @@ select.form-input option {
 
 .form-error-teks {
   font-size: 12px;
-  color: #f0a0a0;
+  color: #b23b3b;
   margin-top: 6px;
 }
 
 .form-pesan-gagal {
-  border: 1px solid rgba(240, 120, 120, 0.4);
-  background: rgba(240, 120, 120, 0.08);
+  border: 1px solid rgba(178, 59, 59, 0.35);
+  background: rgba(178, 59, 59, 0.08);
   border-radius: 10px;
   padding: 14px 16px;
   font-size: 13px;
-  color: #f5b8b8;
+  color: #9c3232;
   margin-bottom: 1.5rem;
 }
 
@@ -409,12 +409,12 @@ select.form-input option {
   margin: 1.25rem 0;
   padding: 16px 28px;
   border-radius: 12px;
-  border: 1px solid rgba(212, 169, 79, 0.4);
-  background: rgba(212, 169, 79, 0.08);
+  border: 1px solid rgba(201, 150, 47, 0.4);
+  background: rgba(201, 150, 47, 0.08);
   font-family: var(--font-judul);
   font-size: 24px;
   font-weight: 600;
-  color: var(--emas-terang);
+  color: var(--emas-tua);
   letter-spacing: 0.04em;
 }
 
@@ -426,19 +426,19 @@ select.form-input option {
   font-weight: 500;
 }
 .status-menunggu {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(15, 42, 74, 0.06);
   color: var(--teks-muted);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(15, 42, 74, 0.2);
 }
 .status-diverifikasi {
-  background: rgba(212, 169, 79, 0.12);
-  color: var(--emas-terang);
-  border: 1px solid rgba(212, 169, 79, 0.4);
+  background: rgba(201, 150, 47, 0.12);
+  color: var(--emas-tua);
+  border: 1px solid rgba(201, 150, 47, 0.4);
 }
 .status-ditolak {
-  background: rgba(240, 120, 120, 0.08);
-  color: #f5b8b8;
-  border: 1px solid rgba(240, 120, 120, 0.4);
+  background: rgba(178, 59, 59, 0.08);
+  color: #9c3232;
+  border: 1px solid rgba(178, 59, 59, 0.35);
 }
 
 .hasil-status-baris {
@@ -446,7 +446,7 @@ select.form-input option {
   justify-content: space-between;
   align-items: baseline;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(15, 42, 74, 0.12);
   font-size: 14px;
 }
 .hasil-status-baris:last-child {
@@ -472,13 +472,13 @@ select.form-input option {
   font-family: var(--font-judul);
   font-size: 19px;
   font-weight: 600;
-  color: var(--emas-terang);
+  color: var(--emas-tua);
   margin: 0 0 0.75rem;
 }
 .info-list {
   margin: 0;
   padding-left: 1.2rem;
-  color: var(--gading);
+  color: var(--teks-utama);
   font-size: 14px;
   line-height: 1.75;
 }
@@ -495,12 +495,12 @@ select.form-input option {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  border: 1px dashed rgba(212, 169, 79, 0.5);
-  background: rgba(212, 169, 79, 0.06);
+  border: 1px dashed rgba(201, 150, 47, 0.5);
+  background: rgba(201, 150, 47, 0.06);
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 13px;
-  color: var(--emas-terang);
+  color: var(--emas-tua);
   margin-top: 10px;
   line-height: 1.6;
 }
@@ -513,7 +513,7 @@ select.form-input option {
     padding: 1.5rem;
   }
   .item-statistik:nth-child(4n) {
-    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    border-right: 1px solid rgba(15, 42, 74, 0.14);
   }
   .item-statistik:nth-child(2n) {
     border-right: none;
@@ -534,9 +534,9 @@ select.form-input option {
     border-radius: 16px;
     padding: 10px;
     z-index: 20;
-    background: rgba(15, 46, 40, 0.97);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    background: rgba(15, 42, 74, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
   }
   .nav-pill.nav-pill-terbuka a {
     justify-content: flex-start;
@@ -553,20 +553,20 @@ select.form-input option {
 .tabel-admin th {
   text-align: left;
   padding: 10px 12px;
-  color: var(--teks-muted);
+  color: var(--teks-muted-terang);
   font-weight: 500;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
   position: sticky;
   top: 0;
-  background: rgba(15, 46, 40, 0.98);
+  background: var(--navy);
   z-index: 5;
 }
 .tabel-admin td {
   padding: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(15, 42, 74, 0.1);
   word-wrap: break-word;
 }
 .tabel-admin th:nth-child(1),
@@ -594,7 +594,7 @@ select.form-input option {
   width: 10%;
 }
 .tabel-admin tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(15, 42, 74, 0.04);
 }
 
 .tombol-kecil {
@@ -602,11 +602,11 @@ select.form-input option {
   font-size: 12.5px;
 }
 
-/* Modal detail pendaftar */
+/* Modal detail pendaftar — kartu terang, senada dengan panel-glass */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(15, 20, 30, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -617,16 +617,16 @@ select.form-input option {
   width: min(560px, 100%);
   max-height: 90vh;
   overflow-y: auto;
-  background: rgba(15, 46, 40, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #fdfbf5;
+  border: 1px solid rgba(15, 42, 74, 0.12);
   border-radius: 16px;
   padding: 1.75rem;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 60px rgba(15, 20, 30, 0.35);
 }
 .modal-tutup {
   background: none;
   border: none;
-  color: var(--gading);
+  color: var(--teks-utama);
   font-size: 24px;
   line-height: 1;
   cursor: pointer;
@@ -654,14 +654,14 @@ select.form-input option {
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: var(--gading);
+  background: rgba(15, 42, 74, 0.06);
+  border: 1px solid rgba(15, 42, 74, 0.16);
+  color: var(--teks-utama);
   cursor: pointer;
   flex-shrink: 0;
 }
 .tombol-ikon:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 42, 74, 0.1);
 }
 .tombol-ikon:disabled {
   opacity: 0.5;

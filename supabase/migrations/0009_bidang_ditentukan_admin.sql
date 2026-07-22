@@ -1,29 +1,7 @@
-alter table pendaftar add column if not exists user_id uuid references auth.users(id);
-
-create index if not exists idx_pendaftar_user on pendaftar(user_id);
-drop policy if exists "pendaftar_insert_publik" on pendaftar;
-
-create policy "pendaftar_insert_pemilik" on pendaftar
-  for insert
-  with check (
-    auth.uid() is not null
-    and user_id = auth.uid()
-    and status = 'menunggu'
-    and diverifikasi_oleh is null
-  );
-create policy "pendaftar_select_pemilik" on pendaftar
-  for select using (auth.uid() = user_id);
-n_pendaftar;
-
-create policy "dokumen_insert_pemilik" on dokumen_pendaftar
-  for insert
-  with check (
-    exists (
-      select 1 from pendaftar p
-      where p.id = dokumen_pendaftar.pendaftar_id
-        and p.user_id = auth.uid()
-    )
-  );
+alter table pendaftar alter column bidang_id drop not null;
+drop function if exists daftar_magang(
+  text, text, text, text, text, text, uuid, date, date
+);
 
 create or replace function daftar_magang(
   p_nama_lengkap text,
@@ -32,7 +10,6 @@ create or replace function daftar_magang(
   p_jenis_institusi text,
   p_asal_institusi text,
   p_jurusan_prodi text,
-  p_bidang_id uuid,
   p_tanggal_mulai date,
   p_tanggal_selesai date
 )
@@ -56,13 +33,42 @@ begin
 
   insert into pendaftar (
     user_id, nama_lengkap, email, no_hp, jenis_institusi, asal_institusi,
-    jurusan_prodi, bidang_id, tanggal_mulai, tanggal_selesai
+    jurusan_prodi, tanggal_mulai, tanggal_selesai
   ) values (
     v_user_id, p_nama_lengkap, p_email, p_no_hp, p_jenis_institusi, p_asal_institusi,
-    p_jurusan_prodi, p_bidang_id, p_tanggal_mulai, p_tanggal_selesai
+    p_jurusan_prodi, p_tanggal_mulai, p_tanggal_selesai
   )
   returning pendaftar.id, pendaftar.nomor_pendaftaran into v_id, v_nomor;
 
   return query select v_id, v_nomor;
 end;
 $$;
+
+grant execute on function daftar_magang(
+  text, text, text, text, text, text, date, date
+) to authenticated;
+
+create or replace function cek_status_pendaftaran(
+  p_nomor_pendaftaran text,
+  p_email text
+)
+returns table (
+  nomor_pendaftaran text,
+  nama_lengkap text,
+  status status_pendaftaran,
+  catatan_admin text,
+  bidang_nama text,
+  dibuat_pada timestamptz
+) as $$
+  select
+    p.nomor_pendaftaran,
+    p.nama_lengkap,
+    p.status,
+    p.catatan_admin,
+    b.nama,
+    p.dibuat_pada
+  from pendaftar p
+  left join bidang b on b.id = p.bidang_id
+  where p.nomor_pendaftaran = p_nomor_pendaftaran
+    and lower(p.email) = lower(p_email);
+$$ language sql stable security definer;

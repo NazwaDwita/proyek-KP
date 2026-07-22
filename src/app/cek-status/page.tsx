@@ -9,7 +9,7 @@ type HasilStatus = {
   nama_lengkap: string;
   status: "menunggu" | "diverifikasi" | "ditolak";
   catatan_admin: string | null;
-  bidang_nama: string;
+  bidang_nama: string | null;
   dibuat_pada: string;
 };
 
@@ -138,8 +138,8 @@ export default function CekStatusPage() {
                   <span>{hasil.nama_lengkap}</span>
                 </div>
                 <div className="hasil-status-baris">
-                  <span className="hasil-status-label">Bidang diminati</span>
-                  <span>{hasil.bidang_nama}</span>
+                  <span className="hasil-status-label">Bidang penempatan</span>
+                  <span>{hasil.bidang_nama ?? "Menunggu penempatan"}</span>
                 </div>
                 <div className="hasil-status-baris">
                   <span className="hasil-status-label">Tanggal daftar</span>
