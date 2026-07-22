@@ -197,8 +197,8 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="halaman">
-      <div className="bungkus" style={{ maxWidth: 1400 }}>
+    <div className="halaman halaman-fit">
+      <div className="bungkus bungkus-fit" style={{ maxWidth: 1400 }}>
         <div
           style={{
             display: "flex",
@@ -246,7 +246,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="panel-glass">
+        <div className="panel-glass panel-scroll">
           {errorMuat && <div className="form-pesan-gagal">{errorMuat}</div>}
 
           <div
@@ -289,7 +289,7 @@ export default function AdminDashboardPage() {
             </span>
           </div>
 
-          <div style={{ overflowX: "auto" }}>
+          <div className="tabel-scroll-area">
             <table className="tabel-admin">
               <thead>
                 <tr>

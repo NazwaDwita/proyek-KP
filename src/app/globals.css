@@ -43,6 +43,14 @@ body {
 }
 
 /* Header + brand */
+.header-sticky {
+  position: sticky;
+  top: 12px;
+  z-index: 30;
+  background: var(--hijau-tua);
+  padding-top: 4px;
+  padding-bottom: 2px;
+}
 .brand {
   display: flex;
   align-items: center;
@@ -450,6 +458,10 @@ select.form-input option {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  position: sticky;
+  top: 0;
+  background: rgba(15, 46, 40, 0.98);
+  z-index: 5;
 }
 .tabel-admin td {
   padding: 12px;
@@ -568,4 +580,31 @@ select.form-input option {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Dashboard admin: hanya area tabel yang scroll, header & filter tetap
+   diam di tempat (bukan sticky biasa, tapi "dikunci" dalam tinggi
+   viewport supaya tidak perlu scroll seluruh halaman). */
+.halaman-fit {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.bungkus-fit {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.panel-scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.tabel-scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }

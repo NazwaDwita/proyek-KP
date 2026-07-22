@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
-import Brand from "@/components/Brand";
-import NavPill from "@/components/NavPill";
+import HeaderSticky from "@/components/HeaderSticky";
 import { supabase } from "@/lib/supabase";
 
 type Bidang = { id: string; nama: string };
@@ -207,8 +206,7 @@ export default function DaftarPage() {
     return (
       <div className="halaman">
         <div className="bungkus">
-          <Brand />
-          <NavPill />
+          <HeaderSticky />
           <div className="panel-glass panel-sukses">
             <p className="eyebrow">Pendaftaran berhasil</p>
             <h1 className="judul-hero" style={{ fontSize: 24, maxWidth: "none" }}>
@@ -228,8 +226,7 @@ export default function DaftarPage() {
   return (
     <div className="halaman">
       <div className="bungkus">
-        <Brand />
-        <NavPill />
+        <HeaderSticky />
 
         <form className="panel-glass" onSubmit={kirimForm}>
           <p className="eyebrow">Formulir pendaftaran</p>

@@ -1,5 +1,4 @@
-import Brand from "@/components/Brand";
-import NavPill from "@/components/NavPill";
+import HeaderSticky from "@/components/HeaderSticky";
 
 const dataStatistik = [
   { angka: 12, label: "Bidang Aplikasi & Informatika" },
@@ -13,8 +12,7 @@ export default function StatistikPage() {
   return (
     <div className="halaman">
       <div className="bungkus">
-        <Brand />
-        <NavPill />
+        <HeaderSticky />
 
         <div className="panel-glass">
           <p className="eyebrow">Data per hari ini</p>
