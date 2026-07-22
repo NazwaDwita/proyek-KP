@@ -1,38 +1,36 @@
 import Link from "next/link";
-import Brand from "@/components/Brand";
-import NavPill from "@/components/NavPill";
+import HeaderSticky from "@/components/HeaderSticky";
 
-export default function BerandaPage() {
+export default function Beranda() {
   return (
     <div className="halaman">
       <div className="bungkus">
-        <Brand />
-        <NavPill />
+        <HeaderSticky />
 
         <div className="panel-glass">
-          <p className="eyebrow">Bidang Aplikasi Informatika (Aptika)</p>
+          <p className="eyebrow">Portal magang</p>
           <h1 className="judul-hero">
-            Pendaftaran magang dan Kerja Praktek, lebih ringkas dari
-            sebelumnya
+            Magang di Diskominfotik Provinsi Riau
           </h1>
           <p className="sub-hero">
-            Daftar secara daring, unggah surat pengantar, dan pantau status
-            pendaftaranmu tanpa perlu bolak-balik ke kantor atau menghubungi
-            staf secara personal.
+            Daftar kerja praktek (KP) atau praktik kerja lapangan (PKL) secara
+            online. Pantau status pendaftaran kamu kapan saja setelah mengisi
+            formulir.
           </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <Link href="/daftar" className="tombol">
-              Mulai daftar
+              Daftar magang
             </Link>
-            <Link href="/statistik" className="tombol sekunder">
-              Lihat statistik peserta
+            <Link href="/info" className="tombol sekunder">
+              Info dan ketentuan
             </Link>
           </div>
         </div>
 
         <p className="keterangan-halaman">
-          Prototipe tampilan &mdash; konten dan data pada halaman ini masih
-          contoh sementara.
+          Sudah mendaftar sebelumnya? Cek status pendaftaran kamu melalui
+          menu <strong>Cek status</strong> di atas.
         </p>
       </div>
     </div>

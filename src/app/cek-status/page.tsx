@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import Brand from "@/components/Brand";
-import NavPill from "@/components/NavPill";
+import HeaderSticky from "@/components/HeaderSticky";
 import { supabase } from "@/lib/supabase";
 
 type HasilStatus = {
@@ -70,8 +69,7 @@ export default function CekStatusPage() {
   return (
     <div className="halaman">
       <div className="bungkus">
-        <Brand />
-        <NavPill />
+        <HeaderSticky />
 
         <form className="panel-glass" onSubmit={cariStatus}>
           <p className="eyebrow">Cek status mandiri</p>

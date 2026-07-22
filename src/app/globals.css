@@ -581,10 +581,6 @@ select.form-input option {
     transform: rotate(360deg);
   }
 }
-
-/* Dashboard admin: hanya area tabel yang scroll, header & filter tetap
-   diam di tempat (bukan sticky biasa, tapi "dikunci" dalam tinggi
-   viewport supaya tidak perlu scroll seluruh halaman). */
 .halaman-fit {
   height: 100vh;
   display: flex;

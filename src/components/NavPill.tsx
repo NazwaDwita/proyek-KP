@@ -64,11 +64,6 @@ export default function NavPill() {
   const [terbuka, setTerbuka] = useState(false);
   const [pathnameSebelumnya, setPathnameSebelumnya] = useState(pathname);
 
-  // Tutup menu otomatis setiap kali pindah halaman. Ditulis sebagai
-  // penyesuaian state saat render (bukan di useEffect terpisah) —
-  // ini pola yang direkomendasikan React untuk "reset state ketika
-  // sebuah nilai berubah", supaya tidak memicu render tambahan yang
-  // tidak perlu.
   if (pathname !== pathnameSebelumnya) {
     setPathnameSebelumnya(pathname);
     setTerbuka(false);
