@@ -74,6 +74,107 @@ body {
   font-weight: 500;
 }
 
+.toggle-mode {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 1.25rem 0 1.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.toggle-mode button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--teks-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-teks);
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+.toggle-mode button svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.toggle-mode button:hover:not(.aktif) {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--gading);
+}
+.toggle-mode button.aktif {
+  background: var(--emas);
+  color: var(--hijau-tua);
+  box-shadow: 0 2px 10px rgba(212, 169, 79, 0.35);
+}
+
+.header-baris-atas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.akun-indikator-placeholder {
+  width: 120px;
+  height: 34px;
+}
+
+.akun-indikator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--gading);
+}
+
+button.akun-indikator {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--emas);
+  color: var(--hijau-tua);
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-teks);
+  font-size: 13px;
+}
+
+.akun-indikator-email {
+  color: var(--teks-muted);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.akun-indikator-keluar {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: var(--gading);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.akun-indikator-keluar:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 640px) {
+  .akun-indikator-email {
+    display: none;
+  }
+}
+
 /* Navigasi pill / folder tab — ini yang sticky, tetap nempel di atas
    saat halaman di-scroll. top:0 (bukan pakai offset top:12px) supaya
    backgroundnya nutup rapat sampai ke ujung atas viewport, tidak ada

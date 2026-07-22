@@ -26,28 +26,6 @@ const menuItems = [
     ),
   },
   {
-    href: "/cek-status",
-    label: "Cek status",
-    icon: (
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="M21 21l-4.3-4.3" />
-      </>
-    ),
-  },
-  {
-    href: "/statistik",
-    label: "Statistik peserta",
-    icon: (
-      <>
-        <path d="M3 3v18h18" />
-        <rect x="7" y="13" width="3" height="5" />
-        <rect x="12" y="9" width="3" height="9" />
-        <rect x="17" y="6" width="3" height="12" />
-      </>
-    ),
-  },
-  {
     href: "/info",
     label: "Info dan ketentuan",
     icon: (

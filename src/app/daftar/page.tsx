@@ -3,6 +3,8 @@
 import { useEffect, useState, FormEvent } from "react";
 import HeaderSticky from "@/components/HeaderSticky";
 import { supabase } from "@/lib/supabase";
+import { useSesi } from "@/lib/useSesi";
+import { useModalMasuk } from "@/lib/ModalMasukContext";
 
 type Bidang = { id: string; nama: string };
 
@@ -34,6 +36,8 @@ const DAFTAR_SMK_PEKANBARU = [
 ];
 
 export default function DaftarPage() {
+  const { sesi, memuat } = useSesi();
+  const { bukaModalMasuk } = useModalMasuk();
   const [daftarBidang, setDaftarBidang] = useState<Bidang[]>([]);
   const [errorBidang, setErrorBidang] = useState<string | null>(null);
   const [mengirim, setMengirim] = useState(false);
@@ -59,6 +63,12 @@ export default function DaftarPage() {
     form.jenis_institusi === "kampus"
       ? DAFTAR_KAMPUS_PEKANBARU
       : DAFTAR_SMK_PEKANBARU;
+
+  useEffect(() => {
+    if (sesi?.user.email) {
+      setForm((f) => (f.email ? f : { ...f, email: sesi.user.email! }));
+    }
+  }, [sesi]);
 
   useEffect(() => {
     let komponenMasihTerpasang = true;
@@ -217,6 +227,40 @@ export default function DaftarPage() {
               Gunakan nomor ini beserta email yang kamu daftarkan pada halaman
               Cek Status untuk memantau perkembangan pendaftaranmu.
             </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (memuat) {
+    return (
+      <div className="halaman">
+        <div className="bungkus">
+          <HeaderSticky />
+        </div>
+      </div>
+    );
+  }
+
+  if (!sesi) {
+    return (
+      <div className="halaman">
+        <div className="bungkus">
+          <HeaderSticky />
+          <div className="panel-glass">
+            <p className="eyebrow">Masuk diperlukan</p>
+            <h1 className="judul-hero" style={{ fontSize: 26, maxWidth: "none" }}>
+              Masuk dulu untuk mendaftar magang
+            </h1>
+            <p className="sub-hero" style={{ marginBottom: "1.75rem" }}>
+              Supaya kamu bisa memantau status pendaftaran langsung dari
+              Beranda, pendaftaran magang mengharuskan kamu masuk terlebih
+              dahulu menggunakan email.
+            </p>
+            <button type="button" className="tombol" onClick={bukaModalMasuk}>
+              Masuk / Buat akun
+            </button>
           </div>
         </div>
       </div>

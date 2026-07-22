@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSesi } from "@/lib/useSesi";
+import { useModalMasuk } from "@/lib/ModalMasukContext";
 import { supabase } from "@/lib/supabase";
 
 export default function AkunIndikator() {
   const { sesi, memuat } = useSesi();
+  const { bukaModalMasuk } = useModalMasuk();
   const router = useRouter();
 
   async function keluar() {
@@ -23,9 +24,9 @@ export default function AkunIndikator() {
 
   if (!sesi) {
     return (
-      <Link href="/akun/masuk" className="akun-indikator">
+      <button type="button" className="akun-indikator" onClick={bukaModalMasuk}>
         Masuk / Buat akun
-      </Link>
+      </button>
     );
   }
 

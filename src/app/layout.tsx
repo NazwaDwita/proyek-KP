@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ModalMasukProvider } from "@/lib/ModalMasukContext";
 
 export const metadata: Metadata = {
   title: "Portal Magang Diskominfotik Provinsi Riau",
@@ -21,7 +22,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <ModalMasukProvider>{children}</ModalMasukProvider>
+      </body>
     </html>
   );
 }
