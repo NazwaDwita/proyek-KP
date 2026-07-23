@@ -1,6 +1,13 @@
+-- Menghubungkan setiap pendaftaran ke akun yang login, supaya
+-- pendaftaran wajib login dan pendaftar bisa melihat status
+-- pendaftarannya sendiri langsung dari Beranda.
+
 alter table pendaftar add column if not exists user_id uuid references auth.users(id);
 
 create index if not exists idx_pendaftar_user on pendaftar(user_id);
+
+-- Ganti kebijakan insert: dulu siapa saja (anon) boleh insert,
+-- sekarang wajib login dan user_id harus sesuai akun yang login.
 drop policy if exists "pendaftar_insert_publik" on pendaftar;
 
 create policy "pendaftar_insert_pemilik" on pendaftar
@@ -11,9 +18,15 @@ create policy "pendaftar_insert_pemilik" on pendaftar
     and status = 'menunggu'
     and diverifikasi_oleh is null
   );
+
+-- Pendaftar boleh lihat baris miliknya sendiri (selain admin yang
+-- sudah bisa lihat semua lewat kebijakan pendaftar_select_admin).
 create policy "pendaftar_select_pemilik" on pendaftar
   for select using (auth.uid() = user_id);
-n_pendaftar;
+
+-- Dokumen: batasi upload hanya untuk pendaftaran milik sendiri
+-- (sebelumnya "with check (true)" terlalu longgar).
+drop policy if exists "dokumen_insert_publik" on dokumen_pendaftar;
 
 create policy "dokumen_insert_pemilik" on dokumen_pendaftar
   for insert
@@ -25,6 +38,8 @@ create policy "dokumen_insert_pemilik" on dokumen_pendaftar
     )
   );
 
+-- Fungsi daftar_magang: sekarang mewajibkan auth.uid() dan otomatis
+-- mengisi user_id dari sesi yang login (bukan dari input client).
 create or replace function daftar_magang(
   p_nama_lengkap text,
   p_email text,
@@ -48,6 +63,14 @@ declare
 begin
   if v_user_id is null then
     raise exception 'Anda harus masuk terlebih dahulu untuk mendaftar.';
+  end if;
+
+  if exists (
+    select 1 from pendaftar
+    where user_id = v_user_id
+      and status in ('menunggu', 'diverifikasi')
+  ) then
+    raise exception 'Kamu masih punya pendaftaran yang sedang aktif. Cek statusnya di Beranda.';
   end if;
 
   if p_tanggal_selesai < p_tanggal_mulai then

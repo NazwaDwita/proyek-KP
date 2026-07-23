@@ -142,6 +142,7 @@ export default function AdminDashboardPage() {
       }
     }, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ditolakAkses, memuat]);
 
   const daftarTersaring = useMemo(() => {
@@ -365,7 +366,7 @@ function ModalDetail({
   onSelesai: () => void;
 }) {
   const [catatan, setCatatan] = useState(pendaftar.catatan_admin ?? "");
-  const [bidangId, setBidangId] = useState(pendaftar.bidang_id ?? "");
+  const [bidangId, setBidangId] = useState(pendaftar.bidang_id);
   const [menyimpan, setMenyimpan] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
   const [dokumen, setDokumen] = useState<Dokumen[]>([]);
@@ -412,7 +413,7 @@ function ModalDetail({
       .update({
         status: statusBaru,
         catatan_admin: catatan.trim() || null,
-        bidang_id: bidangId || null,
+        bidang_id: bidangId,
         diverifikasi_oleh: sesi.session?.user.id ?? null,
         diverifikasi_pada: new Date().toISOString(),
       })
@@ -517,8 +518,8 @@ function ModalDetail({
           <select
             id="bidang_id"
             className="form-input"
-            value={bidangId}
-            onChange={(e) => setBidangId(e.target.value)}
+            value={bidangId ?? ""}
+            onChange={(e) => setBidangId(e.target.value || null)}
           >
             <option value="" disabled>
               Belum ditentukan

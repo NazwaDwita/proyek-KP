@@ -1,15 +1,22 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent } from "react";
+import Link from "next/link";
 import HeaderSticky from "@/components/HeaderSticky";
 import { supabase } from "@/lib/supabase";
 import { useSesi } from "@/lib/useSesi";
 import { useModalMasuk } from "@/lib/ModalMasukContext";
 
+
 const UKURAN_MAKS_BYTE = 5 * 1024 * 1024; 
 const TIPE_FILE_DIIZINKAN = ["application/pdf"];
 
 const OPSI_LAINNYA = "__lainnya__";
+
+const LABEL_STATUS: Record<string, string> = {
+  menunggu: "menunggu diverifikasi",
+  diverifikasi: "sudah diverifikasi",
+};
 
 const DAFTAR_KAMPUS_PEKANBARU = [
   "Universitas Riau (UNRI)",
@@ -40,6 +47,12 @@ export default function DaftarPage() {
   const [pesanGagal, setPesanGagal] = useState<string | null>(null);
   const [nomorPendaftaran, setNomorPendaftaran] = useState<string | null>(null);
 
+  const [pendaftaranAktif, setPendaftaranAktif] = useState<{
+    nomor_pendaftaran: string;
+    status: string;
+  } | null>(null);
+  const [memeriksaPendaftaranAktif, setMemeriksaPendaftaranAktif] = useState(true);
+
   const [form, setForm] = useState({
     nama_lengkap: "",
     email: "",
@@ -58,6 +71,49 @@ export default function DaftarPage() {
     form.jenis_institusi === "kampus"
       ? DAFTAR_KAMPUS_PEKANBARU
       : DAFTAR_SMK_PEKANBARU;
+
+  useEffect(() => {
+    if (sesi?.user) {
+      const namaAkun = (sesi.user.user_metadata?.nama as string) || "";
+      setForm((f) => ({
+        ...f,
+        email: f.email || sesi.user.email || "",
+        nama_lengkap: f.nama_lengkap || namaAkun,
+      }));
+    }
+  }, [sesi]);
+
+  useEffect(() => {
+    let masihTerpasang = true;
+
+    async function cekPendaftaranAktif() {
+      if (!sesi?.user) {
+        setMemeriksaPendaftaranAktif(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("pendaftar")
+        .select("nomor_pendaftaran, status")
+        .eq("user_id", sesi.user.id)
+        .in("status", ["menunggu", "diverifikasi"])
+        .maybeSingle();
+
+      if (!masihTerpasang) return;
+
+      if (error) {
+        console.error("Gagal memeriksa pendaftaran aktif:", error);
+      } else {
+        setPendaftaranAktif(data);
+      }
+      setMemeriksaPendaftaranAktif(false);
+    }
+
+    cekPendaftaranAktif();
+    return () => {
+      masihTerpasang = false;
+    };
+  }, [sesi]);
 
   function ubahField(field: keyof typeof form, nilai: string) {
     setForm((f) => ({ ...f, [field]: nilai }));
@@ -86,10 +142,6 @@ export default function DaftarPage() {
     e.preventDefault();
     setPesanGagal(null);
 
-    if (!sesi) {
-      setPesanGagal("Sesi kamu sudah berakhir, silakan masuk lagi.");
-      return;
-    }
     if (!fileSurat) {
       setErrorFile("Surat pengantar wajib diunggah.");
       return;
@@ -115,11 +167,12 @@ export default function DaftarPage() {
         "daftar_magang",
         {
           p_nama_lengkap: form.nama_lengkap,
-          p_email: form.email || sesi.user.email,
+          p_email: form.email,
           p_no_hp: form.no_hp,
           p_jenis_institusi: form.jenis_institusi,
           p_asal_institusi: asalInstitusiFinal,
           p_jurusan_prodi: form.jurusan_prodi || null,
+          p_bidang_id: null,
           p_tanggal_mulai: form.tanggal_mulai,
           p_tanggal_selesai: form.tanggal_selesai,
         }
@@ -225,6 +278,41 @@ export default function DaftarPage() {
     );
   }
 
+  if (memeriksaPendaftaranAktif) {
+    return (
+      <div className="halaman">
+        <div className="bungkus">
+          <HeaderSticky />
+        </div>
+      </div>
+    );
+  }
+
+  if (pendaftaranAktif) {
+    return (
+      <div className="halaman">
+        <div className="bungkus">
+          <HeaderSticky />
+          <div className="panel-glass">
+            <p className="eyebrow">Sudah ada pendaftaran</p>
+            <h1 className="judul-hero" style={{ fontSize: 26, maxWidth: "none" }}>
+              Kamu sudah punya pendaftaran aktif
+            </h1>
+            <p className="sub-hero" style={{ marginBottom: "1.75rem" }}>
+              Akun ini sudah mendaftar dengan nomor{" "}
+              <strong>{pendaftaranAktif.nomor_pendaftaran}</strong>, status
+              saat ini: {LABEL_STATUS[pendaftaranAktif.status] ?? pendaftaranAktif.status}. Kamu bisa mendaftar lagi
+              nanti kalau pendaftaran ini ditolak.
+            </p>
+            <Link href="/" className="tombol">
+              Lihat status di Beranda
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="halaman">
       <div className="bungkus">
@@ -261,7 +349,7 @@ export default function DaftarPage() {
                 type="email"
                 className="form-input"
                 required
-                value={form.email || sesi.user.email || ""}
+                value={form.email}
                 onChange={(e) => ubahField("email", e.target.value)}
               />
             </div>

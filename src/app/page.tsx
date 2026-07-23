@@ -54,7 +54,14 @@ export default function Beranda() {
     <div className="halaman">
       <div className="bungkus">
         <HeaderSticky />
-        {sesi ? <BerandaSudahLogin userId={sesi.user.id} email={sesi.user.email ?? ""} /> : <BerandaBelumLogin />}
+        {sesi ? (
+          <BerandaSudahLogin
+            userId={sesi.user.id}
+            nama={(sesi.user.user_metadata?.nama as string) || sesi.user.email || ""}
+          />
+        ) : (
+          <BerandaBelumLogin />
+        )}
       </div>
     </div>
   );
@@ -138,7 +145,7 @@ function BerandaBelumLogin() {
   );
 }
 
-function BerandaSudahLogin({ userId, email }: { userId: string; email: string }) {
+function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
   const [daftarPendaftaran, setDaftarPendaftaran] = useState<PendaftaranSaya[]>([]);
   const [memuat, setMemuat] = useState(true);
   const [pesanError, setPesanError] = useState<string | null>(null);
@@ -177,7 +184,7 @@ function BerandaSudahLogin({ userId, email }: { userId: string; email: string })
       <div className="panel-glass">
         <p className="eyebrow">Akun kamu</p>
         <h1 className="judul-hero" style={{ fontSize: 24, maxWidth: "none" }}>
-          Selamat datang, {email}
+          Selamat datang, {nama}
         </h1>
         <p className="sub-hero" style={{ marginBottom: 0 }}>
           Status pendaftaran magangmu ditampilkan otomatis di bawah ini.
@@ -215,8 +222,8 @@ function BerandaSudahLogin({ userId, email }: { userId: string; email: string })
                 <strong>{p.nomor_pendaftaran}</strong>
               </div>
               <div className="hasil-status-baris">
-                <span className="hasil-status-label">Bidang penempatan</span>
-                <span>{p.bidang?.nama ?? "Menunggu penempatan"}</span>
+                <span className="hasil-status-label">Bidang diminati</span>
+                <span>{p.bidang?.nama ?? "-"}</span>
               </div>
               <div className="hasil-status-baris">
                 <span className="hasil-status-label">Periode magang</span>

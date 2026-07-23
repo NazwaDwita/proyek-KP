@@ -30,9 +30,11 @@ export default function AkunIndikator() {
     );
   }
 
+  const nama = (sesi.user.user_metadata?.nama as string) || sesi.user.email;
+
   return (
     <div className="akun-indikator">
-      <span className="akun-indikator-email">{sesi.user.email}</span>
+      <span className="akun-indikator-email">{nama}</span>
       <button type="button" onClick={keluar} className="akun-indikator-keluar">
         Keluar
       </button>

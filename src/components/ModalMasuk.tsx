@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Mode = "masuk" | "daftar" | "verifikasi";
+type Mode = "masuk" | "daftar";
 
 function terjemahkanError(pesan: string): string {
   if (pesan.includes("Invalid login credentials")) {
@@ -14,9 +14,6 @@ function terjemahkanError(pesan: string): string {
   }
   if (pesan.includes("Password should be at least")) {
     return "Password minimal 6 karakter.";
-  }
-  if (pesan.includes("Token has expired") || pesan.includes("invalid")) {
-    return "Kode salah atau sudah kedaluwarsa. Periksa kembali, atau minta kode baru.";
   }
   return pesan;
 }
@@ -31,22 +28,20 @@ export default function ModalMasuk({
   const [mode, setMode] = useState<Mode>("masuk");
 
   const [email, setEmail] = useState("");
+  const [namaLengkap, setNamaLengkap] = useState("");
   const [password, setPassword] = useState("");
   const [konfirmasiPassword, setKonfirmasiPassword] = useState("");
-  const [kode, setKode] = useState("");
 
   const [memproses, setMemproses] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
-  const [pesanInfo, setPesanInfo] = useState<string | null>(null);
 
   function resetSemua() {
     setMode("masuk");
     setEmail("");
+    setNamaLengkap("");
     setPassword("");
     setKonfirmasiPassword("");
-    setKode("");
     setPesanError(null);
-    setPesanInfo(null);
   }
 
   function tutupDanReset() {
@@ -57,7 +52,6 @@ export default function ModalMasuk({
   function pindahMode(modeBaru: Mode) {
     setMode(modeBaru);
     setPesanError(null);
-    setPesanInfo(null);
   }
 
   async function submitMasuk(e: FormEvent) {
@@ -65,36 +59,37 @@ export default function ModalMasuk({
     setMemproses(true);
     setPesanError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
 
-    setMemproses(false);
-
-    if (error) {
-      console.error("Gagal masuk:", error);
-
-      if (error.message.includes("Email not confirmed")) {
-        setPesanInfo(
-          "Akun ini belum diverifikasi. Kami kirim ulang kode verifikasi ke emailmu."
-        );
-        await supabase.auth.resend({ type: "signup", email: email.trim() });
-        setMode("verifikasi");
+      if (error) {
+        console.error("Gagal masuk:", error);
+        setPesanError(terjemahkanError(error.message));
         return;
       }
 
-      setPesanError(terjemahkanError(error.message));
-      return;
+      tutupDanReset();
+    } catch (err) {
+      console.error("Error tak terduga saat masuk:", err);
+      setPesanError(
+        "Terjadi kesalahan koneksi ke server. Periksa koneksi internet kamu dan coba lagi."
+      );
+    } finally {
+      setMemproses(false);
     }
-
-    tutupDanReset();
   }
 
   async function submitDaftar(e: FormEvent) {
     e.preventDefault();
     setPesanError(null);
 
+    if (namaLengkap.trim().length < 2) {
+      setPesanError("Masukkan nama kamu terlebih dahulu.");
+      return;
+    }
     if (password.length < 6) {
       setPesanError("Password minimal 6 karakter.");
       return;
@@ -105,66 +100,47 @@ export default function ModalMasuk({
     }
 
     setMemproses(true);
-    const { error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-    });
-    setMemproses(false);
 
-    if (error) {
-      console.error("Gagal daftar:", error);
-      setPesanError(terjemahkanError(error.message));
-      return;
-    }
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            nama: namaLengkap.trim(),
+          },
+        },
+      });
 
-    setMode("verifikasi");
-  }
+      if (error) {
+        console.error("Gagal daftar:", error);
+        setPesanError(terjemahkanError(error.message));
+        return;
+      }
 
-  async function submitVerifikasi(e: FormEvent) {
-    e.preventDefault();
-    setMemproses(true);
-    setPesanError(null);
+      if (!data.session) {
+        // Ini terjadi kalau "Confirm email" di Supabase masih aktif.
+        // Seharusnya sudah dimatikan supaya bisa langsung login.
+        setPesanError(
+          "Akun berhasil dibuat, tapi belum bisa langsung masuk. Hubungi admin untuk memeriksa pengaturan verifikasi email."
+        );
+        return;
+      }
 
-    const { error } = await supabase.auth.verifyOtp({
-      email: email.trim(),
-      token: kode.trim(),
-      type: "signup",
-    });
-
-    setMemproses(false);
-
-    if (error) {
-      console.error("Gagal verifikasi:", error);
-      setPesanError(terjemahkanError(error.message));
-      return;
-    }
-
-    tutupDanReset();
-  }
-
-  async function kirimUlangKode() {
-    setMemproses(true);
-    setPesanError(null);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: email.trim(),
-    });
-    setMemproses(false);
-    if (error) {
-      setPesanError("Gagal mengirim ulang kode. Coba lagi sebentar.");
-    } else {
-      setPesanInfo("Kode baru sudah dikirim.");
+      tutupDanReset();
+    } catch (err) {
+      console.error("Error tak terduga saat daftar:", err);
+      setPesanError(
+        "Terjadi kesalahan koneksi ke server. Periksa koneksi internet kamu dan coba lagi."
+      );
+    } finally {
+      setMemproses(false);
     }
   }
 
   if (!terbuka) return null;
 
-  const judul =
-    mode === "masuk"
-      ? "Masuk ke akunmu"
-      : mode === "daftar"
-      ? "Buat akun baru"
-      : "Verifikasi email";
+  const judul = mode === "masuk" ? "Masuk ke akunmu" : "Buat akun baru";
 
   return (
     <div
@@ -186,43 +162,36 @@ export default function ModalMasuk({
           </button>
         </div>
 
-        {mode !== "verifikasi" && (
-          <div className="toggle-mode">
-            <button
-              type="button"
-              className={mode === "masuk" ? "aktif" : ""}
-              onClick={() => pindahMode("masuk")}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                <path d="M10 17l5-5-5-5" />
-                <path d="M15 12H3" />
-              </svg>
-              Masuk
-            </button>
-            <button
-              type="button"
-              className={mode === "daftar" ? "aktif" : ""}
-              onClick={() => pindahMode("daftar")}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M19 8v6M22 11h-6" />
-              </svg>
-              Daftar
-            </button>
-          </div>
-        )}
+        <div className="toggle-mode">
+          <button
+            type="button"
+            className={mode === "masuk" ? "aktif" : ""}
+            onClick={() => pindahMode("masuk")}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <path d="M10 17l5-5-5-5" />
+              <path d="M15 12H3" />
+            </svg>
+            Masuk
+          </button>
+          <button
+            type="button"
+            className={mode === "daftar" ? "aktif" : ""}
+            onClick={() => pindahMode("daftar")}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M19 8v6M22 11h-6" />
+            </svg>
+            Daftar
+          </button>
+        </div>
 
-        {mode === "masuk" && (
+        {mode === "masuk" ? (
           <form onSubmit={submitMasuk}>
             {pesanError && <div className="form-pesan-gagal">{pesanError}</div>}
-            {pesanInfo && !pesanError && (
-              <div className="info-placeholder" style={{ marginTop: 0, marginBottom: "1.25rem" }}>
-                {pesanInfo}
-              </div>
-            )}
 
             <div className="form-grup">
               <label htmlFor="masuk-email">Alamat email</label>
@@ -253,12 +222,26 @@ export default function ModalMasuk({
               {memproses ? "Memproses..." : "Masuk"}
             </button>
           </form>
-        )}
-
-        {mode === "daftar" && (
+        ) : (
           <form onSubmit={submitDaftar}>
             {pesanError && <div className="form-pesan-gagal">{pesanError}</div>}
 
+            <div className="form-grup">
+              <label htmlFor="daftar-nama">Nama lengkap</label>
+              <input
+                id="daftar-nama"
+                type="text"
+                className="form-input"
+                required
+                autoFocus
+                placeholder="Nama kamu"
+                value={namaLengkap}
+                onChange={(e) => setNamaLengkap(e.target.value)}
+              />
+              <p className="keterangan-field">
+                Nama ini akan ditampilkan di Beranda, bukan email kamu.
+              </p>
+            </div>
             <div className="form-grup">
               <label htmlFor="daftar-email">Alamat email</label>
               <input
@@ -266,7 +249,6 @@ export default function ModalMasuk({
                 type="email"
                 className="form-input"
                 required
-                autoFocus
                 placeholder="nama@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -299,50 +281,6 @@ export default function ModalMasuk({
             <button type="submit" className="tombol" disabled={memproses} style={{ width: "100%", justifyContent: "center" }}>
               {memproses ? "Mendaftarkan..." : "Buat akun"}
             </button>
-          </form>
-        )}
-
-        {mode === "verifikasi" && (
-          <form onSubmit={submitVerifikasi}>
-            <p className="sub-hero" style={{ marginBottom: "1.5rem" }}>
-              Kode verifikasi sudah dikirim ke <strong>{email}</strong>.
-              Masukkan kode 6 digit dari email tersebut untuk mengaktifkan
-              akunmu.
-            </p>
-
-            {pesanError && <div className="form-pesan-gagal">{pesanError}</div>}
-            {pesanInfo && !pesanError && (
-              <div className="info-placeholder" style={{ marginTop: 0, marginBottom: "1.25rem" }}>
-                {pesanInfo}
-              </div>
-            )}
-
-            <div className="form-grup">
-              <label htmlFor="kode-verifikasi">Kode verifikasi</label>
-              <input
-                id="kode-verifikasi"
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                className="form-input"
-                required
-                autoFocus
-                maxLength={6}
-                placeholder="123456"
-                value={kode}
-                onChange={(e) => setKode(e.target.value)}
-                style={{ letterSpacing: "0.3em", fontSize: 18 }}
-              />
-            </div>
-
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button type="submit" className="tombol" disabled={memproses} style={{ flex: 1, justifyContent: "center" }}>
-                {memproses ? "Memverifikasi..." : "Verifikasi"}
-              </button>
-              <button type="button" className="tombol sekunder" onClick={kirimUlangKode} disabled={memproses}>
-                Kirim ulang
-              </button>
-            </div>
           </form>
         )}
       </div>

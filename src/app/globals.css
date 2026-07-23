@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  /* Tema terang: putih gading + navy + emas (gaya resmi pemerintahan).
+     --navy dipakai sebagai warna gelap utama (nav bar, teks aksen kuat,
+     teks di atas tombol emas) — pengganti peran --hijau-tua di tema lama.
+     --teks-terang / --teks-muted-terang khusus dipakai untuk teks di
+     ATAS permukaan gelap (nav bar, tabel admin, dropdown mobile), supaya
+     tidak ketuker sama --teks-utama / --teks-muted yang untuk teks di
+     atas latar terang (mayoritas halaman). */
   --dasar: #f7f3e8;
   --navy: #0f2a4a;
   --navy-sekunder: #1c3f66;
@@ -177,6 +184,13 @@ button.akun-indikator {
     display: none;
   }
 }
+
+/* Navigasi pill / folder tab — ini yang sticky, tetap nempel di atas
+   saat halaman di-scroll. Sengaja dibuat jadi "pulau" navy solid (beda
+   dari latar halaman yang terang) supaya terasa seperti nav bar resmi
+   instansi pemerintahan. top:0 (bukan pakai offset top:12px) supaya
+   backgroundnya nutup rapat sampai ke ujung atas viewport, tidak ada
+   celah yang bikin konten di belakangnya keliatan "bolong". */
 .nav-wrapper {
   position: sticky;
   top: 0;
