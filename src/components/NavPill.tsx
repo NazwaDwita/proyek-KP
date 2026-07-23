@@ -35,6 +35,17 @@ const menuItems = [
       </>
     ),
   },
+  {
+    href: "/profil-dinas",
+    label: "Profil dinas",
+    icon: (
+      <>
+        <path d="M3 21h18" />
+        <path d="M5 21V7l7-4 7 4v14" />
+        <path d="M9 9h1M9 13h1M14 9h1M14 13h1" />
+      </>
+    ),
+  },
 ];
 
 export default function NavPill() {

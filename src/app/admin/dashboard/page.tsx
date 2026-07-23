@@ -176,42 +176,15 @@ export default function AdminDashboardPage() {
     <div className="halaman halaman-fit">
       <div className="bungkus bungkus-fit" style={{ maxWidth: 1400 }}>
         <AdminNav onKeluar={keluar} />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "1.5rem",
-            flexWrap: "wrap",
-            gap: 10,
-          }}
-        >
-          <div>
-            <p className="eyebrow" style={{ margin: 0 }}>
-              Dashboard admin
-            </p>
-            <h1 className="judul-hero" style={{ fontSize: 24, maxWidth: "none" }}>
-              Data pendaftar magang
-            </h1>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              type="button"
-              className={`tombol-ikon${sedangMuatUlang ? " memuat" : ""}`}
-              onClick={muatUlangManual}
-              disabled={sedangMuatUlang}
-              title="Muat ulang"
-              aria-label="Muat ulang data"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-                <path d="M21 3v6h-6" />
-              </svg>
-            </button>
-          </div>
-        </div>
 
         <div className="panel-glass panel-scroll">
+          <h1
+            className="judul-hero"
+            style={{ fontSize: 24, maxWidth: "none", marginBottom: "1.25rem" }}
+          >
+            Data pendaftar magang
+          </h1>
+
           {errorMuat && <div className="form-pesan-gagal">{errorMuat}</div>}
 
           <div
@@ -243,6 +216,20 @@ export default function AdminDashboardPage() {
               <option value="diverifikasi">Diverifikasi</option>
               <option value="ditolak">Ditolak</option>
             </select>
+
+            <button
+              type="button"
+              className={`tombol-ikon${sedangMuatUlang ? " memuat" : ""}`}
+              onClick={muatUlangManual}
+              disabled={sedangMuatUlang}
+              title="Muat ulang"
+              aria-label="Muat ulang data"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                <path d="M21 3v6h-6" />
+              </svg>
+            </button>
 
             <span style={{ fontSize: 12, color: "var(--teks-muted)", marginLeft: "auto" }}>
               {terakhirDiperbarui
@@ -395,8 +382,8 @@ function ModalDetail({
   }
 
   return (
-    <div className="modal-overlay" onClick={onTutup}>
-      <div className="modal-isi" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay">
+      <div className="modal-isi">
         <div
           style={{
             display: "flex",
@@ -413,7 +400,7 @@ function ModalDetail({
             </h2>
           </div>
           <button className="modal-tutup" onClick={onTutup} aria-label="Tutup">
-            ×
+            &times;
           </button>
         </div>
 

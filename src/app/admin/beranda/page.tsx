@@ -83,8 +83,8 @@ export default function AdminBerandaPage() {
   }
 
   return (
-    <div className="halaman halaman-fit">
-      <div className="bungkus bungkus-fit" style={{ maxWidth: 1400 }}>
+    <div className="halaman">
+      <div className="bungkus" style={{ maxWidth: 1400 }}>
         <AdminNav onKeluar={keluar} />
 
         <div style={{ marginBottom: "1.5rem" }}>

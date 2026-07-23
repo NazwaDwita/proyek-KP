@@ -39,8 +39,8 @@ export default function AdminInfoPage() {
   }
 
   return (
-    <div className="halaman halaman-fit">
-      <div className="bungkus bungkus-fit" style={{ maxWidth: 1400 }}>
+    <div className="halaman">
+      <div className="bungkus" style={{ maxWidth: 1400 }}>
         <AdminNav onKeluar={keluar} />
 
         <div className="panel-glass">
