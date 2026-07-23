@@ -114,7 +114,7 @@ export default function AdminBerandaPage() {
           }}
         >
           <KartuRingkasan label="Menunggu" nilai={ringkasan?.menunggu} />
-          <KartuRingkasan label="Diverifikasi" nilai={ringkasan?.diverifikasi} />
+          <KartuRingkasan label="Diterima" nilai={ringkasan?.diverifikasi} />
           <KartuRingkasan label="Ditolak" nilai={ringkasan?.ditolak} />
           <KartuRingkasan label="Total pendaftar" nilai={ringkasan?.total} tebal />
         </div>
@@ -127,7 +127,7 @@ export default function AdminBerandaPage() {
             Kelola pendaftar yang masuk
           </h2>
           <p className="sub-hero" style={{ marginBottom: "1.25rem" }}>
-            Verifikasi, tolak, atau tetapkan bidang penempatan untuk pendaftar
+            Terima, tolak, atau tetapkan bidang penempatan untuk pendaftar
             yang statusnya masih menunggu.
           </p>
           <Link href="/admin/dashboard" className="tombol">

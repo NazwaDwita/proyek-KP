@@ -14,8 +14,8 @@ const TIPE_FILE_DIIZINKAN = ["application/pdf"];
 const OPSI_LAINNYA = "__lainnya__";
 
 const LABEL_STATUS: Record<string, string> = {
-  menunggu: "menunggu diverifikasi",
-  diverifikasi: "sudah diverifikasi",
+  menunggu: "menunggu",
+  diverifikasi: "diterima",
 };
 
 const DAFTAR_KAMPUS_PEKANBARU = [

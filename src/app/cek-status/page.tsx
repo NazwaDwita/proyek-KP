@@ -14,8 +14,8 @@ type HasilStatus = {
 };
 
 const LABEL_STATUS: Record<HasilStatus["status"], string> = {
-  menunggu: "Menunggu diverifikasi",
-  diverifikasi: "Diverifikasi",
+  menunggu: "Menunggu",
+  diverifikasi: "Diterima",
   ditolak: "Ditolak",
 };
 

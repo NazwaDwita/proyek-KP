@@ -36,7 +36,7 @@ type Pendaftar = {
 
 const LABEL_STATUS: Record<StatusPendaftaran, string> = {
   menunggu: "Menunggu",
-  diverifikasi: "Diverifikasi",
+  diverifikasi: "Diterima",
   ditolak: "Ditolak",
 };
 
@@ -213,7 +213,7 @@ export default function AdminDashboardPage() {
             >
               <option value="semua">Semua status</option>
               <option value="menunggu">Menunggu</option>
-              <option value="diverifikasi">Diverifikasi</option>
+              <option value="diverifikasi">Diterima</option>
               <option value="ditolak">Ditolak</option>
             </select>
 
@@ -352,7 +352,7 @@ function ModalDetail({
       return;
     }
     if (statusBaru === "diverifikasi" && !bidangId) {
-      setPesanError("Pilih bidang penempatan dulu sebelum memverifikasi.");
+      setPesanError("Pilih bidang penempatan dulu sebelum menerima pendaftaran.");
       return;
     }
     setMenyimpan(true);
@@ -503,7 +503,7 @@ function ModalDetail({
             disabled={menyimpan}
             onClick={() => simpan("diverifikasi")}
           >
-            {menyimpan ? "Menyimpan..." : "Verifikasi"}
+            {menyimpan ? "Menyimpan..." : "Terima"}
           </button>
           <button
             className="tombol sekunder"

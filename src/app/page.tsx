@@ -9,8 +9,8 @@ import { supabase } from "@/lib/supabase";
 const KUOTA_PER_BIDANG = 10;
 
 const LABEL_STATUS: Record<string, string> = {
-  menunggu: "Menunggu diverifikasi",
-  diverifikasi: "Diverifikasi",
+  menunggu: "Menunggu",
+  diverifikasi: "Diterima",
   ditolak: "Ditolak",
 };
 
