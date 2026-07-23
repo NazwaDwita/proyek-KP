@@ -73,17 +73,6 @@ export default function DaftarPage() {
       : DAFTAR_SMK_PEKANBARU;
 
   useEffect(() => {
-    if (sesi?.user) {
-      const namaAkun = (sesi.user.user_metadata?.nama as string) || "";
-      setForm((f) => ({
-        ...f,
-        email: f.email || sesi.user.email || "",
-        nama_lengkap: f.nama_lengkap || namaAkun,
-      }));
-    }
-  }, [sesi]);
-
-  useEffect(() => {
     let masihTerpasang = true;
 
     async function cekPendaftaranAktif() {
@@ -126,7 +115,7 @@ export default function DaftarPage() {
       return;
     }
     if (!TIPE_FILE_DIIZINKAN.includes(f.type)) {
-      setErrorFile("Format file harus PDF, JPG, atau PNG.");
+      setErrorFile("Format file harus PDF.");
       setFileSurat(null);
       return;
     }
@@ -142,6 +131,10 @@ export default function DaftarPage() {
     e.preventDefault();
     setPesanGagal(null);
 
+    if (!sesi) {
+      setPesanGagal("Sesi kamu sudah berakhir, silakan masuk lagi.");
+      return;
+    }
     if (!fileSurat) {
       setErrorFile("Surat pengantar wajib diunggah.");
       return;
@@ -166,13 +159,15 @@ export default function DaftarPage() {
       const { data: hasilDaftar, error: errorInsert } = await supabase.rpc(
         "daftar_magang",
         {
-          p_nama_lengkap: form.nama_lengkap,
-          p_email: form.email,
+          p_nama_lengkap:
+            form.nama_lengkap ||
+            (sesi.user.user_metadata?.nama as string) ||
+            "",
+          p_email: form.email || sesi.user.email,
           p_no_hp: form.no_hp,
           p_jenis_institusi: form.jenis_institusi,
           p_asal_institusi: asalInstitusiFinal,
           p_jurusan_prodi: form.jurusan_prodi || null,
-          p_bidang_id: null,
           p_tanggal_mulai: form.tanggal_mulai,
           p_tanggal_selesai: form.tanggal_selesai,
         }
@@ -338,7 +333,11 @@ export default function DaftarPage() {
                 id="nama_lengkap"
                 className="form-input"
                 required
-                value={form.nama_lengkap}
+                value={
+                  form.nama_lengkap ||
+                  (sesi.user.user_metadata?.nama as string) ||
+                  ""
+                }
                 onChange={(e) => ubahField("nama_lengkap", e.target.value)}
               />
             </div>
@@ -349,7 +348,7 @@ export default function DaftarPage() {
                 type="email"
                 className="form-input"
                 required
-                value={form.email}
+                value={form.email || sesi.user.email || ""}
                 onChange={(e) => ubahField("email", e.target.value)}
               />
             </div>

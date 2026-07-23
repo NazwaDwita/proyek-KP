@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useAdminAkses } from "@/lib/useAdminAkses";
+import AdminNav from "@/components/admin/AdminNav";
 
 type StatusPendaftaran = "menunggu" | "diverifikasi" | "ditolak";
 
@@ -48,9 +49,7 @@ function formatTanggal(iso: string) {
 }
 
 export default function AdminDashboardPage() {
-  const router = useRouter();
-  const [memuat, setMemuat] = useState(true);
-  const [ditolakAkses, setDitolakAkses] = useState(false);
+  const { memuat, ditolakAkses, keluar } = useAdminAkses();
 
   const [daftar, setDaftar] = useState<Pendaftar[]>([]);
   const [daftarBidang, setDaftarBidang] = useState<Bidang[]>([]);
@@ -90,45 +89,28 @@ export default function AdminDashboardPage() {
   }
 
   useEffect(() => {
-    async function cekAksesDanMuat() {
-      try {
-        const { data: sesi } = await supabase.auth.getSession();
-        if (!sesi.session) {
-          router.replace("/admin/login");
-          return;
-        }
+    if (memuat || ditolakAkses) return;
 
-        // Sesi Auth valid tidak berarti otomatis admin — cek keanggotaan
-        // admin_pengguna. Kalau bukan admin, RLS akan bikin semua query
-        // di bawah kembali kosong diam-diam; lebih baik ditolak eksplisit.
-        const { data: dataAdmin } = await supabase
-          .from("admin_pengguna")
-          .select("id")
-          .maybeSingle();
+    let masihTerpasang = true;
 
-        if (!dataAdmin) {
-          setDitolakAkses(true);
-          setMemuat(false);
-          return;
-        }
+    async function muatDataAwal() {
+      const { data: bidangData } = await supabase
+        .from("bidang")
+        .select("id, nama")
+        .eq("aktif", true)
+        .order("nama");
 
-        const { data: bidangData } = await supabase
-          .from("bidang")
-          .select("id, nama")
-          .eq("aktif", true)
-          .order("nama");
-        setDaftarBidang(bidangData ?? []);
+      if (!masihTerpasang) return;
+      setDaftarBidang(bidangData ?? []);
 
-        await muatUlangData();
-        setMemuat(false);
-      } catch (err) {
-        console.error("Gagal memeriksa akses:", err);
-        router.replace("/admin/login");
-      }
+      await muatUlangData();
     }
 
-    cekAksesDanMuat();
-  }, [router]);
+    muatDataAwal();
+    return () => {
+      masihTerpasang = false;
+    };
+  }, [memuat, ditolakAkses]);
 
   // Auto-refresh berkala, supaya pendaftar baru dari sisi publik
   // ikut muncul tanpa admin harus reload manual. Sengaja bukan
@@ -142,7 +124,6 @@ export default function AdminDashboardPage() {
       }
     }, 30000);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ditolakAkses, memuat]);
 
   const daftarTersaring = useMemo(() => {
@@ -158,11 +139,6 @@ export default function AdminDashboardPage() {
       return true;
     });
   }, [daftar, filterStatus, pencarian]);
-
-  async function keluar() {
-    await supabase.auth.signOut();
-    router.replace("/admin/login");
-  }
 
   if (memuat) {
     return (
@@ -199,6 +175,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="halaman halaman-fit">
       <div className="bungkus bungkus-fit" style={{ maxWidth: 1400 }}>
+        <AdminNav onKeluar={keluar} />
         <div
           style={{
             display: "flex",
@@ -229,18 +206,6 @@ export default function AdminDashboardPage() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 12a9 9 0 1 1-2.64-6.36" />
                 <path d="M21 3v6h-6" />
-              </svg>
-            </button>
-            <button
-              className="tombol-ikon"
-              onClick={keluar}
-              title="Keluar"
-              aria-label="Keluar dari akun admin"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <path d="M16 17l5-5-5-5" />
-                <path d="M21 12H9" />
               </svg>
             </button>
           </div>

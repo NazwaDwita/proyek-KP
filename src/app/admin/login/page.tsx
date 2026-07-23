@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
       .getSession()
       .then(({ data }) => {
         if (data.session) {
-          router.replace("/admin/dashboard");
+          router.replace("/admin/beranda");
         } else {
           setMengecekSesi(false);
         }
@@ -63,7 +63,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.replace("/admin/dashboard");
+      router.replace("/admin/beranda");
     } catch {
       setPesanError("Terjadi kesalahan tak terduga. Silakan coba lagi.");
     } finally {
