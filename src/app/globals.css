@@ -130,12 +130,12 @@ body {
   top: 0;
   z-index: 20;
   background: var(--dasar);
-  padding: 1.25rem 0 1rem;
-  margin-bottom: 1.5rem;
+  padding: 0.85rem 0 0.65rem;
+  margin-bottom: 1rem;
   border-bottom: 1px solid rgba(28, 43, 61, 0.08);
 }
 .admin-header-statis .header-baris-atas {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
 }
 
 .akun-indikator-placeholder {
@@ -269,6 +269,12 @@ button.akun-indikator {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: 2.5rem;
+}
+/* Dipakai di halaman admin yang tingginya dipatok 1 layar penuh (lihat
+   .halaman-fit) -- padding besar seperti .panel-glass biasa terlalu
+   banyak makan ruang vertikal yang seharusnya buat baris tabel. */
+.panel-glass.panel-glass-tabel {
+  padding: 1.5rem 1.75rem;
 }
 
 .eyebrow {

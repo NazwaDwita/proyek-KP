@@ -177,10 +177,10 @@ export default function AdminDashboardPage() {
       <div className="bungkus bungkus-fit" style={{ maxWidth: 1400 }}>
         <AdminNav onKeluar={keluar} />
 
-        <div className="panel-glass panel-scroll">
+        <div className="panel-glass panel-scroll panel-glass-tabel">
           <h1
             className="judul-hero"
-            style={{ fontSize: 24, maxWidth: "none", marginBottom: "1.25rem" }}
+            style={{ fontSize: 22, maxWidth: "none", marginBottom: "0.85rem" }}
           >
             Data pendaftar magang
           </h1>
@@ -193,7 +193,7 @@ export default function AdminDashboardPage() {
               gap: 10,
               flexWrap: "wrap",
               alignItems: "center",
-              marginBottom: "1.25rem",
+              marginBottom: "0.85rem",
             }}
           >
             <input

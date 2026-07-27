@@ -4,7 +4,7 @@ import { Resend } from "resend";
 
 const LABEL_STATUS: Record<string, string> = {
   menunggu: "Menunggu",
-  diverifikasi: "Diverifikasi",
+  diverifikasi: "Diterima",
   ditolak: "Ditolak",
 };
 
