@@ -112,11 +112,6 @@ export default function AdminDashboardPage() {
     };
   }, [memuat, ditolakAkses]);
 
-  // Auto-refresh berkala, supaya pendaftar baru dari sisi publik
-  // ikut muncul tanpa admin harus reload manual. Sengaja bukan
-  // realtime subscription (di luar scope saat ini) -- cukup polling
-  // ringan tiap 30 detik, dan cuma jalan selama tab ini aktif dilihat
-  // supaya tidak boros request kalau tab ditinggal di background.
   useEffect(() => {
     const interval = setInterval(() => {
       if (document.visibilityState === "visible" && !ditolakAkses && !memuat) {
@@ -378,6 +373,25 @@ function ModalDetail({
       setPesanError("Gagal menyimpan perubahan. Coba lagi.");
       return;
     }
+
+    if (sesi.session?.access_token) {
+      try {
+        const res = await fetch("/api/notifikasi-status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sesi.session.access_token}`,
+          },
+          body: JSON.stringify({ pendaftarId: pendaftar.id }),
+        });
+        if (!res.ok) {
+          console.error("Notifikasi email gagal terkirim:", await res.text());
+        }
+      } catch (errNotif) {
+        console.error("Notifikasi email gagal terkirim:", errNotif);
+      }
+    }
+
     onSelesai();
   }
 

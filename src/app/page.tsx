@@ -222,7 +222,7 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
                 <strong>{p.nomor_pendaftaran}</strong>
               </div>
               <div className="hasil-status-baris">
-                <span className="hasil-status-label">Bidang diminati</span>
+                <span className="hasil-status-label">Bidang penempatan</span>
                 <span>{p.bidang?.nama ?? "-"}</span>
               </div>
               <div className="hasil-status-baris">
