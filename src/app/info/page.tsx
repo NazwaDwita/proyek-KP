@@ -1,6 +1,77 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import HeaderSticky from "@/components/HeaderSticky";
+import { supabase } from "@/lib/supabase";
+
+type InfoKonten = {
+  intro: string;
+  siapa_yang_bisa_mendaftar: string;
+  dokumen_diperlukan: string;
+  jam_kerja: string;
+  jadwal_mulai_magang: string;
+  ketentuan_berpakaian: string;
+  alur_setelah_mendaftar: string;
+  keterangan_kontak: string;
+};
+
+// Kolom yang isinya list (satu poin per baris) dirender sebagai <ul><li>.
+// Kolom prose (paragraf biasa) dirender sebagai <p>.
+function DaftarAtauParagraf({ teks }: { teks: string }) {
+  const baris = teks
+    .split("\n")
+    .map((b) => b.trim())
+    .filter(Boolean);
+
+  if (baris.length <= 1) {
+    return <p className="info-teks">{baris[0] ?? ""}</p>;
+  }
+
+  return (
+    <ul className="info-list">
+      {baris.map((b, i) => (
+        <li key={i}>{b}</li>
+      ))}
+    </ul>
+  );
+}
 
 export default function InfoPage() {
+  const [konten, setKonten] = useState<InfoKonten | null>(null);
+  const [memuat, setMemuat] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let masihTerpasang = true;
+
+    async function muatKonten() {
+      const { data, error } = await supabase
+        .from("info_konten")
+        .select(
+          "intro, siapa_yang_bisa_mendaftar, dokumen_diperlukan, jam_kerja, jadwal_mulai_magang, ketentuan_berpakaian, alur_setelah_mendaftar, keterangan_kontak"
+        )
+        .limit(1)
+        .maybeSingle();
+
+      if (!masihTerpasang) return;
+
+      if (error || !data) {
+        console.error("Gagal memuat konten info:", error);
+        setError("Gagal memuat halaman ini. Coba muat ulang.");
+        setMemuat(false);
+        return;
+      }
+
+      setKonten(data as InfoKonten);
+      setMemuat(false);
+    }
+
+    muatKonten();
+    return () => {
+      masihTerpasang = false;
+    };
+  }, []);
+
   return (
     <div className="halaman">
       <div className="bungkus">
@@ -11,93 +82,50 @@ export default function InfoPage() {
           <h1 className="judul-hero" style={{ fontSize: 26, maxWidth: "none" }}>
             Info dan ketentuan magang
           </h1>
-          <p className="sub-hero" style={{ marginBottom: "2rem" }}>
-            Baca halaman ini terlebih dahulu sebelum mengisi formulir pendaftaran,
-            supaya proses verifikasi oleh staf Bidang Aptika dapat berjalan lebih cepat.
-          </p>
 
-          <div className="info-section">
-            <h2>Siapa yang bisa mendaftar</h2>
-            <ul className="info-list">
-              <li>Mahasiswa yang akan melaksanakan Kerja Praktek (KP) dari perguruan tinggi.</li>
-              <li>Siswa SMK yang akan melaksanakan Praktik Kerja Lapangan (PKL).</li>
-            </ul>
-          </div>
+          {memuat && <p className="info-teks">Memuat...</p>}
+          {error && <div className="form-pesan-gagal">{error}</div>}
 
-          <div className="info-section">
-            <h2>Dokumen yang perlu disiapkan</h2>
-            <ul className="info-list">
-              <li>
-                Surat pengantar resmi dari kampus/sekolah, format PDF, maksimal 5MB.
-                Dokumen ini diunggah langsung pada formulir pendaftaran.
-              </li>
-              <li>
-                Surat pernyataan menjaga kerahasiaan informasi. Dokumen ini disediakan
-                dan diproses langsung oleh staf pada saat kedatangan pertama, tidak
-                diunggah melalui formulir pendaftaran online.
-              </li>
-            </ul>
-          </div>
+          {konten && (
+            <>
+              <p className="sub-hero" style={{ marginBottom: "2rem" }}>
+                {konten.intro}
+              </p>
 
-          <div className="info-section">
-            <h2>Jam kerja</h2>
-            <ul className="info-list">
-              <li>Senin&ndash;Selasa: pulang pukul 16.00 WIB.</li>
-              <li>Rabu: pulang pukul 16.00 WIB.</li>
-              <li>Kamis: pulang pukul 16.30 WIB.</li>
-              <li>Jumat: WFH (bekerja dari rumah, tidak hadir ke kantor).</li>
-            </ul>
-          </div>
+              <div className="info-section">
+                <h2>Siapa yang bisa mendaftar</h2>
+                <DaftarAtauParagraf teks={konten.siapa_yang_bisa_mendaftar} />
+              </div>
 
-          <div className="info-section">
-            <h2>Jadwal mulai magang</h2>
-            <p className="info-teks">
-              Tanggal mulai magang diajukan sendiri oleh pendaftar melalui formulir
-              pendaftaran, dan akan dikonfirmasi kembali oleh staf pada saat proses
-              verifikasi.
-            </p>
-            <div className="info-placeholder">
-              Catatan internal: bagian ini masih menunggu konfirmasi resmi dari
-              pembimbing lapangan mengenai ada/tidaknya periode mulai magang yang
-              tetap. Perbarui setelah dikonfirmasi.
-            </div>
-          </div>
+              <div className="info-section">
+                <h2>Dokumen yang perlu disiapkan</h2>
+                <DaftarAtauParagraf teks={konten.dokumen_diperlukan} />
+              </div>
 
-          <div className="info-section">
-            <h2>Ketentuan berpakaian</h2>
-            <ul className="info-list">
-              <li>Senin&ndash;Selasa: pakaian hitam putih.</li>
-              <li>Rabu: kemeja bebas/korsa (rapi, tidak kasual berlebihan).</li>
-              <li>Kamis: batik.</li>
-              <li>Jumat: mengikuti hari WFH, tidak ada ketentuan pakaian kantor.</li>
-            </ul>
-            <p className="info-teks" style={{ marginTop: "0.75rem" }}>
-              Bawahan menggunakan celana panjang berbahan kain (bukan jeans)
-              dan tidak ketat. Rok tidak diwajibkan.
-            </p>
-          </div>
+              <div className="info-section">
+                <h2>Jam kerja</h2>
+                <DaftarAtauParagraf teks={konten.jam_kerja} />
+              </div>
 
-          <div className="info-section">
-            <h2>Alur setelah mendaftar</h2>
-            <ul className="info-list">
-              <li>Formulir dan dokumen diperiksa oleh staf Bidang Aptika.</li>
-              <li>
-                Status pendaftaran dapat dipantau mandiri melalui halaman{" "}
-                <strong>Cek status</strong>, menggunakan nomor pendaftaran dan
-                email yang didaftarkan.
-              </li>
-              <li>
-                Apabila diverifikasi, penempatan bidang akan dicatat dan dapat
-                dilihat pada halaman yang sama.
-              </li>
-            </ul>
-          </div>
+              <div className="info-section">
+                <h2>Jadwal mulai magang</h2>
+                <DaftarAtauParagraf teks={konten.jadwal_mulai_magang} />
+              </div>
+
+              <div className="info-section">
+                <h2>Ketentuan berpakaian</h2>
+                <DaftarAtauParagraf teks={konten.ketentuan_berpakaian} />
+              </div>
+
+              <div className="info-section">
+                <h2>Alur setelah mendaftar</h2>
+                <DaftarAtauParagraf teks={konten.alur_setelah_mendaftar} />
+              </div>
+            </>
+          )}
         </div>
 
-        <p className="keterangan-halaman">
-          Ada pertanyaan lain yang belum terjawab di halaman ini? Hubungi staf
-          Bidang Aptika melalui kontak resmi instansi.
-        </p>
+        {konten && <p className="keterangan-halaman">{konten.keterangan_kontak}</p>}
       </div>
     </div>
   );

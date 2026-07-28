@@ -242,7 +242,6 @@ export default function AdminDashboardPage() {
                 <tr>
                   <th>Nomor</th>
                   <th>Nama</th>
-                  <th>Bidang</th>
                   <th>Periode</th>
                   <th>Status</th>
                   <th></th>
@@ -253,7 +252,6 @@ export default function AdminDashboardPage() {
                   <tr key={p.id}>
                     <td>{p.nomor_pendaftaran}</td>
                     <td>{p.nama_lengkap}</td>
-                    <td>{p.bidang?.nama ?? "-"}</td>
                     <td>
                       {formatTanggal(p.tanggal_mulai)} &ndash;{" "}
                       {formatTanggal(p.tanggal_selesai)}
@@ -275,7 +273,7 @@ export default function AdminDashboardPage() {
                 ))}
                 {daftarTersaring.length === 0 && (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: "center", padding: 20 }}>
+                    <td colSpan={5} style={{ textAlign: "center", padding: 20 }}>
                       Tidak ada data yang cocok.
                     </td>
                   </tr>
