@@ -101,15 +101,6 @@ function BerandaBelumLogin() {
           online. Masuk dengan email untuk mendaftar dan memantau status
           pendaftaranmu.
         </p>
-
-        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-          <Link href="/daftar" className="tombol">
-            Daftar magang
-          </Link>
-          <Link href="/info" className="tombol sekunder">
-            Info dan ketentuan
-          </Link>
-        </div>
       </div>
 
       <div className="panel-glass" style={{ marginTop: "1.5rem" }}>
@@ -235,6 +226,16 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
                 <span className="hasil-status-label">Tanggal daftar</span>
                 <span>{formatTanggal(p.dibuat_pada)}</span>
               </div>
+
+              {p.status === "diverifikasi" && (
+                <Link
+                  href={`/surat-keterangan/${p.nomor_pendaftaran}`}
+                  className="tombol sekunder"
+                  style={{ marginTop: "1rem", display: "inline-block" }}
+                >
+                  Cetak surat keterangan diterima
+                </Link>
+              )}
 
               {p.status === "ditolak" && p.catatan_admin && (
                 <div className="form-pesan-gagal" style={{ marginTop: "1rem", marginBottom: 0 }}>

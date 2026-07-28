@@ -242,6 +242,7 @@ export default function AdminDashboardPage() {
                 <tr>
                   <th>Nomor</th>
                   <th>Nama</th>
+                  <th>Bidang</th>
                   <th>Periode</th>
                   <th>Status</th>
                   <th></th>
@@ -252,6 +253,7 @@ export default function AdminDashboardPage() {
                   <tr key={p.id}>
                     <td>{p.nomor_pendaftaran}</td>
                     <td>{p.nama_lengkap}</td>
+                    <td>{p.bidang?.nama ?? "-"}</td>
                     <td>
                       {formatTanggal(p.tanggal_mulai)} &ndash;{" "}
                       {formatTanggal(p.tanggal_selesai)}
@@ -273,7 +275,7 @@ export default function AdminDashboardPage() {
                 ))}
                 {daftarTersaring.length === 0 && (
                   <tr>
-                    <td colSpan={5} style={{ textAlign: "center", padding: 20 }}>
+                    <td colSpan={6} style={{ textAlign: "center", padding: 20 }}>
                       Tidak ada data yang cocok.
                     </td>
                   </tr>
@@ -316,6 +318,9 @@ function ModalDetail({
   const [pesanError, setPesanError] = useState<string | null>(null);
   const [dokumen, setDokumen] = useState<Dokumen[]>([]);
   const [linkDokumen, setLinkDokumen] = useState<Record<string, string>>({});
+  const [kuotaBidang, setKuotaBidang] = useState<
+    { bidang_id: string; kuota: number; terisi: number }[]
+  >([]);
 
   useEffect(() => {
     async function muatDokumen() {
@@ -338,6 +343,28 @@ function ModalDetail({
     }
     muatDokumen();
   }, [pendaftar.id]);
+
+  useEffect(() => {
+    async function muatKuota() {
+      const { data, error } = await supabase.rpc("kuota_bidang_untuk_periode", {
+        p_tanggal_mulai: pendaftar.tanggal_mulai,
+        p_tanggal_selesai: pendaftar.tanggal_selesai,
+        p_exclude_id: pendaftar.id,
+      });
+      if (error) {
+        console.error("Gagal memuat kuota bidang:", error);
+        return;
+      }
+      setKuotaBidang(
+        (data ?? []).map((b: { bidang_id: string; kuota: number; terisi: number }) => ({
+          bidang_id: b.bidang_id,
+          kuota: b.kuota,
+          terisi: b.terisi,
+        }))
+      );
+    }
+    muatKuota();
+  }, [pendaftar.id, pendaftar.tanggal_mulai, pendaftar.tanggal_selesai]);
 
   async function simpan(statusBaru: StatusPendaftaran) {
     if (statusBaru === "ditolak" && !catatan.trim()) {
@@ -488,12 +515,34 @@ function ModalDetail({
             <option value="" disabled>
               Belum ditentukan
             </option>
-            {daftarBidang.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.nama}
-              </option>
-            ))}
+            {daftarBidang.map((b) => {
+              const kuota = kuotaBidang.find((k) => k.bidang_id === b.id);
+              const keterangan = kuota
+                ? ` (${kuota.terisi}/${kuota.kuota} terisi${
+                    kuota.terisi >= kuota.kuota ? " -- penuh" : ""
+                  })`
+                : "";
+              return (
+                <option key={b.id} value={b.id}>
+                  {b.nama}
+                  {keterangan}
+                </option>
+              );
+            })}
           </select>
+          {(() => {
+            const kuotaTerpilih = kuotaBidang.find((k) => k.bidang_id === bidangId);
+            if (kuotaTerpilih && kuotaTerpilih.terisi >= kuotaTerpilih.kuota) {
+              return (
+                <div className="form-pesan-gagal" style={{ marginTop: "0.6rem" }}>
+                  Bidang ini sudah penuh untuk periode tersebut ({kuotaTerpilih.terisi}
+                  /{kuotaTerpilih.kuota}). Kamu tetap bisa memilihnya kalau memang
+                  ingin melonggarkan kuota.
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
 
         <div className="form-grup">

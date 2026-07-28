@@ -731,3 +731,129 @@ select.form-input option {
   min-height: 0;
   overflow: auto;
 }
+/* ===== Halaman Surat Keterangan ===== */
+.halaman-surat {
+  min-height: 100vh;
+  background: #e8e3d5;
+  padding: 2.5rem 1.5rem;
+  font-family: var(--font-teks);
+  color: var(--teks-utama);
+}
+.tombol-baris-surat {
+  max-width: 210mm;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.kertas-surat {
+  max-width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20mm 18mm;
+  box-shadow: 0 8px 30px rgba(15, 42, 74, 0.18);
+  box-sizing: border-box;
+}
+.kop-surat {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.kop-surat-lambang {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--emas);
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-judul);
+  font-weight: 700;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.kop-surat-teks {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+.kop-surat-teks strong {
+  font-size: 16px;
+  color: var(--navy);
+}
+.kop-surat-alamat {
+  font-size: 12px;
+  color: var(--teks-muted);
+  margin-top: 2px;
+}
+.kop-surat-garis {
+  border: none;
+  border-top: 3px solid var(--navy);
+  margin: 14px 0 24px;
+}
+.judul-surat {
+  text-align: center;
+  font-family: var(--font-judul);
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  margin: 0 0 4px;
+  color: var(--navy);
+}
+.nomor-surat {
+  text-align: center;
+  font-size: 13px;
+  color: var(--teks-muted);
+  margin: 0 0 28px;
+}
+.isi-surat {
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 16px;
+  text-align: justify;
+}
+.tabel-surat {
+  border-collapse: collapse;
+  margin: 0 0 20px 20px;
+  font-size: 14px;
+}
+.tabel-surat td {
+  padding: 3px 8px 3px 0;
+  vertical-align: top;
+}
+.tabel-surat td:first-child {
+  white-space: nowrap;
+  color: var(--teks-muted);
+}
+.tanda-tangan-surat {
+  margin-top: 48px;
+  margin-left: auto;
+  width: 260px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.tanda-tangan-ruang {
+  height: 70px;
+}
+
+@media print {
+  .tanpa-cetak {
+    display: none !important;
+  }
+  .halaman-surat {
+    background: #fff;
+    padding: 0;
+  }
+  .kertas-surat {
+    box-shadow: none;
+    padding: 15mm 15mm;
+    min-height: 0;
+  }
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}
