@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import * as XLSX from "xlsx";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import AdminNav from "@/components/admin/AdminNav";
@@ -45,55 +46,79 @@ function selCsv(nilai: string) {
   return nilai;
 }
 
-function unduhCsv(daftar: BarisRekap[]) {
-  const header = [
-    "Nomor Pendaftaran",
-    "Nama Lengkap",
-    "Email",
-    "No HP",
-    "Asal Institusi",
-    "Jenis Institusi",
-    "Jurusan/Prodi",
-    "Bidang Penempatan",
-    "Periode Mulai",
-    "Periode Selesai",
-    "Status",
-    "Tanggal Daftar",
-  ];
+const HEADER_REKAP = [
+  "Nomor Pendaftaran",
+  "Nama Lengkap",
+  "Email",
+  "No HP",
+  "Asal Institusi",
+  "Jenis Institusi",
+  "Jurusan/Prodi",
+  "Bidang Penempatan",
+  "Periode Mulai",
+  "Periode Selesai",
+  "Status",
+  "Tanggal Daftar",
+];
 
-  const baris = daftar.map((p) =>
-    [
-      p.nomor_pendaftaran,
-      p.nama_lengkap,
-      p.email,
-      p.no_hp,
-      p.asal_institusi,
-      p.jenis_institusi === "kampus" ? "Kampus" : "SMK",
-      p.jurusan_prodi ?? "",
-      p.bidang?.nama ?? "Belum ditentukan",
-      formatTanggal(p.tanggal_mulai),
-      formatTanggal(p.tanggal_selesai),
-      LABEL_STATUS[p.status],
-      formatTanggal(p.dibuat_pada),
-    ]
-      .map(selCsv)
-      .join(",")
-  );
+// Dipakai bareng oleh unduhCsv() dan unduhExcel() supaya susunan
+// kolomnya selalu konsisten di kedua format -- kalau nanti ada kolom
+// baru, cukup ubah di sini, bukan di dua tempat terpisah.
+function barisRekapKeArray(daftar: BarisRekap[]): string[][] {
+  return daftar.map((p) => [
+    p.nomor_pendaftaran,
+    p.nama_lengkap,
+    p.email,
+    p.no_hp,
+    p.asal_institusi,
+    p.jenis_institusi === "kampus" ? "Kampus" : "SMK",
+    p.jurusan_prodi ?? "",
+    p.bidang?.nama ?? "Belum ditentukan",
+    formatTanggal(p.tanggal_mulai),
+    formatTanggal(p.tanggal_selesai),
+    LABEL_STATUS[p.status],
+    formatTanggal(p.dibuat_pada),
+  ]);
+}
+
+function namaFile(ekstensi: string) {
+  const tanggalFile = new Date().toISOString().slice(0, 10);
+  return `rekap-pendaftar-magang-${tanggalFile}.${ekstensi}`;
+}
+
+function unduhCsv(daftar: BarisRekap[]) {
+  const baris = barisRekapKeArray(daftar).map((kolom) => kolom.map(selCsv).join(","));
 
   // \uFEFF (BOM) di depan supaya Excel otomatis kebaca UTF-8 dengan
   // benar (tanpa ini, karakter seperti "&ndash;" atau nama dengan
   // huruf non-ASCII bisa muncul rusak kalau dibuka di Excel Windows).
-  const csv = "\uFEFF" + [header.join(","), ...baris].join("\n");
+  const csv = "\uFEFF" + [HEADER_REKAP.join(","), ...baris].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  const tanggalFile = new Date().toISOString().slice(0, 10);
   a.href = url;
-  a.download = `rekap-pendaftar-magang-${tanggalFile}.csv`;
+  a.download = namaFile("csv");
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+function unduhExcel(daftar: BarisRekap[]) {
+  const data = [HEADER_REKAP, ...barisRekapKeArray(daftar)];
+  const sheet = XLSX.utils.aoa_to_sheet(data);
+
+  // Lebar kolom otomatis, biar nggak semua kepotong pas dibuka.
+  sheet["!cols"] = HEADER_REKAP.map((h, i) => ({
+    wch: Math.max(
+      h.length,
+      ...data.slice(1).map((baris) => (baris[i] ?? "").length)
+    ) + 2,
+  }));
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, sheet, "Rekap Pendaftar");
+  XLSX.writeFile(workbook, namaFile("xlsx"));
 }
 
 export default function AdminRekapPage() {
@@ -101,6 +126,18 @@ export default function AdminRekapPage() {
 
   const [daftar, setDaftar] = useState<BarisRekap[]>([]);
   const [memuatData, setMemuatData] = useState(true);
+  const [dropdownTerbuka, setDropdownTerbuka] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function tutupKalauKlikLuar(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownTerbuka(false);
+      }
+    }
+    document.addEventListener("mousedown", tutupKalauKlikLuar);
+    return () => document.removeEventListener("mousedown", tutupKalauKlikLuar);
+  }, []);
   const [pesanError, setPesanError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -219,14 +256,53 @@ export default function AdminRekapPage() {
               Rekap pendaftar magang
             </h1>
           </div>
-          <button
-            type="button"
-            className="tombol"
-            onClick={() => unduhCsv(daftar)}
-            disabled={memuatData || daftar.length === 0}
-          >
-            Unduh CSV
-          </button>
+          <div ref={dropdownRef} style={{ position: "relative" }}>
+            <button
+              type="button"
+              className="tombol"
+              onClick={() => setDropdownTerbuka((t) => !t)}
+              disabled={memuatData || daftar.length === 0}
+            >
+              Unduh &#9662;
+            </button>
+            {dropdownTerbuka && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "calc(100% + 6px)",
+                  background: "#fff",
+                  border: "1px solid rgba(15, 42, 74, 0.12)",
+                  borderRadius: 10,
+                  boxShadow: "0 10px 30px rgba(15, 42, 74, 0.15)",
+                  overflow: "hidden",
+                  zIndex: 10,
+                  minWidth: 180,
+                }}
+              >
+                <button
+                  type="button"
+                  className="tombol-dropdown-item"
+                  onClick={() => {
+                    unduhCsv(daftar);
+                    setDropdownTerbuka(false);
+                  }}
+                >
+                  CSV (.csv)
+                </button>
+                <button
+                  type="button"
+                  className="tombol-dropdown-item"
+                  onClick={() => {
+                    unduhExcel(daftar);
+                    setDropdownTerbuka(false);
+                  }}
+                >
+                  Excel (.xlsx)
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {pesanError && (

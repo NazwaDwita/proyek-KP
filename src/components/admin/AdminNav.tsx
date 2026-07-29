@@ -59,7 +59,7 @@ export default function AdminNav({ onKeluar }: { onKeluar: () => void }) {
   }
 
   return (
-    <div className="admin-header-statis">
+    <>
       <div className="header-baris-atas">
         <Brand />
         <button
@@ -113,6 +113,6 @@ export default function AdminNav({ onKeluar }: { onKeluar: () => void }) {
           ))}
         </nav>
       </div>
-    </div>
+    </>
   );
 }

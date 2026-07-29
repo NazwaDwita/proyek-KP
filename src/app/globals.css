@@ -857,3 +857,21 @@ select.form-input option {
     margin: 0;
   }
 }
+.tombol-dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  font-family: var(--font-teks);
+  font-size: 14px;
+  color: var(--teks-utama);
+  cursor: pointer;
+}
+.tombol-dropdown-item:hover {
+  background: rgba(201, 150, 47, 0.12);
+}
+.tombol-dropdown-item + .tombol-dropdown-item {
+  border-top: 1px solid rgba(15, 42, 74, 0.08);
+}

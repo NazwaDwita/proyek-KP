@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import AdminNav from "@/components/admin/AdminNav";
@@ -117,22 +116,6 @@ export default function AdminBerandaPage() {
           <KartuRingkasan label="Diterima" nilai={ringkasan?.diverifikasi} />
           <KartuRingkasan label="Ditolak" nilai={ringkasan?.ditolak} />
           <KartuRingkasan label="Total pendaftar" nilai={ringkasan?.total} tebal />
-        </div>
-
-        <div className="panel-glass">
-          <p className="eyebrow" style={{ margin: 0 }}>
-            Langkah berikutnya
-          </p>
-          <h2 className="judul-hero" style={{ fontSize: 18, maxWidth: "none", marginBottom: "0.75rem" }}>
-            Kelola pendaftar yang masuk
-          </h2>
-          <p className="sub-hero" style={{ marginBottom: "1.25rem" }}>
-            Terima, tolak, atau tetapkan bidang penempatan untuk pendaftar
-            yang statusnya masih menunggu.
-          </p>
-          <Link href="/admin/dashboard" className="tombol">
-            Buka data pendaftar
-          </Link>
         </div>
       </div>
     </div>

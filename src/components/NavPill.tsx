@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSesi } from "@/lib/useSesi";
+import { supabase } from "@/lib/supabase";
 
 const menuItems = [
   {
@@ -50,13 +52,53 @@ const menuItems = [
 
 export default function NavPill() {
   const pathname = usePathname();
+  const { sesi } = useSesi();
   const [terbuka, setTerbuka] = useState(false);
   const [pathnameSebelumnya, setPathnameSebelumnya] = useState(pathname);
+  const [sudahDiterima, setSudahDiterima] = useState(false);
 
   if (pathname !== pathnameSebelumnya) {
     setPathnameSebelumnya(pathname);
     setTerbuka(false);
   }
+
+  useEffect(() => {
+    if (!sesi) return;
+
+    let masihTerpasang = true;
+
+    async function cekStatusDiterima() {
+      const { data, error } = await supabase
+        .from("pendaftar")
+        .select("id")
+        .eq("user_id", sesi!.user.id)
+        .eq("status", "diverifikasi")
+        .limit(1)
+        .maybeSingle();
+
+      if (!masihTerpasang) return;
+      if (error) {
+        console.error("Gagal memeriksa status pendaftaran:", error);
+        return;
+      }
+      setSudahDiterima(!!data);
+    }
+
+    cekStatusDiterima();
+    return () => {
+      masihTerpasang = false;
+    };
+  }, [sesi]);
+
+  // Link "Daftar magang" cuma disembunyikan kalau pendaftar sudah
+  // berstatus Diterima -- kalau masih Menunggu atau Ditolak, link ini
+  // tetap perlu tampil (Ditolak butuh jalan buat daftar ulang). Ikut
+  // syarat `sesi` di sini (bukan cuma reset state di effect) supaya
+  // begitu logout, link ini otomatis muncul lagi tanpa perlu setState
+  // tambahan yang bisa memicu cascading render.
+  const itemTampil = menuItems.filter(
+    (item) => !(item.href === "/daftar" && sudahDiterima && sesi)
+  );
 
   return (
     <div className="nav-wrapper">
@@ -81,7 +123,7 @@ export default function NavPill() {
       </button>
 
       <nav className={`nav-pill${terbuka ? " nav-pill-terbuka" : ""}`}>
-        {menuItems.map((item) => (
+        {itemTampil.map((item) => (
           <Link
             key={item.href}
             href={item.href}
