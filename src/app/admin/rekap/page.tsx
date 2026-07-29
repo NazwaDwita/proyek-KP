@@ -239,6 +239,7 @@ export default function AdminRekapPage() {
         <AdminNav onKeluar={keluar} />
 
         <div
+          className="blok-judul-admin"
           style={{
             display: "flex",
             justifyContent: "space-between",

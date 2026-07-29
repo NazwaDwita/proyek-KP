@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --dasar: #f7f3e8;
+  --dasar: #eaf0f7;
   --navy: #0f2a4a;
   --navy-sekunder: #1c3f66;
   --emas: #c9962f;
   --emas-tua: #8a611c;
   --teks-utama: #1c2b3d;
-  --teks-muted: rgba(28, 43, 61, 0.62);
+  --teks-muted: rgba(28, 43, 61, 0.78);
   --teks-terang: #f7f3e8;
   --teks-muted-terang: rgba(247, 243, 232, 0.65);
   --radius: 16px;
@@ -30,8 +30,8 @@ body {
   min-height: 100vh;
   background-image: linear-gradient(
       180deg,
-      rgba(247, 243, 232, 0.9),
-      rgba(247, 243, 232, 0.96)
+      rgba(234, 240, 247, 0.9),
+      rgba(234, 240, 247, 0.96)
     ),
     url("/assets/motif-terang.svg");
   background-size: cover, 220px;
@@ -172,19 +172,6 @@ button.akun-indikator {
   white-space: nowrap;
 }
 
-.akun-indikator-keluar {
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(15, 42, 74, 0.25);
-  background: transparent;
-  color: var(--teks-utama);
-  font-size: 12.5px;
-  cursor: pointer;
-}
-.akun-indikator-keluar:hover {
-  background: rgba(15, 42, 74, 0.06);
-}
-
 @media (max-width: 640px) {
   .akun-indikator-email {
     display: none;
@@ -263,12 +250,13 @@ button.akun-indikator {
 /* Panel glass utama — kartu terang yang sedikit lebih putih dari latar
    halaman, supaya kelihatan "terangkat" di atas motif belakangnya. */
 .panel-glass {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(15, 42, 74, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(15, 42, 74, 0.1);
   border-radius: var(--radius);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: 2.5rem;
+  box-shadow: 0 10px 32px rgba(15, 42, 74, 0.12), 0 2px 8px rgba(15, 42, 74, 0.06);
 }
 /* Dipakai di halaman admin yang tingginya dipatok 1 layar penuh (lihat
    .halaman-fit) -- padding besar seperti .panel-glass biasa terlalu
@@ -457,14 +445,14 @@ select.form-input option {
   border: 1px solid rgba(15, 42, 74, 0.2);
 }
 .status-diverifikasi {
-  background: rgba(201, 150, 47, 0.12);
-  color: var(--emas-tua);
-  border: 1px solid rgba(201, 150, 47, 0.4);
+  background: rgba(34, 139, 65, 0.12);
+  color: #1e6b38;
+  border: 1px solid rgba(34, 139, 65, 0.4);
 }
 .status-ditolak {
-  background: rgba(178, 59, 59, 0.08);
-  color: #9c3232;
-  border: 1px solid rgba(178, 59, 59, 0.35);
+  background: rgba(200, 40, 40, 0.1);
+  color: #b02323;
+  border: 1px solid rgba(200, 40, 40, 0.4);
 }
 
 .hasil-status-baris {
@@ -479,7 +467,8 @@ select.form-input option {
   border-bottom: none;
 }
 .hasil-status-label {
-  color: var(--teks-muted);
+  color: var(--navy-sekunder);
+  font-weight: 500;
 }
 
 .tombol:disabled {

@@ -35,8 +35,17 @@ export default function AkunIndikator() {
   return (
     <div className="akun-indikator">
       <span className="akun-indikator-email">{nama}</span>
-      <button type="button" onClick={keluar} className="akun-indikator-keluar">
-        Keluar
+      <button
+        type="button"
+        onClick={keluar}
+        className="tombol-ikon"
+        title="Keluar"
+        aria-label="Keluar dari akun"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+        </svg>
       </button>
     </div>
   );

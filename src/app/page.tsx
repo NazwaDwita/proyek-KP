@@ -173,7 +173,6 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
   return (
     <>
       <div className="panel-glass">
-        <p className="eyebrow">Akun kamu</p>
         <h1 className="judul-hero" style={{ fontSize: 24, maxWidth: "none" }}>
           Selamat datang, {nama}
         </h1>
@@ -230,7 +229,7 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
               {p.status === "diverifikasi" && (
                 <Link
                   href={`/surat-keterangan/${p.nomor_pendaftaran}`}
-                  className="tombol sekunder"
+                  className="tombol"
                   style={{ marginTop: "1rem", display: "inline-block" }}
                 >
                   Cetak surat keterangan diterima

@@ -190,7 +190,7 @@ export default function AdminInfoPage() {
       <div className="bungkus" style={{ maxWidth: 1400 }}>
         <AdminNav onKeluar={keluar} />
 
-        <div style={{ marginBottom: "1.5rem" }}>
+        <div className="blok-judul-admin" style={{ marginBottom: "1.5rem" }}>
           <p className="eyebrow" style={{ margin: 0 }}>
             Edit info
           </p>
