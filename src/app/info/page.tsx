@@ -15,8 +15,6 @@ type InfoKonten = {
   keterangan_kontak: string;
 };
 
-// Kolom yang isinya list (satu poin per baris) dirender sebagai <ul><li>.
-// Kolom prose (paragraf biasa) dirender sebagai <p>.
 function DaftarAtauParagraf({ teks }: { teks: string }) {
   const baris = teks
     .split("\n")
@@ -78,7 +76,6 @@ export default function InfoPage() {
         <HeaderSticky />
 
         <div className="panel-glass">
-          <p className="eyebrow">Sebelum mendaftar</p>
           <h1 className="judul-hero" style={{ fontSize: 26, maxWidth: "none" }}>
             Info dan ketentuan magang
           </h1>

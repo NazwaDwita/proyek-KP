@@ -94,7 +94,6 @@ function BerandaBelumLogin() {
   return (
     <>
       <div className="panel-glass">
-        <p className="eyebrow">Portal magang</p>
         <h1 className="judul-hero">Magang di Diskominfotik Provinsi Riau</h1>
         <p className="sub-hero">
           Daftar kerja praktek (KP) atau praktik kerja lapangan (PKL) secara

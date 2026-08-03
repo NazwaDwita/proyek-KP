@@ -1,4 +1,6 @@
 import HeaderSticky from "@/components/HeaderSticky";
+import StrukturOrganisasi from "@/components/StrukturOrganisasi";
+import Footer from "@/components/Footer";
 
 export default function ProfilDinasPage() {
   return (
@@ -16,7 +18,7 @@ export default function ProfilDinasPage() {
           </p>
 
           <div style={{ marginBottom: "1.75rem" }}>
-            <h2 style={{ color: "var(--emas-terang)", fontSize: 16, marginBottom: 8 }}>
+            <h2 style={{ color: "var(--emas-tua)", fontSize: 16, marginBottom: 8 }}>
               Visi
             </h2>
             <p className="sub-hero" style={{ margin: 0 }}>
@@ -25,7 +27,7 @@ export default function ProfilDinasPage() {
           </div>
 
           <div style={{ marginBottom: "1.75rem" }}>
-            <h2 style={{ color: "var(--emas-terang)", fontSize: 16, marginBottom: 8 }}>
+            <h2 style={{ color: "var(--emas-tua)", fontSize: 16, marginBottom: 8 }}>
               Bidang di Diskominfotik Provinsi Riau
             </h2>
             <ul style={{ margin: 0, paddingLeft: 20, color: "var(--teks-muted)", lineHeight: 1.8 }}>
@@ -37,8 +39,8 @@ export default function ProfilDinasPage() {
             </ul>
           </div>
 
-          <div>
-            <h2 style={{ color: "var(--emas-terang)", fontSize: 16, marginBottom: 8 }}>
+          <div style={{ marginBottom: "1.75rem" }}>
+            <h2 style={{ color: "var(--emas-tua)", fontSize: 16, marginBottom: 8 }}>
               Kontak
             </h2>
             <p className="sub-hero" style={{ margin: 0 }}>
@@ -47,14 +49,17 @@ export default function ProfilDinasPage() {
               Diskominfotik Provinsi Riau.
             </p>
           </div>
-        </div>
 
-        <p className="keterangan-halaman">
-          Halaman ini masih berisi konten sementara &mdash; perlu dilengkapi
-          dengan info resmi (alamat, nomor telepon, struktur organisasi
-          lengkap) sebelum dipakai untuk publik.
-        </p>
+          <div>
+            <h2 style={{ color: "var(--emas-tua)", fontSize: 16, marginBottom: 8 }}>
+              Struktur Organisasi
+            </h2>
+            <StrukturOrganisasi />
+          </div>
+        </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

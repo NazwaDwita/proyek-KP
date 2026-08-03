@@ -34,6 +34,18 @@ export default function AkunIndikator() {
 
   return (
     <div className="akun-indikator">
+      <svg
+        className="akun-indikator-ikon-user"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+      </svg>
       <span className="akun-indikator-email">{nama}</span>
       <button
         type="button"
@@ -42,9 +54,10 @@ export default function AkunIndikator() {
         title="Keluar"
         aria-label="Keluar dari akun"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
         </svg>
       </button>
     </div>
