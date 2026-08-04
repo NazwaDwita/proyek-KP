@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ModalMasukProvider } from "@/lib/ModalMasukContext";
+import { SesiPendaftarProvider } from "@/lib/SesiPendaftarContext";
+import PageTransition from "@/components/PageTransition";
 
 export const metadata: Metadata = {
   title: "SIMAKRI — Sistem Magang Diskominfotik Provinsi Riau",
@@ -23,7 +25,11 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ModalMasukProvider>{children}</ModalMasukProvider>
+        <SesiPendaftarProvider>
+          <ModalMasukProvider>
+            <PageTransition>{children}</PageTransition>
+          </ModalMasukProvider>
+        </SesiPendaftarProvider>
       </body>
     </html>
   );

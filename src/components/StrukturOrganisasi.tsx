@@ -101,8 +101,6 @@ export default function StrukturOrganisasi() {
           );
         })}
       </div>
-
-      <p className="struktur-catatan">Struktur per tanggal 9 Juli 2026.</p>
     </div>
   );
 }

@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useSesi } from "@/lib/useSesi";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
+import { useSesiPendaftar } from "@/lib/SesiPendaftarContext";
 
 const menuItems = [
   {
@@ -52,43 +51,14 @@ const menuItems = [
 
 export default function NavPill() {
   const pathname = usePathname();
-  const { sesi } = useSesi();
+  const { sesi, sudahDiterima } = useSesiPendaftar();
   const [terbuka, setTerbuka] = useState(false);
   const [pathnameSebelumnya, setPathnameSebelumnya] = useState(pathname);
-  const [sudahDiterima, setSudahDiterima] = useState(false);
 
   if (pathname !== pathnameSebelumnya) {
     setPathnameSebelumnya(pathname);
     setTerbuka(false);
   }
-
-  useEffect(() => {
-    if (!sesi) return;
-
-    let masihTerpasang = true;
-
-    async function cekStatusDiterima() {
-      const { data, error } = await supabase
-        .from("pendaftar")
-        .select("id")
-        .eq("user_id", sesi!.user.id)
-        .eq("status", "diverifikasi")
-        .limit(1)
-        .maybeSingle();
-
-      if (!masihTerpasang) return;
-      if (error) {
-        console.error("Gagal memeriksa status pendaftaran:", error);
-        return;
-      }
-      setSudahDiterima(!!data);
-    }
-
-    cekStatusDiterima();
-    return () => {
-      masihTerpasang = false;
-    };
-  }, [sesi]);
 
   // Link "Daftar magang" cuma disembunyikan kalau pendaftar sudah
   // berstatus Diterima -- kalau masih Menunggu atau Ditolak, link ini

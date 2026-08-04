@@ -1,15 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --dasar: #FCF2E5;
+  --dasar: #F3CD97;
+  --kartu-bg: #ffffff;
+  --putih: #ffffff;
   --navy: #0f2a4a;
   --navy-sekunder: #1c3f66;
+  --navbar-bg: #0f2a4a;
   --emas: #c9962f;
   --emas-tua: #8a611c;
+  --emas-hover: #b3852a;
+  --tombol-bg: var(--emas);
+  --tombol-teks: var(--navy);
+  --tombol-hover-bg: var(--emas-hover);
   --teks-utama: #1c2b3d;
-  --teks-muted: rgba(28, 43, 61, 0.78);
+  --teks-muted: rgb(from var(--teks-utama) r g b / 0.78);
   --teks-terang: #f7f3e8;
-  --teks-muted-terang: rgba(247, 243, 232, 0.65);
+  --teks-muted-terang: rgb(from var(--teks-terang) r g b / 0.65);
   --radius: 16px;
   --font-judul: "Fraunces", Georgia, serif;
   --font-teks: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
@@ -45,7 +52,6 @@ body {
   margin: 0 auto;
 }
 
-/* Brand (logo + judul) — sengaja TIDAK sticky, ikut ke-scroll biasa */
 .brand {
   display: flex;
   align-items: center;
@@ -83,8 +89,8 @@ body {
   padding: 4px;
   margin: 1.25rem 0 1.5rem;
   border-radius: 999px;
-  background: rgba(15, 42, 74, 0.05);
-  border: 1px solid rgba(15, 42, 74, 0.12);
+  background: rgb(from var(--navy) r g b / 0.05);
+  border: 1px solid rgb(from var(--navy) r g b / 0.12);
 }
 .toggle-mode button {
   flex: 1;
@@ -109,13 +115,13 @@ body {
   flex-shrink: 0;
 }
 .toggle-mode button:hover:not(.aktif) {
-  background: rgba(15, 42, 74, 0.06);
+  background: rgb(from var(--navy) r g b / 0.06);
   color: var(--teks-utama);
 }
 .toggle-mode button.aktif {
   background: var(--emas);
   color: var(--navy);
-  box-shadow: 0 2px 10px rgba(201, 150, 47, 0.35);
+  box-shadow: 0 2px 10px rgb(from var(--emas) r g b / 0.35);
 }
 
 .header-baris-atas {
@@ -132,7 +138,7 @@ body {
   background: var(--dasar);
   padding: 0.85rem 0 0.65rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid rgba(28, 43, 61, 0.08);
+  border-bottom: 1px solid rgb(from var(--teks-utama) r g b / 0.08);
 }
 .admin-header-statis .header-baris-atas {
   margin-bottom: 0.6rem;
@@ -155,13 +161,19 @@ body {
 button.akun-indikator {
   padding: 8px 16px;
   border-radius: 999px;
-  background: var(--emas);
-  color: var(--navy);
+  background: var(--tombol-bg);
+  color: var(--tombol-teks);
   font-weight: 500;
   border: none;
   cursor: pointer;
   font-family: var(--font-teks);
   font-size: 13px;
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+button.akun-indikator:hover {
+  background: var(--tombol-hover-bg);
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 10px 22px rgb(from var(--navy) r g b / 0.22);
 }
 
 .akun-indikator-ikon-user {
@@ -204,8 +216,8 @@ button.akun-indikator {
   gap: 6px;
   padding: 6px;
   border-radius: 999px;
-  background: rgba(15, 42, 74, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgb(from var(--navbar-bg) r g b / 0.92);
+  border: 1px solid rgb(from var(--putih) r g b / 0.14);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   flex-wrap: wrap;
@@ -220,14 +232,21 @@ button.akun-indikator {
   font-size: 12px;
   font-weight: 500;
   color: var(--teks-muted-terang);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 .nav-pill a:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--navy-sekunder);
   color: var(--teks-terang);
+  transform: translateY(-3px) scale(1.07);
+  box-shadow: 0 8px 18px rgb(from var(--navy) r g b / 0.35);
 }
 .nav-pill a.aktif {
   background: var(--emas);
+  color: var(--navy);
+}
+.nav-pill a.aktif:hover {
+  background: var(--emas-hover);
   color: var(--navy);
 }
 .nav-pill svg {
@@ -238,13 +257,13 @@ button.akun-indikator {
 /* Panel glass utama — kartu terang yang sedikit lebih putih dari latar
    halaman, supaya kelihatan "terangkat" di atas motif belakangnya. */
 .panel-glass {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(15, 42, 74, 0.1);
+  background: rgb(from var(--kartu-bg) r g b / 0.88);
+  border: 1px solid rgb(from var(--navy) r g b / 0.1);
   border-radius: var(--radius);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: 2.5rem;
-  box-shadow: 0 10px 32px rgba(15, 42, 74, 0.12), 0 2px 8px rgba(15, 42, 74, 0.06);
+  box-shadow: 0 10px 32px rgb(from var(--navy) r g b / 0.12), 0 2px 8px rgb(from var(--navy) r g b / 0.06);
 }
 /* Dipakai di halaman admin yang tingginya dipatok 1 layar penuh (lihat
    .halaman-fit) -- padding besar seperti .panel-glass biasa terlalu
@@ -284,18 +303,33 @@ p.sub-hero {
   gap: 8px;
   padding: 12px 22px;
   border-radius: 999px;
-  background: var(--emas);
-  color: var(--navy);
+  background: var(--tombol-bg);
+  color: var(--tombol-teks);
   font-weight: 500;
   font-size: 14px;
   text-decoration: none;
   border: none;
   cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.tombol:hover:not(:disabled) {
+  background: var(--tombol-hover-bg);
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 10px 22px rgb(from var(--navy) r g b / 0.22);
+}
+.tombol:active:not(:disabled) {
+  transform: translateY(-1px) scale(1.01);
 }
 .tombol.sekunder {
   background: transparent;
   color: var(--teks-utama);
-  border: 1px solid rgba(15, 42, 74, 0.25);
+  border: 1px solid rgb(from var(--navy) r g b / 0.25);
+}
+.tombol.sekunder:hover:not(:disabled) {
+  background: rgb(from var(--navy) r g b / 0.06);
+  color: var(--navy);
+  border-color: var(--navy);
 }
 
 /* Halaman statistik: angka besar, tanpa card terpisah */
@@ -307,8 +341,8 @@ p.sub-hero {
 }
 .item-statistik {
   padding: 1.5rem 1rem;
-  border-right: 1px solid rgba(15, 42, 74, 0.14);
-  border-top: 1px solid rgba(15, 42, 74, 0.14);
+  border-right: 1px solid rgb(from var(--navy) r g b / 0.14);
+  border-top: 1px solid rgb(from var(--navy) r g b / 0.14);
 }
 .item-statistik:nth-child(4n) {
   border-right: none;
@@ -356,22 +390,22 @@ input, select, textarea {
   width: 100%;
   padding: 11px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(15, 42, 74, 0.18);
-  background: #ffffff;
+  border: 1px solid rgb(from var(--navy) r g b / 0.18);
+  background: var(--kartu-bg);
   color: var(--teks-utama);
   font-family: var(--font-teks);
   font-size: 14px;
 }
 .form-input::placeholder {
-  color: rgba(28, 43, 61, 0.35);
+  color: rgb(from var(--teks-utama) r g b / 0.35);
 }
 .form-input:focus {
   outline: none;
   border-color: var(--emas);
-  background: #ffffff;
+  background: var(--kartu-bg);
 }
 select.form-input option {
-  background: #ffffff;
+  background: var(--kartu-bg);
   color: var(--teks-utama);
 }
 
@@ -411,8 +445,8 @@ select.form-input option {
   margin: 1.25rem 0;
   padding: 16px 28px;
   border-radius: 12px;
-  border: 1px solid rgba(201, 150, 47, 0.4);
-  background: rgba(201, 150, 47, 0.08);
+  border: 1px solid rgb(from var(--emas) r g b / 0.4);
+  background: rgb(from var(--emas) r g b / 0.08);
   font-family: var(--font-judul);
   font-size: 24px;
   font-weight: 600;
@@ -428,9 +462,9 @@ select.form-input option {
   font-weight: 500;
 }
 .status-menunggu {
-  background: rgba(15, 42, 74, 0.06);
+  background: rgb(from var(--navy) r g b / 0.06);
   color: var(--teks-muted);
-  border: 1px solid rgba(15, 42, 74, 0.2);
+  border: 1px solid rgb(from var(--navy) r g b / 0.2);
 }
 .status-diverifikasi {
   background: rgba(34, 139, 65, 0.12);
@@ -448,7 +482,7 @@ select.form-input option {
   justify-content: space-between;
   align-items: baseline;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(15, 42, 74, 0.12);
+  border-bottom: 1px solid rgb(from var(--navy) r g b / 0.12);
   font-size: 14px;
 }
 .hasil-status-baris:last-child {
@@ -498,8 +532,8 @@ select.form-input option {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  border: 1px dashed rgba(201, 150, 47, 0.5);
-  background: rgba(201, 150, 47, 0.06);
+  border: 1px dashed rgb(from var(--emas) r g b / 0.5);
+  background: rgb(from var(--emas) r g b / 0.06);
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 13px;
@@ -516,7 +550,7 @@ select.form-input option {
     padding: 1.5rem;
   }
   .item-statistik:nth-child(4n) {
-    border-right: 1px solid rgba(15, 42, 74, 0.14);
+    border-right: 1px solid rgb(from var(--navy) r g b / 0.14);
   }
   .item-statistik:nth-child(2n) {
     border-right: none;
@@ -561,7 +595,7 @@ select.form-input option {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgb(from var(--putih) r g b / 0.16);
   position: sticky;
   top: 0;
   background: var(--navy);
@@ -569,7 +603,7 @@ select.form-input option {
 }
 .tabel-admin td {
   padding: 12px;
-  border-bottom: 1px solid rgba(15, 42, 74, 0.1);
+  border-bottom: 1px solid rgb(from var(--navy) r g b / 0.1);
   word-wrap: break-word;
 }
 .tabel-admin th:nth-child(1),
@@ -597,7 +631,7 @@ select.form-input option {
   width: 10%;
 }
 .tabel-admin tbody tr:hover {
-  background: rgba(15, 42, 74, 0.04);
+  background: rgb(from var(--navy) r g b / 0.04);
 }
 
 .tombol-kecil {
@@ -621,7 +655,7 @@ select.form-input option {
   max-height: 90vh;
   overflow-y: auto;
   background: #fdfbf5;
-  border: 1px solid rgba(15, 42, 74, 0.12);
+  border: 1px solid rgb(from var(--navy) r g b / 0.12);
   border-radius: 16px;
   padding: 1.75rem;
   box-shadow: 0 24px 60px rgba(15, 20, 30, 0.35);
@@ -657,14 +691,19 @@ select.form-input option {
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  background: rgba(15, 42, 74, 0.06);
-  border: 1px solid rgba(15, 42, 74, 0.16);
+  background: rgb(from var(--navy) r g b / 0.06);
+  border: 1px solid rgb(from var(--navy) r g b / 0.16);
   color: var(--teks-utama);
   cursor: pointer;
   flex-shrink: 0;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
-.tombol-ikon:hover {
-  background: rgba(15, 42, 74, 0.1);
+.tombol-ikon:hover:not(:disabled) {
+  background: var(--emas);
+  color: var(--navy);
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 8px 16px rgb(from var(--navy) r g b / 0.22);
 }
 .tombol-ikon:disabled {
   opacity: 0.5;
@@ -729,7 +768,7 @@ select.form-input option {
   margin: 0 auto;
   background: #fff;
   padding: 20mm 18mm;
-  box-shadow: 0 8px 30px rgba(15, 42, 74, 0.18);
+  box-shadow: 0 8px 30px rgb(from var(--navy) r g b / 0.18);
   box-sizing: border-box;
 }
 .kop-surat {
@@ -847,10 +886,10 @@ select.form-input option {
   cursor: pointer;
 }
 .tombol-dropdown-item:hover {
-  background: rgba(201, 150, 47, 0.12);
+  background: rgb(from var(--emas) r g b / 0.12);
 }
 .tombol-dropdown-item + .tombol-dropdown-item {
-  border-top: 1px solid rgba(15, 42, 74, 0.08);
+  border-top: 1px solid rgb(from var(--navy) r g b / 0.08);
 }
 
 /* ===== Struktur Organisasi (kartu bertingkat + accordion) ===== */
@@ -869,7 +908,7 @@ select.form-input option {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  box-shadow: 0 10px 26px rgba(15, 42, 74, 0.22);
+  box-shadow: 0 10px 26px rgb(from var(--navy) r g b / 0.22);
 }
 .struktur-kepala span {
   font-size: 11px;
@@ -905,8 +944,8 @@ select.form-input option {
 }
 
 .struktur-mini-card {
-  background: #ffffff;
-  border: 1px solid rgba(15, 42, 74, 0.12);
+  background: var(--kartu-bg);
+  border: 1px solid rgb(from var(--navy) r g b / 0.12);
   border-radius: 10px;
   padding: 10px 14px;
   margin-bottom: 8px;
@@ -930,8 +969,8 @@ select.form-input option {
 }
 
 .struktur-bidang-card {
-  background: #ffffff;
-  border: 1px solid rgba(15, 42, 74, 0.12);
+  background: var(--kartu-bg);
+  border: 1px solid rgb(from var(--navy) r g b / 0.12);
   border-radius: 12px;
   overflow: hidden;
   align-self: start;
@@ -1016,7 +1055,7 @@ select.form-input option {
 .pohon-tree ul {
   margin-left: 20px;
   padding-left: 20px;
-  border-left: 1px dashed rgba(15, 42, 74, 0.28);
+  border-left: 1px dashed rgb(from var(--navy) r g b / 0.28);
 }
 
 .pohon-tree li {
@@ -1030,15 +1069,15 @@ select.form-input option {
   top: 24px;
   left: -20px;
   width: 20px;
-  border-top: 1px dashed rgba(15, 42, 74, 0.28);
+  border-top: 1px dashed rgb(from var(--navy) r g b / 0.28);
 }
 
 .pohon-node {
   display: inline-flex;
   flex-direction: column;
   gap: 2px;
-  background: #ffffff;
-  border: 1px solid rgba(15, 42, 74, 0.14);
+  background: var(--kartu-bg);
+  border: 1px solid rgb(from var(--navy) r g b / 0.14);
   border-radius: 10px;
   padding: 8px 14px;
   white-space: normal;
@@ -1067,8 +1106,8 @@ select.form-input option {
 }
 
 .pohon-node-grup {
-  background: rgba(201, 150, 47, 0.12);
-  border-color: rgba(201, 150, 47, 0.35);
+  background: rgb(from var(--emas) r g b / 0.12);
+  border-color: rgb(from var(--emas) r g b / 0.35);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1079,7 +1118,7 @@ select.form-input option {
 
 .pohon-node-bidang {
   border-color: var(--emas);
-  background: rgba(201, 150, 47, 0.06);
+  background: rgb(from var(--emas) r g b / 0.06);
 }
 .pohon-node-bidang strong {
   color: var(--emas-tua);
@@ -1127,7 +1166,7 @@ select.form-input option {
   color: var(--emas);
   margin: 0 0 0.9rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgb(from var(--putih) r g b / 0.16);
   font-weight: 600;
 }
 
@@ -1152,7 +1191,7 @@ select.form-input option {
 .footer-peta {
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgb(from var(--putih) r g b / 0.16);
 }
 .footer-peta iframe {
   display: block;
@@ -1176,5 +1215,27 @@ select.form-input option {
   text-align: center;
   font-size: 11.5px;
   color: var(--teks-muted-terang);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgb(from var(--putih) r g b / 0.08);
+}
+
+/* ===== Efek slide tiap pindah halaman ===== */
+.page-transition {
+  animation: page-slide-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
 }
