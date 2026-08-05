@@ -8,6 +8,19 @@ import { supabase } from "@/lib/supabase";
 
 const KUOTA_PER_BIDANG = 10;
 
+const DESKRIPSI_BIDANG: Record<string, string> = {
+  "Bidang Aplikasi & Informatika":
+    "Pengembangan aplikasi, sistem informasi, dan layanan digital pemerintah.",
+  "Bidang Infrastruktur Teknologi Informasi dan Komunikasi":
+    "Infrastruktur jaringan, keamanan sistem, dan dukungan teknis TIK.",
+  "Bidang Informasi dan Komunikasi Publik":
+    "Produksi konten, kehumasan, pengelolaan media sosial, dan layanan informasi publik.",
+  "Bidang Statistik":
+    "Pengolahan data sektoral dan penyediaan data statistik daerah (Satu Data Riau).",
+  "Bidang Persandian":
+    "Keamanan informasi, persandian, dan pengelolaan komunikasi rahasia pemerintah.",
+};
+
 const LABEL_STATUS: Record<string, string> = {
   menunggu: "Menunggu",
   diverifikasi: "Diterima",
@@ -91,44 +104,80 @@ function BerandaBelumLogin() {
     };
   }, []);
 
+  const totalKuota = statistik.length > 0 ? statistik.length * KUOTA_PER_BIDANG : 5 * KUOTA_PER_BIDANG;
+  const totalAktif = statistik.reduce((jumlah, item) => jumlah + item.jumlah_aktif, 0);
+  const totalSisa = Math.max(totalKuota - totalAktif, 0);
+
   return (
     <>
-      <div className="panel-glass">
-        <h1 className="judul-hero">Magang di Diskominfotik Provinsi Riau</h1>
-        <p className="sub-hero">
-          Daftar kerja praktek (KP) atau praktik kerja lapangan (PKL) secara
-          online. Masuk dengan email untuk mendaftar dan memantau status
-          pendaftaranmu.
+      <div className="hero-magang">
+        <span className="hero-badge">Diskominfotik Provinsi Riau</span>
+        <h1>Pendaftaran Magang &amp; PKL Dinas Diskominfotik Provinsi Riau</h1>
+        <p>
+          Terbuka untuk siswa dan mahasiswa dari mana saja. Pilih bidang,
+          tentukan periode magang, dan pantau status pendaftaranmu secara
+          online.
         </p>
+        <div className="hero-tombol-grup">
+          <Link href="/daftar" className="tombol-hero">
+            Daftar Sekarang
+          </Link>
+          <a href="#ketersediaan-slot" className="tombol-hero-sekunder">
+            Lihat Ketersediaan Slot
+          </a>
+        </div>
       </div>
 
-      <div className="panel-glass" style={{ marginTop: "1.5rem" }}>
-        <p className="eyebrow">Data per hari ini</p>
-        <h2 className="judul-hero" style={{ fontSize: 22, maxWidth: "none", marginBottom: "0.5rem" }}>
-          Peserta magang aktif &amp; sisa kuota per bidang
-        </h2>
-        <p className="sub-hero" style={{ marginBottom: "1rem" }}>
-          Setiap bidang menerima maksimal {KUOTA_PER_BIDANG} peserta magang aktif dalam satu periode.
-        </p>
-
+      <div id="ketersediaan-slot" style={{ marginTop: "1.5rem" }}>
         {memuatStatistik ? (
-          <p className="info-teks">Memuat data...</p>
+          <div className="panel-glass">
+            <p className="info-teks" style={{ margin: 0 }}>Memuat data...</p>
+          </div>
         ) : (
-          <div className="grid-statistik">
-            {statistik.map((item) => {
-              const sisa = Math.max(KUOTA_PER_BIDANG - item.jumlah_aktif, 0);
-              return (
-                <div className="item-statistik" key={item.bidang_nama}>
-                  <div className="angka-statistik">{sisa}</div>
-                  <div className="label-statistik">
-                    slot tersisa &middot; {item.bidang_nama}
-                    <br />
-                    ({item.jumlah_aktif} dari {KUOTA_PER_BIDANG} aktif)
+          <>
+            <div className="ringkasan-slot">
+              <div className="ringkasan-slot-kiri">
+                <div className="ringkasan-slot-ikon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" strokeLinecap="round" />
+                    <circle cx="10" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="ringkasan-slot-label">Total peserta magang aktif saat ini</div>
+                  <div className="ringkasan-slot-angka">
+                    {totalAktif} <span>dari {totalKuota} slot</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+              <span className="pil-slot-tersisa">{totalSisa} slot tersedia</span>
+            </div>
+
+            <div className="grid-kartu-bidang">
+              {statistik.map((item) => {
+                const sisa = Math.max(KUOTA_PER_BIDANG - item.jumlah_aktif, 0);
+                const persen = Math.min((item.jumlah_aktif / KUOTA_PER_BIDANG) * 100, 100);
+                return (
+                  <div className="kartu-bidang" key={item.bidang_nama}>
+                    <div className="kartu-bidang-atas">
+                      <h3 className="kartu-bidang-judul">{item.bidang_nama}</h3>
+                      <span className="kartu-bidang-badge">{sisa} slot</span>
+                    </div>
+                    <p className="kartu-bidang-deskripsi">
+                      {DESKRIPSI_BIDANG[item.bidang_nama] ?? "Penempatan magang pada bidang ini."}
+                    </p>
+                    <div className="progress-bar">
+                      <div className="progress-bar-isi" style={{ width: `${persen}%` }} />
+                    </div>
+                    <div className="kartu-bidang-footer">
+                      {item.jumlah_aktif} / {KUOTA_PER_BIDANG} peserta aktif
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
     </>

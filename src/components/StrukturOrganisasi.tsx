@@ -1,106 +1,117 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import {
   stafAhli,
   subbagianSekretariat,
   daftarBidang,
 } from "@/lib/strukturOrganisasiData";
 
-export default function StrukturOrganisasi() {
-  const [terbuka, setTerbuka] = useState<number | null>(null);
-
-  function toggleBidang(index: number) {
-    setTerbuka((sebelumnya) => (sebelumnya === index ? null : index));
-  }
-
+function NodeKartu({
+  judul,
+  nama,
+  pangkat,
+  kecil = false,
+}: {
+  judul: string;
+  nama: string;
+  pangkat: string;
+  kecil?: boolean;
+}) {
   return (
-    <div className="struktur-wrap">
+    <div className={`oc-node${kecil ? " oc-node-kecil" : ""}`}>
+      <div className="oc-node-judul">{judul}</div>
+      <div className="oc-node-isi">
+        <strong>{nama}</strong>
+        <span>{pangkat}</span>
+      </div>
+    </div>
+  );
+}
+
+export default function StrukturOrganisasi() {
+  return (
+    <div className="oc-wrap">
       {/* Kepala Dinas */}
-      <div className="struktur-kepala">
-        <span>Kepala Dinas</span>
-        <strong>Drs. Supriyadi, M.Si.</strong>
-        <span>Pembina Utama Muda (IV/c)</span>
-      </div>
-
-      {/* Staf ahli & Sekretariat */}
-      <div className="struktur-cabang">
-        <div>
-          <p className="struktur-kelompok-judul">Jabatan Fungsional Ahli</p>
-          {stafAhli.map((s) => (
-            <div className="struktur-mini-card" key={s.nama}>
-              <strong>{s.nama}</strong>
-              <span>{s.pangkat}</span>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          <p className="struktur-kelompok-judul">Sekretariat</p>
-          <div className="struktur-mini-card">
-            <strong>Ridho Adriansyah, S.S.T.P.</strong>
-            <span>Sekretaris — Pembina Tk. I (IV/b)</span>
+      <div className="oc-center">
+        <div className="oc-node oc-node-kepala">
+          <div className="oc-foto-kepala">
+            <Image
+              src="/assets/kepala-dinas.png"
+              alt="Foto Kepala Dinas"
+              width={72}
+              height={90}
+              className="oc-foto-kepala-img"
+            />
           </div>
-          {subbagianSekretariat.map((s) => (
-            <div className="struktur-mini-card" key={s.peran}>
-              <strong>{s.nama}</strong>
-              <span>
-                {s.peran} — {s.pangkat}
-              </span>
-            </div>
-          ))}
+          <div className="oc-node-judul">Kepala Dinas</div>
+          <div className="oc-node-isi">
+            <strong>Drs. Supriyadi, M.Si.</strong>
+            <span>Pembina Utama Muda (IV/c)</span>
+          </div>
         </div>
       </div>
 
-      {/* Bidang - accordion */}
-      <p className="struktur-kelompok-judul" style={{ marginTop: "0.5rem" }}>
-        Bidang
-      </p>
-      <div className="struktur-bidang-grid">
-        {daftarBidang.map((b, index) => {
-          const sedangTerbuka = terbuka === index;
-          return (
-            <div className="struktur-bidang-card" key={b.nama}>
-              <button
-                type="button"
-                className="struktur-bidang-tombol"
-                aria-expanded={sedangTerbuka}
-                onClick={() => toggleBidang(index)}
-              >
-                <span>
-                  <strong>{b.nama}</strong>
-                  <span>
-                    {b.kepala.nama} — {b.kepala.pangkat}
-                  </span>
-                </span>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
+      <div className="oc-trunk" />
 
-              {sedangTerbuka && (
-                <div className="struktur-tim-list">
-                  {b.timList.map((t) => (
-                    <div className="struktur-tim-item" key={t.peran}>
-                      <strong>{t.nama}</strong>
-                      <span>
-                        {t.peran} — {t.pangkat}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {/* Cabang 1: Staf Ahli & Sekretaris */}
+      <div className="oc-branch oc-branch-2">
+        <div className="oc-col">
+          <div className="oc-stack">
+            {stafAhli.map((s) => {
+              const [jabatan, golongan] = s.pangkat.split(" — ");
+              return (
+                <NodeKartu
+                  key={s.nama}
+                  judul={jabatan ?? s.pangkat}
+                  nama={s.nama}
+                  pangkat={golongan ?? ""}
+                  kecil
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="oc-col">
+          <NodeKartu
+            judul="Sekretaris"
+            nama="Ridho Adriansyah, S.S.T.P."
+            pangkat="Pembina Tk. I (IV/b)"
+          />
+          <div className="oc-trunk oc-trunk-pendek" />
+          <div className="oc-branch oc-branch-3 oc-branch-dalam">
+            {subbagianSekretariat.map((s) => (
+              <div className="oc-col" key={s.peran}>
+                <NodeKartu judul={s.peran} nama={s.nama} pangkat={s.pangkat} kecil />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      <div className="oc-trunk oc-trunk-panjang" />
+
+      {/* Cabang 2: 5 Bidang */}
+      <div className="oc-branch oc-branch-5">
+        {daftarBidang.map((b) => (
+          <div className="oc-col" key={b.nama}>
+            <NodeKartu
+              judul={b.nama}
+              nama={b.kepala.nama}
+              pangkat={b.kepala.pangkat}
+            />
+            <div className="oc-trunk oc-trunk-pendek" />
+            <div className="oc-stack oc-stack-tim">
+              {b.timList.map((t) => (
+                <NodeKartu key={t.peran} judul={t.peran} nama={t.nama} pangkat={t.pangkat} kecil />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="oc-catatan">Catatan: struktur mengikuti bagan resmi per 9 Juli 2026</p>
     </div>
   );
 }
