@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Clock, FileText, HelpCircle, Mail, MapPin, Phone } from "lucide-react";
 import HeaderSticky from "@/components/HeaderSticky";
+import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 
 type InfoKonten = {
@@ -15,18 +17,22 @@ type InfoKonten = {
   keterangan_kontak: string;
 };
 
-function DaftarAtauParagraf({ teks }: { teks: string }) {
-  const baris = teks
+type Section = { icon: typeof Clock; judul: string; teks: string };
+
+function toBaris(teks: string) {
+  return teks
     .split("\n")
     .map((b) => b.trim())
     .filter(Boolean);
+}
 
+function IsiSection({ teks }: { teks: string }) {
+  const baris = toBaris(teks);
   if (baris.length <= 1) {
-    return <p className="info-teks">{baris[0] ?? ""}</p>;
+    return <p className="mt-2 text-sm text-muted-foreground">{baris[0] ?? ""}</p>;
   }
-
   return (
-    <ul className="info-list">
+    <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
       {baris.map((b, i) => (
         <li key={i}>{b}</li>
       ))}
@@ -70,60 +76,98 @@ export default function InfoPage() {
     };
   }, []);
 
+  const ringkasan: Section[] = konten
+    ? [
+        { icon: Clock, judul: "Jam kerja", teks: konten.jam_kerja },
+        { icon: FileText, judul: "Dokumen diperlukan", teks: konten.dokumen_diperlukan },
+        { icon: MapPin, judul: "Siapa yang bisa mendaftar", teks: konten.siapa_yang_bisa_mendaftar },
+      ]
+    : [];
+
   return (
-    <div className="halaman">
-      <div className="bungkus">
-        <HeaderSticky />
+    <div className="flex min-h-screen flex-col">
+      <HeaderSticky />
 
-        <div className="panel-glass">
-          <h1 className="judul-hero" style={{ fontSize: 26, maxWidth: "none" }}>
-            Info dan ketentuan magang
-          </h1>
+      <main className="flex-1">
+        <section className="border-b border-border bg-secondary/40">
+          <div className="mx-auto max-w-6xl px-4 py-14">
+            <h1 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
+              Info Magang
+            </h1>
+            <p className="mt-3 max-w-2xl text-muted-foreground">
+              {konten?.intro ??
+                "Hal-hal yang perlu kamu ketahui sebelum dan selama menjalani magang di Diskominfotik Provinsi Riau."}
+            </p>
+          </div>
+        </section>
 
-          {memuat && <p className="info-teks">Memuat...</p>}
-          {error && <div className="form-pesan-gagal">{error}</div>}
+        <div className="mx-auto max-w-6xl px-4 py-14">
+          {memuat && <p className="text-sm text-muted-foreground">Memuat...</p>}
+          {error && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              {error}
+            </div>
+          )}
 
           {konten && (
             <>
-              <p className="sub-hero" style={{ marginBottom: "2rem" }}>
-                {konten.intro}
-              </p>
-
-              <div className="info-section">
-                <h2>Siapa yang bisa mendaftar</h2>
-                <DaftarAtauParagraf teks={konten.siapa_yang_bisa_mendaftar} />
+              <div className="grid gap-4 md:grid-cols-3">
+                {ringkasan.map((s) => (
+                  <div key={s.judul} className="rounded-xl border border-border bg-card p-5 shadow-soft">
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
+                      <s.icon className="size-5" />
+                    </div>
+                    <h2 className="mt-4 font-display text-base font-semibold text-foreground">
+                      {s.judul}
+                    </h2>
+                    <IsiSection teks={s.teks} />
+                  </div>
+                ))}
               </div>
 
-              <div className="info-section">
-                <h2>Dokumen yang perlu disiapkan</h2>
-                <DaftarAtauParagraf teks={konten.dokumen_diperlukan} />
+              <div className="mt-10 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-border bg-card p-5 shadow-soft">
+                  <h2 className="font-display text-base font-semibold text-foreground">
+                    Jadwal mulai magang
+                  </h2>
+                  <IsiSection teks={konten.jadwal_mulai_magang} />
+                </div>
+                <div className="rounded-xl border border-border bg-card p-5 shadow-soft">
+                  <h2 className="font-display text-base font-semibold text-foreground">
+                    Ketentuan berpakaian
+                  </h2>
+                  <IsiSection teks={konten.ketentuan_berpakaian} />
+                </div>
               </div>
 
-              <div className="info-section">
-                <h2>Jam kerja</h2>
-                <DaftarAtauParagraf teks={konten.jam_kerja} />
+              <div className="mt-10 rounded-xl border border-border bg-card p-6">
+                <p className="flex items-center gap-2 font-display text-base font-semibold text-foreground">
+                  <HelpCircle className="size-4 text-primary" />
+                  Alur setelah mendaftar
+                </p>
+                <IsiSection teks={konten.alur_setelah_mendaftar} />
               </div>
 
-              <div className="info-section">
-                <h2>Jadwal mulai magang</h2>
-                <DaftarAtauParagraf teks={konten.jadwal_mulai_magang} />
-              </div>
-
-              <div className="info-section">
-                <h2>Ketentuan berpakaian</h2>
-                <DaftarAtauParagraf teks={konten.ketentuan_berpakaian} />
-              </div>
-
-              <div className="info-section">
-                <h2>Alur setelah mendaftar</h2>
-                <DaftarAtauParagraf teks={konten.alur_setelah_mendaftar} />
+              <div className="mt-10 rounded-xl border border-border bg-secondary/40 p-6">
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Butuh bantuan?
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">{konten.keterangan_kontak}</p>
+                <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-2">
+                    <Phone className="size-4 text-primary" /> (0761) 45505
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <Mail className="size-4 text-primary" /> diskominfotik@riau.go.id
+                  </span>
+                </div>
               </div>
             </>
           )}
         </div>
+      </main>
 
-        {konten && <p className="keterangan-halaman">{konten.keterangan_kontak}</p>}
-      </div>
+      <Footer />
     </div>
   );
 }

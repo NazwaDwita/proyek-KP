@@ -1,25 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  --dasar: #EAF6EF;
+  --dasar: #F3FAF6;
   --kartu-bg: #ffffff;
   --putih: #ffffff;
-  --navy: #123B2A;
-  --navy-sekunder: #1B4D36;
-  --navbar-bg: #123B2A;
-  --emas: #2F8F5B;
-  --emas-tua: #17512F;
-  --emas-hover: #26794C;
-  --tombol-bg: var(--emas);
+  --navy: #065F46;
+  --navy-sekunder: #047857;
+  --navbar-bg: #064E3B;
+  --emas: #D97706;
+  --emas-tua: #92400E;
+  --emas-hover: #B45309;
+  --tombol-bg: var(--navy);
   --tombol-teks: #ffffff;
-  --tombol-hover-bg: var(--emas-hover);
-  --teks-utama: #16281C;
+  --tombol-hover-bg: var(--navy-sekunder);
+  --teks-utama: #1C2E27;
   --teks-muted: rgb(from var(--teks-utama) r g b / 0.78);
-  --teks-terang: #EAF6EF;
+  --teks-terang: #ECFDF5;
   --teks-muted-terang: rgb(from var(--teks-terang) r g b / 0.65);
   --radius: 16px;
-  --font-judul: "Fraunces", Georgia, serif;
+  --font-judul: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-teks: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+}
+
+/* Token Tailwind ala Lovable — supaya utility class seperti bg-primary,
+   text-muted-foreground, shadow-soft, font-display bisa langsung dipakai
+   di JSX, tanpa mengganggu class custom (panel-glass, dst) yang sudah ada
+   di bawah. */
+@theme {
+  --color-primary: var(--navy);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #DCFCE7;
+  --color-secondary-foreground: var(--navy);
+  --color-accent: var(--emas);
+  --color-accent-foreground: #ffffff;
+  --color-muted: #EEF6F1;
+  --color-muted-foreground: rgb(28 46 39 / 0.65);
+  --color-card: var(--kartu-bg);
+  --color-card-foreground: var(--teks-utama);
+  --color-background: var(--dasar);
+  --color-foreground: var(--teks-utama);
+  --color-border: rgb(28 46 39 / 0.12);
+
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+
+  --shadow-soft: 0 8px 24px -12px rgb(6 95 70 / 0.18);
+}
+
+@utility bg-hero-gradient {
+  background-image: linear-gradient(
+    to bottom right,
+    rgb(6 78 59 / 0.92),
+    rgb(6 95 70 / 0.88) 45%,
+    rgb(4 120 87 / 0.85)
+  );
 }
 
 * {

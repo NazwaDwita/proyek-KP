@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CalendarClock, CheckCircle2, LayoutGrid, ShieldCheck, Users } from "lucide-react";
 import HeaderSticky from "@/components/HeaderSticky";
+import Footer from "@/components/Footer";
 import { useSesi } from "@/lib/useSesi";
 import { supabase } from "@/lib/supabase";
 
@@ -55,30 +57,50 @@ export default function Beranda() {
 
   if (memuat) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <HeaderSticky />
-        </div>
+      <div className="flex min-h-screen flex-col">
+        <HeaderSticky />
       </div>
     );
   }
 
   return (
-    <div className="halaman">
-      <div className="bungkus">
-        <HeaderSticky />
+    <div className="flex min-h-screen flex-col">
+      <HeaderSticky />
+      <main className="flex-1">
         {sesi ? (
-          <BerandaSudahLogin
-            userId={sesi.user.id}
-            nama={(sesi.user.user_metadata?.nama as string) || sesi.user.email || ""}
-          />
+          <div className="mx-auto max-w-6xl px-4 py-10">
+            <BerandaSudahLogin
+              userId={sesi.user.id}
+              nama={(sesi.user.user_metadata?.nama as string) || sesi.user.email || ""}
+            />
+          </div>
         ) : (
           <BerandaBelumLogin />
         )}
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
+
+const langkah = [
+  { icon: ShieldCheck, judul: "Buat akun", teks: "Registrasi menggunakan email aktif." },
+  {
+    icon: CalendarClock,
+    judul: "Ajukan periode",
+    teks: "Lengkapi data diri dan pilih periode magang 2 sampai 4 bulan.",
+  },
+  {
+    icon: CheckCircle2,
+    judul: "Langsung diterima",
+    teks: "Selama slot masih tersisa, pengajuan kamu otomatis diterima.",
+  },
+  {
+    icon: LayoutGrid,
+    judul: "Penempatan bidang",
+    teks: "Bidang penempatan ditentukan oleh pihak dinas setelah pengajuan diterima.",
+  },
+];
 
 function BerandaBelumLogin() {
   const [statistik, setStatistik] = useState<StatistikBidang[]>([]);
@@ -110,76 +132,154 @@ function BerandaBelumLogin() {
 
   return (
     <>
-      <div className="hero-magang">
-        <span className="hero-badge">Diskominfotik Provinsi Riau</span>
-        <h1>Pendaftaran Magang &amp; PKL Dinas Diskominfotik Provinsi Riau</h1>
-        <p>
-          Terbuka untuk siswa dan mahasiswa dari mana saja. Pilih bidang,
-          tentukan periode magang, dan pantau status pendaftaranmu secara
-          online.
-        </p>
-        <div className="hero-tombol-grup">
-          <Link href="/daftar" className="tombol-hero">
-            Daftar Sekarang
-          </Link>
-          <a href="#ketersediaan-slot" className="tombol-hero-sekunder">
-            Lihat Ketersediaan Slot
-          </a>
-        </div>
-      </div>
-
-      <div id="ketersediaan-slot" style={{ marginTop: "1.5rem" }}>
-        {memuatStatistik ? (
-          <div className="panel-glass">
-            <p className="info-teks" style={{ margin: 0 }}>Memuat data...</p>
+      <section className="relative overflow-hidden">
+        <img
+          src="/assets/hero-kominfotik.jpg"
+          alt="Kantor Diskominfotik Provinsi Riau"
+          className="absolute inset-0 size-full object-cover"
+        />
+        <div className="absolute inset-0 bg-hero-gradient" />
+        <div className="relative mx-auto max-w-6xl px-4 py-20 text-primary-foreground md:py-28">
+          <p className="inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
+            Diskominfotik Provinsi Riau
+          </p>
+          <h1 className="mt-5 max-w-2xl font-display text-4xl font-semibold leading-tight md:text-5xl">
+            Pendaftaran Magang &amp; PKL Dinas Kominfotik Provinsi Riau
+          </h1>
+          <p className="mt-4 max-w-xl text-base text-primary-foreground/85 md:text-lg">
+            Terbuka untuk siswa dan mahasiswa dari mana saja. Pilih bidang, tentukan periode
+            magang, dan pantau status pendaftaranmu secara online.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              href="/daftar"
+              className="inline-flex items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90"
+            >
+              Daftar Sekarang
+            </Link>
+            <a
+              href="#ketersediaan-slot"
+              className="inline-flex items-center justify-center rounded-md border border-primary-foreground/30 bg-primary-foreground/10 px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/20"
+            >
+              Lihat Ketersediaan Slot
+            </a>
           </div>
-        ) : (
-          <>
-            <div className="ringkasan-slot">
-              <div className="ringkasan-slot-kiri">
-                <div className="ringkasan-slot-ikon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" strokeLinecap="round" />
-                    <circle cx="10" cy="7" r="4" />
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="ringkasan-slot-label">Total peserta magang aktif saat ini</div>
-                  <div className="ringkasan-slot-angka">
-                    {totalAktif} <span>dari {totalKuota} slot</span>
-                  </div>
-                </div>
-              </div>
-              <span className="pil-slot-tersisa">{totalSisa} slot tersedia</span>
-            </div>
+        </div>
+      </section>
 
-            <div className="grid-kartu-bidang">
-              {statistik.map((item) => {
-                const sisa = Math.max(KUOTA_PER_BIDANG - item.jumlah_aktif, 0);
-                const persen = Math.min((item.jumlah_aktif / KUOTA_PER_BIDANG) * 100, 100);
-                return (
-                  <div className="kartu-bidang" key={item.bidang_nama}>
-                    <div className="kartu-bidang-atas">
-                      <h3 className="kartu-bidang-judul">{item.bidang_nama}</h3>
-                      <span className="kartu-bidang-badge">{sisa} slot</span>
-                    </div>
-                    <p className="kartu-bidang-deskripsi">
-                      {DESKRIPSI_BIDANG[item.bidang_nama] ?? "Penempatan magang pada bidang ini."}
-                    </p>
-                    <div className="progress-bar">
-                      <div className="progress-bar-isi" style={{ width: `${persen}%` }} />
-                    </div>
-                    <div className="kartu-bidang-footer">
-                      {item.jumlah_aktif} / {KUOTA_PER_BIDANG} peserta aktif
-                    </div>
-                  </div>
-                );
-              })}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <h2 className="font-display text-2xl font-semibold text-foreground">Alur pendaftaran</h2>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {langkah.map((l, i) => (
+            <div key={l.judul} className="rounded-xl border border-border bg-card p-5 shadow-soft">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
+                <l.icon className="size-5" />
+              </div>
+              <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Langkah {i + 1}
+              </p>
+              <h3 className="mt-1 font-display text-base font-semibold text-foreground">
+                {l.judul}
+              </h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">{l.teks}</p>
             </div>
-          </>
-        )}
-      </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="ketersediaan-slot" className="border-y border-border bg-secondary/40 py-16">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl font-semibold text-foreground">
+                Ketersediaan slot per bidang
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Data peserta magang yang sedang aktif hari ini.
+              </p>
+            </div>
+            <Link
+              href="/statistik"
+              className="inline-flex items-center justify-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+            >
+              Statistik lengkap
+            </Link>
+          </div>
+
+          <div className="mt-8">
+            {memuatStatistik ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-32 animate-pulse rounded-xl border border-border bg-card" />
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-border bg-card p-5 shadow-soft">
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
+                    <Users className="size-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Total peserta magang aktif saat ini
+                    </p>
+                    <p className="text-2xl font-semibold text-foreground">
+                      {totalAktif}{" "}
+                      <span className="text-base font-normal text-muted-foreground">
+                        dari {totalKuota} slot
+                      </span>
+                    </p>
+                  </div>
+                  <span className="ml-auto rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-accent-foreground/90" style={{ color: "var(--emas-tua)" }}>
+                    {totalSisa} slot tersedia
+                  </span>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {statistik.map((item) => {
+                    const sisa = Math.max(KUOTA_PER_BIDANG - item.jumlah_aktif, 0);
+                    const persen = Math.min((item.jumlah_aktif / KUOTA_PER_BIDANG) * 100, 100);
+                    const penuh = sisa <= 0;
+                    return (
+                      <div
+                        key={item.bidang_nama}
+                        className="rounded-xl border border-border bg-card p-5 shadow-soft"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className="font-display text-base font-semibold text-foreground">
+                            {item.bidang_nama}
+                          </h3>
+                          <span
+                            className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
+                              penuh
+                                ? "bg-red-100 text-red-700"
+                                : "border border-border text-muted-foreground"
+                            }`}
+                          >
+                            {penuh ? "Penuh" : `${sisa} slot`}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 text-sm text-muted-foreground">
+                          {DESKRIPSI_BIDANG[item.bidang_nama] ?? "Penempatan magang pada bidang ini."}
+                        </p>
+                        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+                          <div
+                            className={`h-full rounded-full ${penuh ? "bg-red-500" : "bg-primary"}`}
+                            style={{ width: `${persen}%` }}
+                          />
+                        </div>
+                        <p className="mt-1.5 text-xs text-muted-foreground">
+                          {item.jumlah_aktif} / {KUOTA_PER_BIDANG} peserta aktif
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
     </>
   );
 }
