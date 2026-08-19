@@ -1,4 +1,4 @@
-import { Building2, Compass, Mail, MapPin, Phone, Target } from "lucide-react";
+import { Building2, Compass, Target } from "lucide-react";
 import HeaderSticky from "@/components/HeaderSticky";
 import StrukturOrganisasi from "@/components/StrukturOrganisasi";
 import Footer from "@/components/Footer";
@@ -88,24 +88,6 @@ export default function ProfilDinasPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-4 py-14">
-          <h2 className="font-display text-2xl font-semibold text-foreground">Kontak</h2>
-          <div className="mt-5 grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
-            <p className="flex items-start gap-2 rounded-lg border border-border bg-card p-4">
-              <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
-              Jalan Diponegoro Nomor 24 A, Pekanbaru
-            </p>
-            <p className="flex items-start gap-2 rounded-lg border border-border bg-card p-4">
-              <Phone className="mt-0.5 size-4 shrink-0 text-primary" />
-              (0761) 45505
-            </p>
-            <p className="flex items-start gap-2 rounded-lg border border-border bg-card p-4">
-              <Mail className="mt-0.5 size-4 shrink-0 text-primary" />
-              diskominfotik@riau.go.id
-            </p>
           </div>
         </section>
 

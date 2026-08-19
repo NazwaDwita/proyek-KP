@@ -169,6 +169,56 @@ body {
   box-shadow: 0 2px 10px rgb(from var(--emas) r g b / 0.35);
 }
 
+.pemisah-atau {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1.25rem 0;
+  color: var(--teks-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.pemisah-atau::before,
+.pemisah-atau::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgb(from var(--navy) r g b / 0.12);
+}
+
+.tombol-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 0;
+  border-radius: 10px;
+  border: 1px solid rgb(from var(--navy) r g b / 0.16);
+  background: var(--kartu-bg);
+  color: var(--teks-utama);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-teks);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.tombol-google:hover:not(:disabled) {
+  background: rgb(from var(--navy) r g b / 0.04);
+  border-color: rgb(from var(--navy) r g b / 0.28);
+}
+.tombol-google:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.tombol-google svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 .header-baris-atas {
   display: flex;
   align-items: center;
@@ -681,6 +731,38 @@ input, select, textarea {
 select.form-input option {
   background: var(--kartu-bg);
   color: var(--teks-utama);
+}
+
+.input-sandi-bungkus {
+  position: relative;
+}
+.input-sandi-bungkus .form-input {
+  padding-right: 42px;
+}
+.tombol-lihat-sandi {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  color: var(--teks-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tombol-lihat-sandi:hover {
+  background: rgb(from var(--navy) r g b / 0.06);
+  color: var(--teks-utama);
+}
+.tombol-lihat-sandi svg {
+  width: 18px;
+  height: 18px;
 }
 
 .form-baris {

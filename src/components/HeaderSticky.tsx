@@ -31,9 +31,11 @@ export default function HeaderSticky() {
     router.refresh();
   }
 
-  const itemTampil = menuItems.filter(
-    (item) => !(item.href === "/daftar" && sudahDiterima && sesi)
-  );
+  const itemTampil = menuItems.filter((item) => {
+    if (item.href === "/daftar" && sudahDiterima && sesi) return false;
+    if (item.href === "/statistik" && !sesi) return false;
+    return true;
+  });
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">

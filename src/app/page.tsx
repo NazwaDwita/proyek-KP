@@ -304,74 +304,96 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
     };
   }, [userId]);
 
+  const badgeKelas: Record<PendaftaranSaya["status"], string> = {
+    menunggu: "bg-muted text-muted-foreground border border-border",
+    diverifikasi: "bg-green-100 text-green-700 border border-green-200",
+    ditolak: "bg-red-100 text-red-700 border border-red-200",
+  };
+
   return (
     <>
-      <div className="panel-glass">
-        <h1 className="judul-hero" style={{ fontSize: 24, maxWidth: "none" }}>
+      <div className="rounded-xl border border-border bg-card p-7 shadow-soft">
+        <h1 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
           Selamat datang, {nama}
         </h1>
-        <p className="sub-hero" style={{ marginBottom: 0 }}>
+        <p className="mt-2 text-sm text-muted-foreground">
           Status pendaftaran magangmu ditampilkan otomatis di bawah ini.
         </p>
       </div>
 
-      <div className="panel-glass" style={{ marginTop: "1.5rem" }}>
-        <p className="eyebrow">Status pendaftaran</p>
+      <div className="mt-6 rounded-xl border border-border bg-card p-7 shadow-soft">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Status pendaftaran
+        </p>
 
-        {memuat && <p className="info-teks">Memuat data...</p>}
-        {pesanError && <div className="form-pesan-gagal">{pesanError}</div>}
+        {memuat && <p className="mt-3 text-sm text-muted-foreground">Memuat data...</p>}
+
+        {pesanError && (
+          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {pesanError}
+          </div>
+        )}
 
         {!memuat && !pesanError && daftarPendaftaran.length === 0 && (
           <>
-            <p className="sub-hero" style={{ marginBottom: "1.25rem" }}>
+            <p className="mt-3 text-sm text-muted-foreground">
               Kamu belum pernah mendaftar magang menggunakan akun ini.
             </p>
-            <Link href="/daftar" className="tombol">
+            <Link
+              href="/daftar"
+              className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
               Daftar magang sekarang
             </Link>
           </>
         )}
 
         {!memuat &&
-          daftarPendaftaran.map((p) => (
-            <div key={p.nomor_pendaftaran} style={{ marginBottom: "1.5rem" }}>
-              <div style={{ marginBottom: "0.75rem" }}>
-                <span className={`status-badge status-${p.status}`}>
-                  {LABEL_STATUS[p.status]}
-                </span>
-              </div>
+          daftarPendaftaran.map((p, i) => (
+            <div
+              key={p.nomor_pendaftaran}
+              className={`${i > 0 ? "mt-6 border-t border-border pt-6" : "mt-4"}`}
+            >
+              <span
+                className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${badgeKelas[p.status]}`}
+              >
+                {LABEL_STATUS[p.status]}
+              </span>
 
-              <div className="hasil-status-baris">
-                <span className="hasil-status-label">Nomor pendaftaran</span>
-                <strong>{p.nomor_pendaftaran}</strong>
-              </div>
-              <div className="hasil-status-baris">
-                <span className="hasil-status-label">Bidang penempatan</span>
-                <span>{p.bidang?.nama ?? "-"}</span>
-              </div>
-              <div className="hasil-status-baris">
-                <span className="hasil-status-label">Periode magang</span>
-                <span>
-                  {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
-                </span>
-              </div>
-              <div className="hasil-status-baris">
-                <span className="hasil-status-label">Tanggal daftar</span>
-                <span>{formatTanggal(p.dibuat_pada)}</span>
+              <div className="mt-3 divide-y divide-border text-sm">
+                <div className="flex items-center justify-between py-3">
+                  <span className="text-muted-foreground">Nomor pendaftaran</span>
+                  <span className="font-medium text-foreground">{p.nomor_pendaftaran}</span>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="text-muted-foreground">Bidang penempatan</span>
+                  <span className="font-medium text-foreground">{p.bidang?.nama ?? "-"}</span>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="text-muted-foreground">Periode magang</span>
+                  <span className="font-medium text-foreground">
+                    {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="text-muted-foreground">Tanggal daftar</span>
+                  <span className="font-medium text-foreground">
+                    {formatTanggal(p.dibuat_pada)}
+                  </span>
+                </div>
               </div>
 
               {p.status === "diverifikasi" && (
                 <Link
                   href={`/surat-keterangan/${p.nomor_pendaftaran}`}
-                  className="tombol"
-                  style={{ marginTop: "1rem", display: "inline-block" }}
+                  className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   Cetak surat keterangan diterima
                 </Link>
               )}
 
               {p.status === "ditolak" && p.catatan_admin && (
-                <div className="form-pesan-gagal" style={{ marginTop: "1rem", marginBottom: 0 }}>
+                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                   <strong>Catatan dari staf:</strong> {p.catatan_admin}
                 </div>
               )}
