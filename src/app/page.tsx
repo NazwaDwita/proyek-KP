@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CalendarClock, CheckCircle2, LayoutGrid, ShieldCheck, Users } from "lucide-react";
+import { CalendarClock, ClipboardCheck, LayoutGrid, ShieldCheck, Users } from "lucide-react";
 import HeaderSticky from "@/components/HeaderSticky";
 import Footer from "@/components/Footer";
 import { useSesi } from "@/lib/useSesi";
@@ -91,14 +91,14 @@ const langkah = [
     teks: "Lengkapi data diri dan pilih periode magang 2 sampai 4 bulan.",
   },
   {
-    icon: CheckCircle2,
-    judul: "Langsung diterima",
-    teks: "Selama slot masih tersisa, pengajuan kamu otomatis diterima.",
+    icon: ClipboardCheck,
+    judul: "Diperiksa admin",
+    teks: "Pengajuanmu masuk ke sistem admin. Staf Diskominfotik yang memeriksa dan menentukan pengajuan diterima atau ditolak.",
   },
   {
     icon: LayoutGrid,
     judul: "Penempatan bidang",
-    teks: "Bidang penempatan ditentukan oleh pihak dinas setelah pengajuan diterima.",
+    teks: "Kalau diterima, bidang penempatan ditentukan oleh admin, bukan dipilih sendiri saat mendaftar.",
   },
 ];
 
@@ -147,23 +147,9 @@ function BerandaBelumLogin() {
             Pendaftaran Magang &amp; PKL Dinas Kominfotik Provinsi Riau
           </h1>
           <p className="mt-4 max-w-xl text-base text-primary-foreground/85 md:text-lg">
-            Terbuka untuk siswa dan mahasiswa dari mana saja. Pilih bidang, tentukan periode
-            magang, dan pantau status pendaftaranmu secara online.
+            Terbuka untuk siswa dan mahasiswa dari mana saja. Ajukan periode magang, dan
+            pantau status pendaftaranmu secara online.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href="/daftar"
-              className="inline-flex items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90"
-            >
-              Daftar Sekarang
-            </Link>
-            <a
-              href="#ketersediaan-slot"
-              className="inline-flex items-center justify-center rounded-md border border-primary-foreground/30 bg-primary-foreground/10 px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/20"
-            >
-              Lihat Ketersediaan Slot
-            </a>
-          </div>
         </div>
       </section>
 
