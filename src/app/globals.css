@@ -734,24 +734,39 @@ select.form-input option {
 }
 
 .input-sandi-bungkus {
-  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgb(from var(--navy) r g b / 0.18);
+  background: var(--kartu-bg);
+  transition: border-color 0.15s ease;
+}
+.input-sandi-bungkus:focus-within {
+  border-color: var(--emas);
 }
 .input-sandi-bungkus .form-input {
-  padding-right: 42px;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding-right: 8px;
+}
+.input-sandi-bungkus .form-input:focus {
+  outline: none;
+  border: none;
+  background: transparent;
 }
 .tombol-lihat-sandi {
-  position: absolute;
-  top: 50%;
-  right: 6px;
-  transform: translateY(-50%);
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  margin-right: 4px;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 7px;
   color: var(--teks-muted);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
@@ -761,8 +776,8 @@ select.form-input option {
   color: var(--teks-utama);
 }
 .tombol-lihat-sandi svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
 }
 
 .form-baris {

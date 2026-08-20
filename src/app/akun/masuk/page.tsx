@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import HeaderSticky from "@/components/HeaderSticky";
@@ -16,9 +16,27 @@ function terjemahkanError(pesan: string): string {
     return "Email ini sudah terdaftar. Silakan masuk, atau gunakan email lain.";
   }
   if (pesan.includes("Password should be at least")) {
-    return "Password minimal 6 karakter.";
+    return "Password minimal 8 karakter, kombinasi huruf kapital, angka, dan simbol.";
   }
   return pesan;
+}
+
+// Aturan password: minimal 8 karakter, mengandung huruf kapital, angka,
+// dan simbol -- supaya lebih kuat dari sekadar batas panjang minimal.
+function validasiKekuatanPassword(password: string): string | null {
+  if (password.length < 8) {
+    return "Password minimal 8 karakter.";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "Password harus mengandung minimal satu huruf kapital.";
+  }
+  if (!/[0-9]/.test(password)) {
+    return "Password harus mengandung minimal satu angka.";
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return "Password harus mengandung minimal satu simbol (mis. ! @ # $ %).";
+  }
+  return null;
 }
 
 function IkonGoogle() {
@@ -68,6 +86,21 @@ export default function MasukPage() {
     setPesanError(null);
   }
 
+  // Kalau tombol Google diklik lalu pengguna kembali ke halaman ini (mis.
+  // tekan tombol back, atau proses di Google dibatalkan/gagal), browser
+  // sering menampilkan halaman ini lagi dari cache (bfcache) tanpa
+  // menjalankan ulang kode -- akibatnya tombol kejebak permanen di teks
+  // "Mengalihkan ke Google...". Ini memastikan statusnya direset.
+  useEffect(() => {
+    function tanganiPageshow(e: PageTransitionEvent) {
+      if (e.persisted) {
+        setMemprosesGoogle(false);
+      }
+    }
+    window.addEventListener("pageshow", tanganiPageshow);
+    return () => window.removeEventListener("pageshow", tanganiPageshow);
+  }, []);
+
   async function masukGoogle() {
     setMemprosesGoogle(true);
     setPesanError(null);
@@ -75,7 +108,7 @@ export default function MasukPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
@@ -128,8 +161,9 @@ export default function MasukPage() {
       setPesanError("Masukkan nama kamu terlebih dahulu.");
       return;
     }
-    if (password.length < 6) {
-      setPesanError("Password minimal 6 karakter.");
+    const errorKekuatan = validasiKekuatanPassword(password);
+    if (errorKekuatan) {
+      setPesanError(errorKekuatan);
       return;
     }
     if (password !== konfirmasiPassword) {
@@ -319,7 +353,7 @@ export default function MasukPage() {
                         className="form-input"
                         required
                         autoComplete="new-password"
-                        minLength={6}
+                        minLength={8}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
@@ -333,7 +367,7 @@ export default function MasukPage() {
                         {lihatSandiDaftar ? <EyeOff /> : <Eye />}
                       </button>
                     </div>
-                    <p className="keterangan-field">Minimal 6 karakter.</p>
+                    <p className="keterangan-field">Minimal 8 karakter, kombinasi huruf kapital, angka, dan simbol.</p>
                   </div>
                   <div className="form-grup">
                     <label htmlFor="daftar-konfirmasi">Konfirmasi kata sandi</label>
@@ -344,7 +378,7 @@ export default function MasukPage() {
                         className="form-input"
                         required
                         autoComplete="new-password"
-                        minLength={6}
+                        minLength={8}
                         value={konfirmasiPassword}
                         onChange={(e) => setKonfirmasiPassword(e.target.value)}
                       />

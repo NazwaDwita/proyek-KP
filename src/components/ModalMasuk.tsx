@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -37,9 +37,25 @@ function terjemahkanError(pesan: string): string {
     return "Email ini sudah terdaftar. Silakan masuk, atau gunakan email lain.";
   }
   if (pesan.includes("Password should be at least")) {
-    return "Password minimal 6 karakter.";
+    return "Password minimal 8 karakter, kombinasi huruf kapital, angka, dan simbol.";
   }
   return pesan;
+}
+
+function validasiKekuatanPassword(password: string): string | null {
+  if (password.length < 8) {
+    return "Password minimal 8 karakter.";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "Password harus mengandung minimal satu huruf kapital.";
+  }
+  if (!/[0-9]/.test(password)) {
+    return "Password harus mengandung minimal satu angka.";
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return "Password harus mengandung minimal satu simbol (mis. ! @ # $ %).";
+  }
+  return null;
 }
 
 export default function ModalMasuk({
@@ -64,6 +80,20 @@ export default function ModalMasuk({
   const [lihatSandiDaftar, setLihatSandiDaftar] = useState(false);
   const [lihatKonfirmasi, setLihatKonfirmasi] = useState(false);
 
+  // Sama seperti di halaman /akun/masuk: reset tombol Google kalau
+  // halaman ini muncul lagi dari bfcache browser (mis. user menekan back
+  // setelah proses di Google dibatalkan/gagal), supaya nggak kejebak di
+  // teks "Mengalihkan ke Google...".
+  useEffect(() => {
+    function tanganiPageshow(e: PageTransitionEvent) {
+      if (e.persisted) {
+        setMemprosesGoogle(false);
+      }
+    }
+    window.addEventListener("pageshow", tanganiPageshow);
+    return () => window.removeEventListener("pageshow", tanganiPageshow);
+  }, []);
+
   async function masukGoogle() {
     setMemprosesGoogle(true);
     setPesanError(null);
@@ -71,7 +101,7 @@ export default function ModalMasuk({
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
@@ -142,8 +172,9 @@ export default function ModalMasuk({
       setPesanError("Masukkan nama kamu terlebih dahulu.");
       return;
     }
-    if (password.length < 6) {
-      setPesanError("Password minimal 6 karakter.");
+    const errorKekuatan = validasiKekuatanPassword(password);
+    if (errorKekuatan) {
+      setPesanError(errorKekuatan);
       return;
     }
     if (password !== konfirmasiPassword) {
@@ -339,7 +370,7 @@ export default function ModalMasuk({
                   className="form-input"
                   required
                   autoComplete="new-password"
-                  minLength={6}
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -353,7 +384,7 @@ export default function ModalMasuk({
                   {lihatSandiDaftar ? <EyeOff /> : <Eye />}
                 </button>
               </div>
-              <p className="keterangan-field">Minimal 6 karakter.</p>
+              <p className="keterangan-field">Minimal 8 karakter, kombinasi huruf kapital, angka, dan simbol.</p>
             </div>
             <div className="form-grup">
               <label htmlFor="daftar-konfirmasi">Konfirmasi password</label>
@@ -364,7 +395,7 @@ export default function ModalMasuk({
                   className="form-input"
                   required
                   autoComplete="new-password"
-                  minLength={6}
+                  minLength={8}
                   value={konfirmasiPassword}
                   onChange={(e) => setKonfirmasiPassword(e.target.value)}
                 />
