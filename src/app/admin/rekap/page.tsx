@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
+import { ChevronDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import AdminNav from "@/components/admin/AdminNav";
@@ -110,10 +111,7 @@ function unduhExcel(daftar: BarisRekap[]) {
 
   // Lebar kolom otomatis, biar nggak semua kepotong pas dibuka.
   sheet["!cols"] = HEADER_REKAP.map((h, i) => ({
-    wch: Math.max(
-      h.length,
-      ...data.slice(1).map((baris) => (baris[i] ?? "").length)
-    ) + 2,
+    wch: Math.max(h.length, ...data.slice(1).map((baris) => (baris[i] ?? "").length)) + 2,
   }));
 
   const workbook = XLSX.utils.book_new();
@@ -203,101 +201,80 @@ export default function AdminRekapPage() {
 
   if (memuat) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <p className="sub-hero">Memeriksa akses...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <p className="text-sm text-muted-foreground">Memeriksa akses...</p>
       </div>
     );
   }
 
   if (ditolakAkses) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <div className="panel-glass">
-            <p className="eyebrow">Akses ditolak</p>
-            <h1 className="judul-hero" style={{ fontSize: 22, maxWidth: "none" }}>
-              Akun ini tidak memiliki akses admin
-            </h1>
-            <p className="sub-hero">
-              Hubungi staf lain yang sudah terdaftar untuk ditambahkan sebagai
-              admin.
-            </p>
-            <button className="tombol sekunder" onClick={keluar}>
-              Kembali ke login
-            </button>
-          </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-soft">
+          <p className="text-xs font-semibold uppercase tracking-widest text-red-600">
+            Akses ditolak
+          </p>
+          <h1 className="mt-2 font-display text-xl font-semibold text-foreground">
+            Akun ini tidak memiliki akses admin
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Hubungi staf lain yang sudah terdaftar untuk ditambahkan sebagai admin.
+          </p>
+          <button
+            onClick={keluar}
+            className="mt-5 inline-flex items-center justify-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+          >
+            Kembali ke login
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="halaman">
-      <div className="bungkus" style={{ maxWidth: 1400 }}>
-        <AdminNav onKeluar={keluar} />
+    <div className="min-h-screen bg-background">
+      <AdminNav onKeluar={keluar} />
 
-        <div
-          className="blok-judul-admin"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            flexWrap: "wrap",
-            gap: 10,
-            marginBottom: "1.5rem",
-          }}
-        >
+      <main className="w-full px-4 py-8 md:px-8">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="eyebrow" style={{ margin: 0 }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[color:var(--emas-tua)]">
               Rekap data
             </p>
-            <h1 className="judul-hero" style={{ fontSize: 22, maxWidth: "none" }}>
+            <h1 className="mt-1 font-display text-2xl font-semibold text-foreground md:text-3xl">
               Rekap pendaftar magang
             </h1>
           </div>
-          <div ref={dropdownRef} style={{ position: "relative" }}>
+
+          <div ref={dropdownRef} className="relative">
             <button
               type="button"
-              className="tombol"
               onClick={() => setDropdownTerbuka((t) => !t)}
               disabled={memuatData || daftar.length === 0}
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Unduh &#9662;
+              Unduh
+              <ChevronDown className="size-4" />
             </button>
             {dropdownTerbuka && (
-              <div
-                style={{
-                  position: "absolute",
-                  right: 0,
-                  top: "calc(100% + 6px)",
-                  background: "#fff",
-                  border: "1px solid rgba(15, 42, 74, 0.12)",
-                  borderRadius: 10,
-                  boxShadow: "0 10px 30px rgba(15, 42, 74, 0.15)",
-                  overflow: "hidden",
-                  zIndex: 10,
-                  minWidth: 180,
-                }}
-              >
+              <div className="absolute right-0 top-[calc(100%+8px)] z-10 w-44 overflow-hidden rounded-lg border border-border bg-card shadow-soft">
                 <button
                   type="button"
-                  className="tombol-dropdown-item"
                   onClick={() => {
                     unduhCsv(daftar);
                     setDropdownTerbuka(false);
                   }}
+                  className="block w-full px-4 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
                   CSV (.csv)
                 </button>
                 <button
                   type="button"
-                  className="tombol-dropdown-item"
                   onClick={() => {
                     unduhExcel(daftar);
                     setDropdownTerbuka(false);
                   }}
+                  className="block w-full px-4 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
                   Excel (.xlsx)
                 </button>
@@ -307,22 +284,15 @@ export default function AdminRekapPage() {
         </div>
 
         {pesanError && (
-          <div className="form-pesan-gagal" style={{ marginBottom: "1.25rem" }}>
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {pesanError}
           </div>
         )}
-        {memuatData && <p className="sub-hero">Memuat data...</p>}
+        {memuatData && <p className="text-sm text-muted-foreground">Memuat data...</p>}
 
         {!memuatData && !pesanError && (
           <>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                gap: 14,
-                marginBottom: "1.75rem",
-              }}
-            >
+            <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               <KartuAngka label="Total pendaftar" nilai={daftar.length} tebal />
               <KartuAngka label="Menunggu" nilai={ringkasanStatus.menunggu} />
               <KartuAngka label="Diterima" nilai={ringkasanStatus.diverifikasi} />
@@ -331,35 +301,38 @@ export default function AdminRekapPage() {
               <KartuAngka label="Dari SMK" nilai={ringkasanInstitusi.smk} />
             </div>
 
-            <div className="panel-glass">
-              <p className="eyebrow" style={{ margin: 0 }}>
+            <div className="rounded-xl border border-border bg-card p-6 shadow-soft md:p-7">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[color:var(--emas-tua)]">
                 Per bidang
               </p>
-              <h2
-                className="judul-hero"
-                style={{ fontSize: 18, maxWidth: "none", marginBottom: "1rem" }}
-              >
+              <h2 className="mt-1 mb-4 font-display text-lg font-semibold text-foreground">
                 Sebaran pendaftar per bidang
               </h2>
 
               {rekapBidang.length === 0 ? (
-                <p className="info-teks">Belum ada data pendaftar.</p>
+                <p className="text-sm text-muted-foreground">Belum ada data pendaftar.</p>
               ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table className="tabel-admin">
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <table className="w-full text-sm">
                     <thead>
-                      <tr>
-                        <th>Bidang</th>
-                        <th>Total pendaftar</th>
-                        <th>Sedang aktif</th>
+                      <tr className="bg-primary text-primary-foreground">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                          Bidang
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                          Total pendaftar
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                          Sedang aktif
+                        </th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-border">
                       {rekapBidang.map((b) => (
-                        <tr key={b.nama}>
-                          <td>{b.nama}</td>
-                          <td>{b.total}</td>
-                          <td>{b.aktif}</td>
+                        <tr key={b.nama} className="transition-colors hover:bg-secondary/40">
+                          <td className="px-4 py-3 text-foreground">{b.nama}</td>
+                          <td className="px-4 py-3 text-foreground">{b.total}</td>
+                          <td className="px-4 py-3 text-foreground">{b.aktif}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -369,7 +342,7 @@ export default function AdminRekapPage() {
             </div>
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 }
@@ -385,25 +358,14 @@ function KartuAngka({
 }) {
   return (
     <div
-      className="panel-glass"
-      style={{
-        padding: "1.1rem 1.25rem",
-        borderColor: tebal ? "var(--emas)" : undefined,
-      }}
+      className={`rounded-xl border bg-card p-5 shadow-soft ${
+        tebal ? "border-accent" : "border-border"
+      }`}
     >
-      <p className="eyebrow" style={{ margin: 0 }}>
+      <p className="text-xs font-semibold uppercase tracking-widest text-[color:var(--emas-tua)]">
         {label}
       </p>
-      <p
-        style={{
-          fontFamily: "var(--font-judul)",
-          fontSize: 30,
-          margin: "0.2rem 0 0",
-          color: "var(--navy)",
-        }}
-      >
-        {nilai}
-      </p>
+      <p className="mt-1 font-display text-3xl font-semibold text-primary">{nilai}</p>
     </div>
   );
 }

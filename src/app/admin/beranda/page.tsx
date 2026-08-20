@@ -51,73 +51,66 @@ export default function AdminBerandaPage() {
 
   if (memuat) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <p className="sub-hero">Memeriksa akses...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <p className="text-sm text-muted-foreground">Memeriksa akses...</p>
       </div>
     );
   }
 
   if (ditolakAkses) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <div className="panel-glass">
-            <p className="eyebrow">Akses ditolak</p>
-            <h1 className="judul-hero" style={{ fontSize: 22, maxWidth: "none" }}>
-              Akun ini tidak memiliki akses admin
-            </h1>
-            <p className="sub-hero">
-              Hubungi staf lain yang sudah terdaftar untuk ditambahkan sebagai
-              admin.
-            </p>
-            <button className="tombol sekunder" onClick={keluar}>
-              Kembali ke login
-            </button>
-          </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-soft">
+          <p className="text-xs font-semibold uppercase tracking-widest text-red-600">
+            Akses ditolak
+          </p>
+          <h1 className="mt-2 font-display text-xl font-semibold text-foreground">
+            Akun ini tidak memiliki akses admin
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Hubungi staf lain yang sudah terdaftar untuk ditambahkan sebagai admin.
+          </p>
+          <button
+            onClick={keluar}
+            className="mt-5 inline-flex items-center justify-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+          >
+            Kembali ke login
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="halaman">
-      <div className="bungkus" style={{ maxWidth: 1400 }}>
-        <AdminNav onKeluar={keluar} />
+    <div className="min-h-screen bg-background">
+      <AdminNav onKeluar={keluar} />
 
-        <div className="blok-judul-admin" style={{ marginBottom: "1.5rem" }}>
-          <p className="eyebrow" style={{ margin: 0 }}>
+      <main className="w-full px-4 py-8 md:px-8">
+        <div className="mb-6">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[color:var(--emas-tua)]">
             Dashboard admin
           </p>
-          <h1 className="judul-hero" style={{ fontSize: 24, maxWidth: "none" }}>
+          <h1 className="mt-1 font-display text-2xl font-semibold text-foreground md:text-3xl">
             Ringkasan pendaftaran magang
           </h1>
-          <p className="sub-hero" style={{ margin: "0.35rem 0 0" }}>
+          <p className="mt-1.5 text-sm text-muted-foreground">
             Pantauan singkat status pendaftar sebelum masuk ke data lengkap.
           </p>
         </div>
 
         {errorRingkasan && (
-          <div className="form-pesan-gagal" style={{ marginBottom: "1.25rem" }}>
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {errorRingkasan}
           </div>
         )}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: 14,
-            marginBottom: "1.75rem",
-          }}
-        >
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <KartuRingkasan label="Menunggu" nilai={ringkasan?.menunggu} />
           <KartuRingkasan label="Diterima" nilai={ringkasan?.diverifikasi} />
           <KartuRingkasan label="Ditolak" nilai={ringkasan?.ditolak} />
           <KartuRingkasan label="Total pendaftar" nilai={ringkasan?.total} tebal />
         </div>
-      </div>
+      </main>
     </div>
   );
 }
@@ -133,23 +126,14 @@ function KartuRingkasan({
 }) {
   return (
     <div
-      className="panel-glass"
-      style={{
-        padding: "1.1rem 1.25rem",
-        borderColor: tebal ? "var(--emas)" : undefined,
-      }}
+      className={`rounded-xl border bg-card p-5 shadow-soft ${
+        tebal ? "border-accent" : "border-border"
+      }`}
     >
-      <p className="eyebrow" style={{ margin: 0 }}>
+      <p className="text-xs font-semibold uppercase tracking-widest text-[color:var(--emas-tua)]">
         {label}
       </p>
-      <p
-        style={{
-          fontFamily: "var(--font-judul)",
-          fontSize: 30,
-          margin: "0.2rem 0 0",
-          color: "var(--navy)",
-        }}
-      >
+      <p className="mt-1 font-display text-3xl font-semibold text-primary">
         {nilai ?? "–"}
       </p>
     </div>

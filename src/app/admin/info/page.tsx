@@ -27,13 +27,13 @@ const FIELD_LIST: {
     key: "intro",
     label: "Kalimat pembuka",
     keterangan: "Paragraf singkat di bagian paling atas halaman.",
-    baris: 2,
+    baris: 3,
   },
   {
     key: "siapa_yang_bisa_mendaftar",
     label: "Siapa yang bisa mendaftar",
     keterangan: "1 poin per baris -- setiap baris jadi 1 bullet point.",
-    baris: 3,
+    baris: 4,
   },
   {
     key: "dokumen_diperlukan",
@@ -69,7 +69,7 @@ const FIELD_LIST: {
     key: "keterangan_kontak",
     label: "Kalimat penutup / kontak",
     keterangan: "Muncul paling bawah halaman, di luar kotak putih.",
-    baris: 2,
+    baris: 3,
   },
 ];
 
@@ -155,105 +155,98 @@ export default function AdminInfoPage() {
 
   if (memuat) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <p className="sub-hero">Memeriksa akses...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <p className="text-sm text-muted-foreground">Memeriksa akses...</p>
       </div>
     );
   }
 
   if (ditolakAkses) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <div className="panel-glass">
-            <p className="eyebrow">Akses ditolak</p>
-            <h1 className="judul-hero" style={{ fontSize: 22, maxWidth: "none" }}>
-              Akun ini tidak memiliki akses admin
-            </h1>
-            <p className="sub-hero">
-              Hubungi staf lain yang sudah terdaftar untuk ditambahkan sebagai
-              admin.
-            </p>
-            <button className="tombol sekunder" onClick={keluar}>
-              Kembali ke login
-            </button>
-          </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-soft">
+          <p className="text-xs font-semibold uppercase tracking-widest text-red-600">
+            Akses ditolak
+          </p>
+          <h1 className="mt-2 font-display text-xl font-semibold text-foreground">
+            Akun ini tidak memiliki akses admin
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Hubungi staf lain yang sudah terdaftar untuk ditambahkan sebagai admin.
+          </p>
+          <button
+            onClick={keluar}
+            className="mt-5 inline-flex items-center justify-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+          >
+            Kembali ke login
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="halaman">
-      <div className="bungkus" style={{ maxWidth: 1400 }}>
-        <AdminNav onKeluar={keluar} />
+    <div className="min-h-screen bg-background">
+      <AdminNav onKeluar={keluar} />
 
-        <div className="blok-judul-admin" style={{ marginBottom: "1.5rem" }}>
-          <p className="eyebrow" style={{ margin: 0 }}>
+      <main className="w-full px-4 py-8 md:px-8">
+        <div className="mb-6">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[color:var(--emas-tua)]">
             Edit info
           </p>
-          <h1 className="judul-hero" style={{ fontSize: 22, maxWidth: "none" }}>
+          <h1 className="mt-1 font-display text-2xl font-semibold text-foreground md:text-3xl">
             Konten halaman Info dan Ketentuan
           </h1>
-          <p className="sub-hero" style={{ margin: "0.35rem 0 0" }}>
+          <p className="mt-1.5 text-sm text-muted-foreground">
             Perubahan di sini langsung tampil di halaman publik &quot;Info dan
             ketentuan&quot; setelah disimpan.
           </p>
         </div>
 
-        {memuatKonten && <p className="sub-hero">Memuat konten...</p>}
+        {memuatKonten && <p className="text-sm text-muted-foreground">Memuat konten...</p>}
         {!konten && pesanError && (
-          <div className="form-pesan-gagal" style={{ marginBottom: "1.25rem" }}>
+          <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {pesanError}
           </div>
         )}
 
         {konten && (
-          <div
-            className="panel-glass"
-            style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginBottom: "2rem" }}
-          >
-            {FIELD_LIST.map((f) => (
-              <div className="form-grup" key={f.key}>
-                <label htmlFor={f.key}>{f.label}</label>
-                <p className="info-teks" style={{ margin: "0 0 0.4rem", fontSize: 13 }}>
-                  {f.keterangan}
-                </p>
-                <textarea
-                  id={f.key}
-                  className="form-input"
-                  rows={f.baris}
-                  value={konten[f.key]}
-                  onChange={(e) => ubahField(f.key, e.target.value)}
-                />
-              </div>
-            ))}
+          <div className="rounded-xl border border-border bg-card p-6 shadow-soft md:p-8">
+            <div className="grid gap-6 lg:grid-cols-2">
+              {FIELD_LIST.map((f) => (
+                <div key={f.key} className={f.key === "keterangan_kontak" ? "lg:col-span-2" : ""}>
+                  <label htmlFor={f.key} className="block text-sm font-medium text-foreground">
+                    {f.label}
+                  </label>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{f.keterangan}</p>
+                  <textarea
+                    id={f.key}
+                    rows={f.baris}
+                    value={konten[f.key]}
+                    onChange={(e) => ubahField(f.key, e.target.value)}
+                    className="mt-2 w-full rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
+              ))}
+            </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <div className="mt-7 flex flex-wrap items-center gap-4 border-t border-border pt-6">
               <button
                 type="button"
-                className="tombol"
                 onClick={simpan}
                 disabled={menyimpan}
+                className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {menyimpan ? "Menyimpan..." : "Simpan perubahan"}
               </button>
               {pesanSukses && (
-                <span style={{ color: "#2f6b46", fontSize: 14 }}>
-                  ✓ {pesanSukses}
-                </span>
+                <span className="text-sm text-green-700">&#10003; {pesanSukses}</span>
               )}
-              {pesanError && (
-                <span style={{ color: "#b3392e", fontSize: 14 }}>
-                  {pesanError}
-                </span>
-              )}
+              {pesanError && <span className="text-sm text-red-700">{pesanError}</span>}
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

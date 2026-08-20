@@ -3,116 +3,108 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import Brand from "@/components/Brand";
+import {
+  BarChart3,
+  Home,
+  Landmark,
+  LogOut,
+  Menu,
+  Pencil,
+  Users,
+  X,
+} from "lucide-react";
 
 const menuItems = [
-  {
-    href: "/admin/beranda",
-    label: "Beranda",
-    icon: (
-      <>
-        <path d="M3 11l9-8 9 8" />
-        <path d="M5 10v10h14V10" />
-      </>
-    ),
-  },
-  {
-    href: "/admin/dashboard",
-    label: "Data pendaftar",
-    icon: (
-      <>
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <path d="M14 2v6h6" />
-      </>
-    ),
-  },
-  {
-    href: "/admin/info",
-    label: "Edit info",
-    icon: (
-      <>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 8h.01M11 12h1v4h1" />
-      </>
-    ),
-  },
-  {
-    href: "/admin/rekap",
-    label: "Rekap data",
-    icon: (
-      <>
-        <path d="M3 3v18h18" />
-        <path d="M7 15l4-6 4 4 5-8" />
-      </>
-    ),
-  },
-];
+  { href: "/admin/beranda", label: "Beranda", icon: Home },
+  { href: "/admin/dashboard", label: "Data pendaftar", icon: Users },
+  { href: "/admin/info", label: "Edit info", icon: Pencil },
+  { href: "/admin/rekap", label: "Rekap data", icon: BarChart3 },
+] as const;
 
 export default function AdminNav({ onKeluar }: { onKeluar: () => void }) {
   const pathname = usePathname();
-  const [terbuka, setTerbuka] = useState(false);
-  const [pathnameSebelumnya, setPathnameSebelumnya] = useState(pathname);
-
-  if (pathname !== pathnameSebelumnya) {
-    setPathnameSebelumnya(pathname);
-    setTerbuka(false);
-  }
+  const [menuTerbuka, setMenuTerbuka] = useState(false);
 
   return (
-    <>
-      <div className="header-baris-atas">
-        <Brand />
-        <button
-          type="button"
-          className="tombol-ikon"
-          onClick={onKeluar}
-          title="Keluar"
-          aria-label="Keluar dari akun admin"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <path d="M16 17l5-5-5-5" />
-            <path d="M21 12H9" />
-          </svg>
-        </button>
-      </div>
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur">
+      <div className="flex w-full items-center gap-4 px-4 py-3 md:px-8">
+        <Link href="/admin/beranda" className="flex items-center gap-3">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Landmark className="size-5" />
+          </span>
+          <span className="leading-tight">
+            <span className="block font-display text-sm font-semibold text-foreground">
+              SIMAKRI
+            </span>
+            <span className="block text-xs text-muted-foreground">
+              Panel admin &middot; Diskominfotik Riau
+            </span>
+          </span>
+        </Link>
 
-      <div className="nav-wrapper">
-        <button
-          type="button"
-          className="nav-hamburger"
-          aria-label={terbuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
-          aria-expanded={terbuka}
-          onClick={() => setTerbuka((t) => !t)}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            {terbuka ? (
-              <path d="M18 6L6 18M6 6l12 12" />
-            ) : (
-              <>
-                <path d="M3 6h18" />
-                <path d="M3 12h18" />
-                <path d="M3 18h18" />
-              </>
-            )}
-          </svg>
-        </button>
-
-        <nav className={`nav-pill${terbuka ? " nav-pill-terbuka" : ""}`}>
-          {menuItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={pathname === item.href ? "aktif" : ""}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                {item.icon}
-              </svg>
-              {item.label}
-            </Link>
-          ))}
+        <nav className="ml-auto hidden items-center gap-1 lg:flex">
+          {menuItems.map((item) => {
+            const aktif = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-secondary-foreground ${
+                  aktif ? "bg-secondary text-secondary-foreground" : "text-muted-foreground"
+                }`}
+              >
+                <item.icon className="size-4" />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
+
+        <div className="ml-auto flex items-center gap-2 lg:ml-2">
+          <button
+            type="button"
+            onClick={onKeluar}
+            title="Keluar"
+            aria-label="Keluar dari akun admin"
+            className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
+          >
+            <LogOut className="size-4" />
+          </button>
+
+          <button
+            type="button"
+            className="flex size-9 items-center justify-center rounded-md text-foreground lg:hidden"
+            aria-label={menuTerbuka ? "Tutup menu" : "Buka menu"}
+            aria-expanded={menuTerbuka}
+            onClick={() => setMenuTerbuka((t) => !t)}
+          >
+            {menuTerbuka ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
       </div>
-    </>
+
+      {menuTerbuka && (
+        <nav className="border-t border-border bg-background px-4 py-3 lg:hidden">
+          <div className="flex flex-col gap-1">
+            {menuItems.map((item) => {
+              const aktif = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMenuTerbuka(false)}
+                  className={`flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-secondary hover:text-secondary-foreground ${
+                    aktif ? "bg-secondary text-secondary-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  <item.icon className="size-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
+    </header>
   );
 }

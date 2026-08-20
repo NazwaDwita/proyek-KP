@@ -2,6 +2,7 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Landmark } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function AdminLoginPage() {
@@ -76,48 +77,68 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="halaman">
-      <div className="bungkus" style={{ maxWidth: 420 }}>
-        <form className="panel-glass" onSubmit={login}>
-          <p className="eyebrow">Khusus staf</p>
-          <h1 className="judul-hero" style={{ fontSize: 24, maxWidth: "none" }}>
-            Login admin
-          </h1>
-          <p className="sub-hero" style={{ marginBottom: "1.5rem" }}>
-            Halaman ini untuk staf Bidang Aptika yang mengelola data
-            pendaftaran magang.
-          </p>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      <form
+        onSubmit={login}
+        className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-soft"
+      >
+        <span className="flex size-11 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <Landmark className="size-6" />
+        </span>
 
-          {pesanError && <div className="form-pesan-gagal">{pesanError}</div>}
+        <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-[color:var(--emas-tua)]">
+          Khusus staf
+        </p>
+        <h1 className="mt-1 font-display text-2xl font-semibold text-foreground">
+          Login admin
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Halaman ini untuk staf Bidang Aptika yang mengelola data pendaftaran
+          magang.
+        </p>
 
-          <div className="form-grup">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              className="form-input"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+        {pesanError && (
+          <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700">
+            {pesanError}
           </div>
-          <div className="form-grup">
-            <label htmlFor="password">Kata sandi</label>
-            <input
-              id="password"
-              type="password"
-              className="form-input"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+        )}
 
-          <button type="submit" className="tombol" disabled={masuk}>
-            {masuk ? "Memeriksa..." : "Masuk"}
-          </button>
-        </form>
-      </div>
+        <div className="mt-6">
+          <label htmlFor="email" className="mb-1.5 block text-sm text-muted-foreground">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+        </div>
+
+        <div className="mt-4">
+          <label htmlFor="password" className="mb-1.5 block text-sm text-muted-foreground">
+            Kata sandi
+          </label>
+          <input
+            id="password"
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={masuk}
+          className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {masuk ? "Memeriksa..." : "Masuk"}
+        </button>
+      </form>
     </div>
   );
 }

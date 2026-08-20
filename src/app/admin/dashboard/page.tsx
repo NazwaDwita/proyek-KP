@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { RefreshCw, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import AdminNav from "@/components/admin/AdminNav";
@@ -38,6 +39,12 @@ const LABEL_STATUS: Record<StatusPendaftaran, string> = {
   menunggu: "Menunggu",
   diverifikasi: "Diterima",
   ditolak: "Ditolak",
+};
+
+const BADGE_STATUS: Record<StatusPendaftaran, string> = {
+  menunggu: "bg-muted text-muted-foreground border border-border",
+  diverifikasi: "bg-green-100 text-green-700 border border-green-200",
+  ditolak: "bg-red-100 text-red-700 border border-red-200",
 };
 
 function formatTanggal(iso: string) {
@@ -137,136 +144,133 @@ export default function AdminDashboardPage() {
 
   if (memuat) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <p className="sub-hero">Memeriksa akses...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <p className="text-sm text-muted-foreground">Memeriksa akses...</p>
       </div>
     );
   }
 
   if (ditolakAkses) {
     return (
-      <div className="halaman">
-        <div className="bungkus">
-          <div className="panel-glass">
-            <p className="eyebrow">Akses ditolak</p>
-            <h1 className="judul-hero" style={{ fontSize: 22, maxWidth: "none" }}>
-              Akun ini tidak memiliki akses admin
-            </h1>
-            <p className="sub-hero">
-              Hubungi staf lain yang sudah terdaftar untuk ditambahkan sebagai
-              admin.
-            </p>
-            <button className="tombol sekunder" onClick={keluar}>
-              Kembali ke login
-            </button>
-          </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-soft">
+          <p className="text-xs font-semibold uppercase tracking-widest text-red-600">
+            Akses ditolak
+          </p>
+          <h1 className="mt-2 font-display text-xl font-semibold text-foreground">
+            Akun ini tidak memiliki akses admin
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Hubungi staf lain yang sudah terdaftar untuk ditambahkan sebagai admin.
+          </p>
+          <button
+            onClick={keluar}
+            className="mt-5 inline-flex items-center justify-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+          >
+            Kembali ke login
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="halaman halaman-fit">
-      <div className="bungkus bungkus-fit" style={{ maxWidth: 1400 }}>
-        <AdminNav onKeluar={keluar} />
+    <div className="min-h-screen bg-background">
+      <AdminNav onKeluar={keluar} />
 
-        <div className="panel-glass panel-scroll panel-glass-tabel">
-          <h1
-            className="judul-hero"
-            style={{ fontSize: 22, maxWidth: "none", marginBottom: "0.85rem" }}
-          >
-            Data pendaftar magang
-          </h1>
+      <main className="w-full px-4 py-8 md:px-8">
+        <h1 className="mb-5 font-display text-2xl font-semibold text-foreground md:text-3xl">
+          Data pendaftar magang
+        </h1>
 
-          {errorMuat && <div className="form-pesan-gagal">{errorMuat}</div>}
-
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              flexWrap: "wrap",
-              alignItems: "center",
-              marginBottom: "0.85rem",
-            }}
-          >
-            <input
-              className="form-input"
-              style={{ maxWidth: 260 }}
-              placeholder="Cari nama atau nomor pendaftaran..."
-              value={pencarian}
-              onChange={(e) => setPencarian(e.target.value)}
-            />
-            <select
-              className="form-input"
-              style={{ maxWidth: 200 }}
-              value={filterStatus}
-              onChange={(e) =>
-                setFilterStatus(e.target.value as typeof filterStatus)
-              }
-            >
-              <option value="semua">Semua status</option>
-              <option value="menunggu">Menunggu</option>
-              <option value="diverifikasi">Diterima</option>
-              <option value="ditolak">Ditolak</option>
-            </select>
-
-            <button
-              type="button"
-              className={`tombol-ikon${sedangMuatUlang ? " memuat" : ""}`}
-              onClick={muatUlangManual}
-              disabled={sedangMuatUlang}
-              title="Muat ulang"
-              aria-label="Muat ulang data"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-                <path d="M21 3v6h-6" />
-              </svg>
-            </button>
-
-            <span style={{ fontSize: 12, color: "var(--teks-muted)", marginLeft: "auto" }}>
-              {terakhirDiperbarui
-                ? `Diperbarui otomatis tiap 30 detik \u00b7 terakhir ${terakhirDiperbarui.toLocaleTimeString(
-                    "id-ID",
-                    { hour: "2-digit", minute: "2-digit" }
-                  )}`
-                : ""}
-            </span>
+        {errorMuat && (
+          <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {errorMuat}
           </div>
+        )}
 
-          <div className="tabel-scroll-area">
-            <table className="tabel-admin">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <input
+            placeholder="Cari nama atau nomor pendaftaran..."
+            value={pencarian}
+            onChange={(e) => setPencarian(e.target.value)}
+            className="w-full max-w-xs rounded-md border border-border bg-card px-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
+            className="rounded-md border border-border bg-card px-3.5 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          >
+            <option value="semua">Semua status</option>
+            <option value="menunggu">Menunggu</option>
+            <option value="diverifikasi">Diterima</option>
+            <option value="ditolak">Ditolak</option>
+          </select>
+
+          <button
+            type="button"
+            onClick={muatUlangManual}
+            disabled={sedangMuatUlang}
+            title="Muat ulang"
+            aria-label="Muat ulang data"
+            className="flex size-9 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw className={`size-4 ${sedangMuatUlang ? "animate-spin" : ""}`} />
+          </button>
+
+          <span className="ml-auto text-xs text-muted-foreground">
+            {terakhirDiperbarui
+              ? `Diperbarui otomatis tiap 30 detik \u00b7 terakhir ${terakhirDiperbarui.toLocaleTimeString(
+                  "id-ID",
+                  { hour: "2-digit", minute: "2-digit" }
+                )}`
+              : ""}
+          </span>
+        </div>
+
+        <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-soft">
+          <div className="max-h-[65vh] overflow-y-auto">
+            <table className="w-full text-sm">
               <thead>
-                <tr>
-                  <th>Nomor</th>
-                  <th>Nama</th>
-                  <th>Bidang</th>
-                  <th>Periode</th>
-                  <th>Status</th>
-                  <th></th>
+                <tr className="sticky top-0 z-[1] bg-primary text-primary-foreground">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                    Nomor
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                    Nama
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                    Bidang
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                    Periode
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                    Status
+                  </th>
+                  <th className="px-4 py-3"></th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border">
                 {daftarTersaring.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.nomor_pendaftaran}</td>
-                    <td>{p.nama_lengkap}</td>
-                    <td>{p.bidang?.nama ?? "-"}</td>
-                    <td>
-                      {formatTanggal(p.tanggal_mulai)} &ndash;{" "}
-                      {formatTanggal(p.tanggal_selesai)}
+                  <tr key={p.id} className="transition-colors hover:bg-secondary/40">
+                    <td className="px-4 py-3 text-foreground">{p.nomor_pendaftaran}</td>
+                    <td className="px-4 py-3 text-foreground">{p.nama_lengkap}</td>
+                    <td className="px-4 py-3 text-foreground">{p.bidang?.nama ?? "-"}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-foreground">
+                      {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
                     </td>
-                    <td>
-                      <span className={`status-badge status-${p.status}`}>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${BADGE_STATUS[p.status]}`}
+                      >
                         {LABEL_STATUS[p.status]}
                       </span>
                     </td>
-                    <td>
+                    <td className="px-4 py-3">
                       <button
-                        className="tombol sekunder tombol-kecil"
                         onClick={() => setDipilih(p)}
+                        className="inline-flex items-center justify-center rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
                       >
                         Detail
                       </button>
@@ -275,7 +279,7 @@ export default function AdminDashboardPage() {
                 ))}
                 {daftarTersaring.length === 0 && (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: "center", padding: 20 }}>
+                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
                       Tidak ada data yang cocok.
                     </td>
                   </tr>
@@ -284,7 +288,7 @@ export default function AdminDashboardPage() {
             </table>
           </div>
         </div>
-      </div>
+      </main>
 
       {dipilih && (
         <ModalDetail
@@ -421,96 +425,111 @@ function ModalDetail({
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-isi">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
-        >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-5 backdrop-blur-sm">
+      <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-card p-7 shadow-soft">
+        <div className="flex items-start justify-between">
           <div>
-            <p className="eyebrow" style={{ margin: 0 }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[color:var(--emas-tua)]">
               {pendaftar.nomor_pendaftaran}
             </p>
-            <h2 style={{ margin: "4px 0 0", fontSize: 20 }}>
+            <h2 className="mt-1 font-display text-xl font-semibold text-foreground">
               {pendaftar.nama_lengkap}
             </h2>
           </div>
-          <button className="modal-tutup" onClick={onTutup} aria-label="Tutup">
-            &times;
+          <button
+            onClick={onTutup}
+            aria-label="Tutup"
+            className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
+          >
+            <X className="size-4" />
           </button>
         </div>
 
         {pesanError && (
-          <div className="form-pesan-gagal" style={{ marginTop: 14 }}>
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700">
             {pesanError}
           </div>
         )}
 
-        <div className="modal-grid">
+        <div className="mt-5 grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="hasil-status-label">Email</span>
-            <p>{pendaftar.email}</p>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Email
+            </span>
+            <p className="mt-0.5 text-foreground">{pendaftar.email}</p>
           </div>
           <div>
-            <span className="hasil-status-label">No. HP</span>
-            <p>{pendaftar.no_hp}</p>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              No. HP
+            </span>
+            <p className="mt-0.5 text-foreground">{pendaftar.no_hp}</p>
           </div>
           <div>
-            <span className="hasil-status-label">Asal institusi</span>
-            <p>{pendaftar.asal_institusi}</p>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Asal institusi
+            </span>
+            <p className="mt-0.5 text-foreground">{pendaftar.asal_institusi}</p>
           </div>
           <div>
-            <span className="hasil-status-label">Jurusan/prodi</span>
-            <p>{pendaftar.jurusan_prodi || "-"}</p>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Jurusan/prodi
+            </span>
+            <p className="mt-0.5 text-foreground">{pendaftar.jurusan_prodi || "-"}</p>
           </div>
           <div>
-            <span className="hasil-status-label">Periode</span>
-            <p>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Periode
+            </span>
+            <p className="mt-0.5 text-foreground">
               {formatTanggal(pendaftar.tanggal_mulai)} &ndash;{" "}
               {formatTanggal(pendaftar.tanggal_selesai)}
             </p>
           </div>
           <div>
-            <span className="hasil-status-label">Didaftarkan</span>
-            <p>{formatTanggal(pendaftar.dibuat_pada)}</p>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Didaftarkan
+            </span>
+            <p className="mt-0.5 text-foreground">{formatTanggal(pendaftar.dibuat_pada)}</p>
           </div>
         </div>
 
-        <div className="form-grup" style={{ marginTop: 4 }}>
-          <label>Dokumen surat pengantar</label>
+        <div className="mt-5">
+          <label className="block text-sm font-medium text-foreground">
+            Dokumen surat pengantar
+          </label>
           {dokumen.length === 0 && (
-            <p className="sub-hero" style={{ margin: 0 }}>
-              Tidak ada dokumen ditemukan.
-            </p>
+            <p className="mt-1.5 text-sm text-muted-foreground">Tidak ada dokumen ditemukan.</p>
           )}
-          {dokumen.map((d) => (
-            <div key={d.id}>
-              {linkDokumen[d.id] ? (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {dokumen.map((d) =>
+              linkDokumen[d.id] ? (
                 <a
+                  key={d.id}
                   href={linkDokumen[d.id]}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="tombol sekunder tombol-kecil"
+                  className="inline-flex items-center justify-center rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
                 >
                   Lihat {d.nama_file_asli ?? d.jenis_dokumen}
                 </a>
               ) : (
-                <span className="sub-hero">Memuat link dokumen...</span>
-              )}
-            </div>
-          ))}
+                <span key={d.id} className="text-sm text-muted-foreground">
+                  Memuat link dokumen...
+                </span>
+              )
+            )}
+          </div>
         </div>
 
-        <div className="form-grup">
-          <label htmlFor="bidang_id">Bidang penempatan</label>
+        <div className="mt-5">
+          <label htmlFor="bidang_id" className="block text-sm font-medium text-foreground">
+            Bidang penempatan
+          </label>
           <select
             id="bidang_id"
-            className="form-input"
             value={bidangId ?? ""}
             onChange={(e) => setBidangId(e.target.value || null)}
+            className="mt-2 w-full rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             <option value="" disabled>
               Belum ditentukan
@@ -534,10 +553,10 @@ function ModalDetail({
             const kuotaTerpilih = kuotaBidang.find((k) => k.bidang_id === bidangId);
             if (kuotaTerpilih && kuotaTerpilih.terisi >= kuotaTerpilih.kuota) {
               return (
-                <div className="form-pesan-gagal" style={{ marginTop: "0.6rem" }}>
-                  Bidang ini sudah penuh untuk periode tersebut ({kuotaTerpilih.terisi}
-                  /{kuotaTerpilih.kuota}). Kamu tetap bisa memilihnya kalau memang
-                  ingin melonggarkan kuota.
+                <div className="mt-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700">
+                  Bidang ini sudah penuh untuk periode tersebut ({kuotaTerpilih.terisi}/
+                  {kuotaTerpilih.kuota}). Kamu tetap bisa memilihnya kalau memang ingin
+                  melonggarkan kuota.
                 </div>
               );
             }
@@ -545,31 +564,31 @@ function ModalDetail({
           })()}
         </div>
 
-        <div className="form-grup">
-          <label htmlFor="catatan_admin">
+        <div className="mt-5">
+          <label htmlFor="catatan_admin" className="block text-sm font-medium text-foreground">
             Catatan (wajib diisi kalau menolak)
           </label>
           <textarea
             id="catatan_admin"
-            className="form-input"
             rows={3}
             value={catatan}
             onChange={(e) => setCatatan(e.target.value)}
+            className="mt-2 w-full rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
 
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div className="mt-6 flex flex-wrap gap-3">
           <button
-            className="tombol"
             disabled={menyimpan}
             onClick={() => simpan("diverifikasi")}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {menyimpan ? "Menyimpan..." : "Terima"}
           </button>
           <button
-            className="tombol sekunder"
             disabled={menyimpan}
             onClick={() => simpan("ditolak")}
+            className="inline-flex items-center justify-center rounded-md border border-red-300 px-4 py-2.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Tolak
           </button>
