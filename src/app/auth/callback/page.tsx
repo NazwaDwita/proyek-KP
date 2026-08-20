@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -24,8 +24,18 @@ function terjemahkanErrorOAuth(kode: string | null, deskripsi: string | null): s
 export default function AuthCallback() {
   const router = useRouter();
   const [pesanError, setPesanError] = useState<string | null>(null);
+  const sudahDiproses = useRef(false);
 
   useEffect(() => {
+    // Di mode development, React (Strict Mode) sengaja menjalankan effect
+    // dua kali untuk mendeteksi bug. Kode & code-verifier PKCE cuma bisa
+    // dipakai SEKALI -- kalau selesaikanMasuk() jalan dua kali, percobaan
+    // kedua akan gagal dengan "code verifier not found" walau yang
+    // pertama sukses. Ref ini memastikan proses tukar-sesi cuma jalan
+    // sekali walau effect-nya terpanggil berkali-kali.
+    if (sudahDiproses.current) return;
+    sudahDiproses.current = true;
+
     async function selesaikanMasuk() {
       try {
         const url = new URL(window.location.href);
