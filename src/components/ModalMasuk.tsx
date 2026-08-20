@@ -8,7 +8,7 @@ type Mode = "masuk" | "daftar";
 
 function IkonGoogle() {
   return (
-    <svg viewBox="0 0 48 48">
+    <svg viewBox="0 0 48 48" className="h-[18px] w-[18px] flex-shrink-0">
       <path
         fill="#FFC107"
         d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.3-.4-3.5z"
@@ -225,33 +225,70 @@ export default function ModalMasuk({
 
   const judul = mode === "masuk" ? "Masuk ke akunmu" : "Buat akun baru";
 
+  const kelasInput =
+    "w-full rounded-[10px] border border-primary/15 bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-foreground/35 focus:border-primary focus:outline-none";
+  const kelasLabel = "mb-1.5 block text-[13px] text-muted-foreground";
+  const kelasKeterangan = "mt-1 text-xs text-muted-foreground/75";
+  const kelasTombolUtama =
+    "flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none";
+  const kelasTombolGoogle =
+    "flex w-full items-center justify-center gap-2.5 rounded-[10px] border border-primary/15 bg-card py-[11px] text-sm font-medium text-foreground transition hover:border-primary/25 hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-60";
+  const kelasTombolLihatSandi =
+    "mr-1 flex w-[34px] flex-shrink-0 items-center justify-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-secondary-foreground";
+
+  const pemisah = (
+    <div className="my-5 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+      <span className="h-px flex-1 bg-primary/10" />
+      Atau
+      <span className="h-px flex-1 bg-primary/10" />
+    </div>
+  );
+
+  const tombolGoogle = (
+    <button type="button" className={kelasTombolGoogle} onClick={masukGoogle} disabled={memprosesGoogle}>
+      <IkonGoogle />
+      {memprosesGoogle ? "Mengalihkan ke Google..." : "Lanjutkan dengan Google"}
+    </button>
+  );
+
   return (
     <div
-      className="modal-overlay"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-primary/45 p-5 backdrop-blur-[2px]"
       onClick={(e) => {
         if (e.target === e.currentTarget) tutupDanReset();
       }}
     >
-      <div className="modal-isi" style={{ maxWidth: 440 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div className="max-h-[90vh] w-full max-w-[440px] overflow-y-auto rounded-2xl border border-primary/10 bg-card p-7 shadow-soft">
+        <div className="flex items-start justify-between">
           <div>
-            <p className="eyebrow">Masuk / Buat akun</p>
-            <h2 className="judul-hero" style={{ fontSize: 22, maxWidth: "none", marginBottom: "0.5rem" }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+              Masuk / Buat akun
+            </p>
+            <h2 className="mb-2 mt-1 font-display text-[22px] font-semibold text-foreground">
               {judul}
             </h2>
           </div>
-          <button type="button" className="modal-tutup" onClick={tutupDanReset} aria-label="Tutup">
+          <button
+            type="button"
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-2xl leading-none text-muted-foreground transition hover:bg-secondary hover:text-secondary-foreground"
+            onClick={tutupDanReset}
+            aria-label="Tutup"
+          >
             &times;
           </button>
         </div>
 
-        <div className="toggle-mode">
+        <div className="mb-6 mt-5 flex gap-1 rounded-full border border-primary/10 bg-primary/5 p-1">
           <button
             type="button"
-            className={mode === "masuk" ? "aktif" : ""}
             onClick={() => pindahMode("masuk")}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-2.5 text-[13.5px] font-medium transition ${
+              mode === "masuk"
+                ? "bg-secondary text-secondary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+            }`}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-[15px] w-[15px]">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
               <path d="M10 17l5-5-5-5" />
               <path d="M15 12H3" />
@@ -260,10 +297,14 @@ export default function ModalMasuk({
           </button>
           <button
             type="button"
-            className={mode === "daftar" ? "aktif" : ""}
             onClick={() => pindahMode("daftar")}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-2.5 text-[13.5px] font-medium transition ${
+              mode === "daftar"
+                ? "bg-secondary text-secondary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+            }`}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-[15px] w-[15px]">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <path d="M19 8v6M22 11h-6" />
@@ -274,14 +315,20 @@ export default function ModalMasuk({
 
         {mode === "masuk" ? (
           <form onSubmit={submitMasuk}>
-            {pesanError && <div className="form-pesan-gagal">{pesanError}</div>}
+            {pesanError && (
+              <div className="mb-6 rounded-[10px] border border-red-200 bg-red-50 px-4 py-3.5 text-[13px] text-red-700">
+                {pesanError}
+              </div>
+            )}
 
-            <div className="form-grup">
-              <label htmlFor="masuk-email">Alamat email</label>
+            <div className="mb-5">
+              <label htmlFor="masuk-email" className={kelasLabel}>
+                Alamat email
+              </label>
               <input
                 id="masuk-email"
                 type="email"
-                className="form-input"
+                className={kelasInput}
                 required
                 autoFocus
                 placeholder="nama@email.com"
@@ -289,13 +336,15 @@ export default function ModalMasuk({
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="form-grup">
-              <label htmlFor="masuk-password">Password</label>
-              <div className="input-sandi-bungkus">
+            <div className="mb-5">
+              <label htmlFor="masuk-password" className={kelasLabel}>
+                Password
+              </label>
+              <div className="flex items-stretch rounded-[10px] border border-primary/15 bg-card transition focus-within:border-primary">
                 <input
                   id="masuk-password"
                   type={lihatSandiMasuk ? "text" : "password"}
-                  className="form-input"
+                  className="min-w-0 flex-1 rounded-[10px] border-none bg-transparent px-3.5 py-2.5 pr-2 text-sm text-foreground focus:outline-none"
                   required
                   autoComplete="current-password"
                   value={password}
@@ -303,71 +352,72 @@ export default function ModalMasuk({
                 />
                 <button
                   type="button"
-                  className="tombol-lihat-sandi"
+                  className={kelasTombolLihatSandi}
                   onClick={() => setLihatSandiMasuk((v) => !v)}
                   aria-label={lihatSandiMasuk ? "Sembunyikan password" : "Tampilkan password"}
                   tabIndex={-1}
                 >
-                  {lihatSandiMasuk ? <EyeOff /> : <Eye />}
+                  {lihatSandiMasuk ? <EyeOff className="h-[15px] w-[15px]" /> : <Eye className="h-[15px] w-[15px]" />}
                 </button>
               </div>
             </div>
 
-            <button type="submit" className="tombol" disabled={memproses} style={{ width: "100%", justifyContent: "center" }}>
+            <button type="submit" className={kelasTombolUtama} disabled={memproses}>
               {memproses ? "Memproses..." : "Masuk"}
             </button>
 
-            <div className="pemisah-atau">Atau</div>
-
-            <button
-              type="button"
-              className="tombol-google"
-              onClick={masukGoogle}
-              disabled={memprosesGoogle}
-            >
-              <IkonGoogle />
-              {memprosesGoogle ? "Mengalihkan ke Google..." : "Lanjutkan dengan Google"}
-            </button>
+            {pemisah}
+            {tombolGoogle}
           </form>
         ) : (
           <form onSubmit={submitDaftar}>
-            {pesanError && <div className="form-pesan-gagal">{pesanError}</div>}
+            {pesanError && (
+              <div className="mb-6 rounded-[10px] border border-red-200 bg-red-50 px-4 py-3.5 text-[13px] text-red-700">
+                {pesanError}
+              </div>
+            )}
 
-            <div className="form-grup">
-              <label htmlFor="daftar-nama">Nama lengkap</label>
+            <div className="mb-5">
+              <label htmlFor="daftar-nama" className={kelasLabel}>
+                Nama lengkap
+              </label>
               <input
                 id="daftar-nama"
                 type="text"
-                className="form-input"
+                className={kelasInput}
                 required
                 autoFocus
                 placeholder="Nama kamu"
                 value={namaLengkap}
                 onChange={(e) => setNamaLengkap(e.target.value)}
               />
-              <p className="keterangan-field">
+              <p className={kelasKeterangan}>
                 Nama ini akan ditampilkan di Beranda, bukan email kamu.
               </p>
             </div>
-            <div className="form-grup">
-              <label htmlFor="daftar-email">Alamat email</label>
+            <div className="mb-5">
+              <label htmlFor="daftar-email" className={kelasLabel}>
+                Alamat email
+              </label>
               <input
                 id="daftar-email"
                 type="email"
-                className="form-input"
+                className={kelasInput}
                 required
                 placeholder="nama@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="form-grup">
-              <label htmlFor="daftar-password">Password</label>
-              <div className="input-sandi-bungkus">
+            <div className="mb-5">
+              <label htmlFor="daftar-password" className={kelasLabel}>
+                Password
+              </label>
+              <div className="flex items-stretch rounded-[10px] border border-primary/15 bg-card transition focus-within:border-primary">
                 <input
                   id="daftar-password"
                   type={lihatSandiDaftar ? "text" : "password"}
-                  className="form-input"
+                  className="min-w-0 flex-1 rounded-[10px] border-none bg-transparent px-3.5 py-2.5 pr-2 text-sm text-foreground focus:outline-none"
                   required
                   autoComplete="new-password"
                   minLength={8}
@@ -376,23 +426,25 @@ export default function ModalMasuk({
                 />
                 <button
                   type="button"
-                  className="tombol-lihat-sandi"
+                  className={kelasTombolLihatSandi}
                   onClick={() => setLihatSandiDaftar((v) => !v)}
                   aria-label={lihatSandiDaftar ? "Sembunyikan password" : "Tampilkan password"}
                   tabIndex={-1}
                 >
-                  {lihatSandiDaftar ? <EyeOff /> : <Eye />}
+                  {lihatSandiDaftar ? <EyeOff className="h-[15px] w-[15px]" /> : <Eye className="h-[15px] w-[15px]" />}
                 </button>
               </div>
-              <p className="keterangan-field">Minimal 8 karakter, kombinasi huruf kapital, angka, dan simbol.</p>
+              <p className={kelasKeterangan}>Minimal 8 karakter, kombinasi huruf kapital, angka, dan simbol.</p>
             </div>
-            <div className="form-grup">
-              <label htmlFor="daftar-konfirmasi">Konfirmasi password</label>
-              <div className="input-sandi-bungkus">
+            <div className="mb-5">
+              <label htmlFor="daftar-konfirmasi" className={kelasLabel}>
+                Konfirmasi password
+              </label>
+              <div className="flex items-stretch rounded-[10px] border border-primary/15 bg-card transition focus-within:border-primary">
                 <input
                   id="daftar-konfirmasi"
                   type={lihatKonfirmasi ? "text" : "password"}
-                  className="form-input"
+                  className="min-w-0 flex-1 rounded-[10px] border-none bg-transparent px-3.5 py-2.5 pr-2 text-sm text-foreground focus:outline-none"
                   required
                   autoComplete="new-password"
                   minLength={8}
@@ -401,31 +453,22 @@ export default function ModalMasuk({
                 />
                 <button
                   type="button"
-                  className="tombol-lihat-sandi"
+                  className={kelasTombolLihatSandi}
                   onClick={() => setLihatKonfirmasi((v) => !v)}
                   aria-label={lihatKonfirmasi ? "Sembunyikan password" : "Tampilkan password"}
                   tabIndex={-1}
                 >
-                  {lihatKonfirmasi ? <EyeOff /> : <Eye />}
+                  {lihatKonfirmasi ? <EyeOff className="h-[15px] w-[15px]" /> : <Eye className="h-[15px] w-[15px]" />}
                 </button>
               </div>
             </div>
 
-            <button type="submit" className="tombol" disabled={memproses} style={{ width: "100%", justifyContent: "center" }}>
+            <button type="submit" className={kelasTombolUtama} disabled={memproses}>
               {memproses ? "Mendaftarkan..." : "Buat akun"}
             </button>
 
-            <div className="pemisah-atau">Atau</div>
-
-            <button
-              type="button"
-              className="tombol-google"
-              onClick={masukGoogle}
-              disabled={memprosesGoogle}
-            >
-              <IkonGoogle />
-              {memprosesGoogle ? "Mengalihkan ke Google..." : "Lanjutkan dengan Google"}
-            </button>
+            {pemisah}
+            {tombolGoogle}
           </form>
         )}
       </div>
