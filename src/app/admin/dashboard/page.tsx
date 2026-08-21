@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { RefreshCw, X } from "lucide-react";
+import { X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import AdminNav from "@/components/admin/AdminNav";
@@ -68,7 +68,6 @@ export default function AdminDashboardPage() {
   const [pencarian, setPencarian] = useState("");
 
   const [dipilih, setDipilih] = useState<Pendaftar | null>(null);
-  const [sedangMuatUlang, setSedangMuatUlang] = useState(false);
   const [terakhirDiperbarui, setTerakhirDiperbarui] = useState<Date | null>(null);
 
   async function muatUlangData() {
@@ -87,12 +86,6 @@ export default function AdminDashboardPage() {
     }
     setDaftar((data as unknown as Pendaftar[]) ?? []);
     setTerakhirDiperbarui(new Date());
-  }
-
-  async function muatUlangManual() {
-    setSedangMuatUlang(true);
-    await muatUlangData();
-    setSedangMuatUlang(false);
   }
 
   useEffect(() => {
@@ -206,17 +199,6 @@ export default function AdminDashboardPage() {
             <option value="diverifikasi">Diterima</option>
             <option value="ditolak">Ditolak</option>
           </select>
-
-          <button
-            type="button"
-            onClick={muatUlangManual}
-            disabled={sedangMuatUlang}
-            title="Muat ulang"
-            aria-label="Muat ulang data"
-            className="flex size-9 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <RefreshCw className={`size-4 ${sedangMuatUlang ? "animate-spin" : ""}`} />
-          </button>
 
           <span className="ml-auto text-xs text-muted-foreground">
             {terakhirDiperbarui
@@ -384,7 +366,7 @@ function ModalDetail({
 
     const { data: sesi } = await supabase.auth.getSession();
 
-    const { error } = await supabase
+    const { data: baruDisimpan, error } = await supabase
       .from("pendaftar")
       .update({
         status: statusBaru,
@@ -393,7 +375,8 @@ function ModalDetail({
         diverifikasi_oleh: sesi.session?.user.id ?? null,
         diverifikasi_pada: new Date().toISOString(),
       })
-      .eq("id", pendaftar.id);
+      .eq("id", pendaftar.id)
+      .select("id");
 
     setMenyimpan(false);
 
@@ -403,22 +386,17 @@ function ModalDetail({
       return;
     }
 
-    if (sesi.session?.access_token) {
-      try {
-        const res = await fetch("/api/notifikasi-status", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${sesi.session.access_token}`,
-          },
-          body: JSON.stringify({ pendaftarId: pendaftar.id }),
-        });
-        if (!res.ok) {
-          console.error("Notifikasi email gagal terkirim:", await res.text());
-        }
-      } catch (errNotif) {
-        console.error("Notifikasi email gagal terkirim:", errNotif);
-      }
+    if (!baruDisimpan || baruDisimpan.length === 0) {
+      // Tidak ada error, tapi juga tidak ada baris yang benar-benar
+      // berubah -- biasanya tanda RLS (is_admin()) diam-diam menolak
+      // update ini. Daripada pura-pura berhasil, tampilkan errornya.
+      console.error(
+        "Update pendaftar tidak mengubah baris manapun (kemungkinan diblokir RLS/is_admin())."
+      );
+      setPesanError(
+        "Perubahan TIDAK tersimpan -- kemungkinan akun kamu tidak lagi terdaftar sebagai admin, atau sesi login sudah kedaluwarsa. Coba logout lalu masuk lagi."
+      );
+      return;
     }
 
     onSelesai();
