@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { CheckCircle2, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import AdminNav from "@/components/admin/AdminNav";
@@ -55,6 +55,16 @@ function formatTanggal(iso: string) {
   });
 }
 
+// Dipakai buat nampilin penanda "Sudah selesai" -- status "Diterima" di
+// database nggak berubah otomatis begitu periode magangnya lewat, jadi
+// ini murni penanda visual biar admin nggak perlu ngitung tanggal manual
+// waktu lihat tabel.
+function periodeSudahSelesai(tanggalSelesai: string) {
+  const hariIni = new Date();
+  hariIni.setHours(0, 0, 0, 0);
+  return new Date(tanggalSelesai) < hariIni;
+}
+
 export default function AdminDashboardPage() {
   const { memuat, ditolakAkses, keluar } = useAdminAkses();
 
@@ -62,7 +72,7 @@ export default function AdminDashboardPage() {
   const [daftarBidang, setDaftarBidang] = useState<Bidang[]>([]);
   const [errorMuat, setErrorMuat] = useState<string | null>(null);
 
-  const [filterStatus, setFilterStatus] = useState<"semua" | StatusPendaftaran>(
+  const [filterStatus, setFilterStatus] = useState<"semua" | StatusPendaftaran | "selesai">(
     "semua"
   );
   const [pencarian, setPencarian] = useState("");
@@ -123,7 +133,13 @@ export default function AdminDashboardPage() {
 
   const daftarTersaring = useMemo(() => {
     return daftar.filter((p) => {
-      if (filterStatus !== "semua" && p.status !== filterStatus) return false;
+      if (filterStatus === "selesai") {
+        if (!(p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai))) {
+          return false;
+        }
+      } else if (filterStatus !== "semua" && p.status !== filterStatus) {
+        return false;
+      }
       if (pencarian.trim()) {
         const q = pencarian.trim().toLowerCase();
         return (
@@ -197,6 +213,7 @@ export default function AdminDashboardPage() {
             <option value="semua">Semua status</option>
             <option value="menunggu">Menunggu</option>
             <option value="diverifikasi">Diterima</option>
+            <option value="selesai">Sudah selesai</option>
             <option value="ditolak">Ditolak</option>
           </select>
 
@@ -243,11 +260,18 @@ export default function AdminDashboardPage() {
                       {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${BADGE_STATUS[p.status]}`}
-                      >
-                        {LABEL_STATUS[p.status]}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${BADGE_STATUS[p.status]}`}
+                        >
+                          {LABEL_STATUS[p.status]}
+                        </span>
+                        {p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai) && (
+                          <span title="Periode magangnya sudah lewat dari hari ini">
+                            <CheckCircle2 className="size-4 shrink-0 text-sky-600" />
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <button
@@ -458,9 +482,15 @@ function ModalDetail({
             <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Periode
             </span>
-            <p className="mt-0.5 text-foreground">
+            <p className="mt-0.5 flex items-center gap-1.5 text-foreground">
               {formatTanggal(pendaftar.tanggal_mulai)} &ndash;{" "}
               {formatTanggal(pendaftar.tanggal_selesai)}
+              {pendaftar.status === "diverifikasi" &&
+                periodeSudahSelesai(pendaftar.tanggal_selesai) && (
+                  <span title="Periode magangnya sudah lewat dari hari ini">
+                    <CheckCircle2 className="size-4 shrink-0 text-sky-600" />
+                  </span>
+                )}
             </p>
           </div>
           <div>
