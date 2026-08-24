@@ -7,6 +7,7 @@ import HeaderSticky from "@/components/HeaderSticky";
 import Footer from "@/components/Footer";
 import { useSesi } from "@/lib/useSesi";
 import { supabase } from "@/lib/supabase";
+import { periodeSudahSelesai } from "@/lib/periodeMagang";
 
 const KUOTA_PER_BIDANG = 10;
 
@@ -388,7 +389,9 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
                   href={`/surat-keterangan/${p.nomor_pendaftaran}`}
                   className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
-                  Cetak surat keterangan diterima
+                  {periodeSudahSelesai(p.tanggal_selesai)
+                    ? "Cetak surat keterangan selesai magang"
+                    : "Cetak surat keterangan diterima"}
                 </Link>
               )}
 

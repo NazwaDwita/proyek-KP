@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
+import { periodeSudahSelesai } from "@/lib/periodeMagang";
 import AdminNav from "@/components/admin/AdminNav";
 
 type StatusPendaftaran = "menunggu" | "diverifikasi" | "ditolak";
@@ -53,16 +54,6 @@ function formatTanggal(iso: string) {
     month: "short",
     year: "numeric",
   });
-}
-
-// Dipakai buat nampilin penanda "Sudah selesai" -- status "Diterima" di
-// database nggak berubah otomatis begitu periode magangnya lewat, jadi
-// ini murni penanda visual biar admin nggak perlu ngitung tanggal manual
-// waktu lihat tabel.
-function periodeSudahSelesai(tanggalSelesai: string) {
-  const hariIni = new Date();
-  hariIni.setHours(0, 0, 0, 0);
-  return new Date(tanggalSelesai) < hariIni;
 }
 
 export default function AdminDashboardPage() {
@@ -324,6 +315,8 @@ function ModalDetail({
 }) {
   const [catatan, setCatatan] = useState(pendaftar.catatan_admin ?? "");
   const [bidangId, setBidangId] = useState(pendaftar.bidang_id);
+  const [tanggalMulai, setTanggalMulai] = useState(pendaftar.tanggal_mulai);
+  const [tanggalSelesai, setTanggalSelesai] = useState(pendaftar.tanggal_selesai);
   const [menyimpan, setMenyimpan] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
   const [dokumen, setDokumen] = useState<Dokumen[]>([]);
@@ -331,6 +324,9 @@ function ModalDetail({
   const [kuotaBidang, setKuotaBidang] = useState<
     { bidang_id: string; kuota: number; terisi: number }[]
   >([]);
+
+  const periodeBerubah =
+    tanggalMulai !== pendaftar.tanggal_mulai || tanggalSelesai !== pendaftar.tanggal_selesai;
 
   useEffect(() => {
     async function muatDokumen() {
@@ -355,10 +351,16 @@ function ModalDetail({
   }, [pendaftar.id]);
 
   useEffect(() => {
+    // Sengaja pakai tanggalMulai/tanggalSelesai (state yang sedang diedit
+    // admin), bukan pendaftar.tanggal_mulai/tanggal_selesai (nilai asli) --
+    // supaya kalau admin lagi mengetik periode baru, info kuota yang
+    // ditampilkan langsung menyesuaikan periode barunya, bukan periode lama.
+    if (!tanggalMulai || !tanggalSelesai || tanggalSelesai < tanggalMulai) return;
+
     async function muatKuota() {
       const { data, error } = await supabase.rpc("kuota_bidang_untuk_periode", {
-        p_tanggal_mulai: pendaftar.tanggal_mulai,
-        p_tanggal_selesai: pendaftar.tanggal_selesai,
+        p_tanggal_mulai: tanggalMulai,
+        p_tanggal_selesai: tanggalSelesai,
         p_exclude_id: pendaftar.id,
       });
       if (error) {
@@ -374,31 +376,61 @@ function ModalDetail({
       );
     }
     muatKuota();
-  }, [pendaftar.id, pendaftar.tanggal_mulai, pendaftar.tanggal_selesai]);
+  }, [pendaftar.id, tanggalMulai, tanggalSelesai]);
 
-  async function simpan(statusBaru: StatusPendaftaran) {
-    if (statusBaru === "ditolak" && !catatan.trim()) {
+  // statusBaru diisi cuma kalau ini aksi Terima/Tolak. Kalau kosong,
+  // artinya admin cuma menyimpan perubahan periode/bidang/catatan tanpa
+  // mengubah keputusan -- makanya status, diverifikasi_oleh, dan
+  // diverifikasi_pada sengaja TIDAK ikut ditimpa, biar jejak kapan
+  // pendaftaran ini pertama kali diputuskan tetap utuh.
+  async function simpan(statusBaru?: StatusPendaftaran) {
+    const statusUntukDicek = statusBaru ?? pendaftar.status;
+
+    if (statusUntukDicek === "ditolak" && !catatan.trim()) {
       setPesanError("Catatan wajib diisi kalau menolak pendaftaran.");
       return;
     }
-    if (statusBaru === "diverifikasi" && !bidangId) {
+    if (statusUntukDicek === "diverifikasi" && !bidangId) {
       setPesanError("Pilih bidang penempatan dulu sebelum menerima pendaftaran.");
       return;
     }
+    if (!tanggalMulai || !tanggalSelesai) {
+      setPesanError("Tanggal mulai dan tanggal selesai wajib diisi.");
+      return;
+    }
+    if (tanggalSelesai < tanggalMulai) {
+      setPesanError("Tanggal selesai tidak boleh sebelum tanggal mulai.");
+      return;
+    }
+
     setMenyimpan(true);
     setPesanError(null);
 
-    const { data: sesi } = await supabase.auth.getSession();
+    const payload: {
+      catatan_admin: string | null;
+      bidang_id: string | null;
+      tanggal_mulai: string;
+      tanggal_selesai: string;
+      status?: StatusPendaftaran;
+      diverifikasi_oleh?: string | null;
+      diverifikasi_pada?: string;
+    } = {
+      catatan_admin: catatan.trim() || null,
+      bidang_id: bidangId,
+      tanggal_mulai: tanggalMulai,
+      tanggal_selesai: tanggalSelesai,
+    };
+
+    if (statusBaru) {
+      const { data: sesi } = await supabase.auth.getSession();
+      payload.status = statusBaru;
+      payload.diverifikasi_oleh = sesi.session?.user.id ?? null;
+      payload.diverifikasi_pada = new Date().toISOString();
+    }
 
     const { data: baruDisimpan, error } = await supabase
       .from("pendaftar")
-      .update({
-        status: statusBaru,
-        catatan_admin: catatan.trim() || null,
-        bidang_id: bidangId,
-        diverifikasi_oleh: sesi.session?.user.id ?? null,
-        diverifikasi_pada: new Date().toISOString(),
-      })
+      .update(payload)
       .eq("id", pendaftar.id)
       .select("id");
 
@@ -480,25 +512,61 @@ function ModalDetail({
           </div>
           <div>
             <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Periode
-            </span>
-            <p className="mt-0.5 flex items-center gap-1.5 text-foreground">
-              {formatTanggal(pendaftar.tanggal_mulai)} &ndash;{" "}
-              {formatTanggal(pendaftar.tanggal_selesai)}
-              {pendaftar.status === "diverifikasi" &&
-                periodeSudahSelesai(pendaftar.tanggal_selesai) && (
-                  <span title="Periode magangnya sudah lewat dari hari ini">
-                    <CheckCircle2 className="size-4 shrink-0 text-sky-600" />
-                  </span>
-                )}
-            </p>
-          </div>
-          <div>
-            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Didaftarkan
             </span>
             <p className="mt-0.5 text-foreground">{formatTanggal(pendaftar.dibuat_pada)}</p>
           </div>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Periode magang
+            </span>
+            {pendaftar.status === "diverifikasi" && periodeSudahSelesai(tanggalSelesai) && (
+              <span
+                className="inline-flex items-center gap-1 text-xs font-medium text-sky-600"
+                title="Periode magangnya sudah lewat dari hari ini"
+              >
+                <CheckCircle2 className="size-3.5 shrink-0" />
+                Sudah selesai
+              </span>
+            )}
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="tanggal_mulai" className="block text-xs text-muted-foreground">
+                Tanggal mulai
+              </label>
+              <input
+                id="tanggal_mulai"
+                type="date"
+                value={tanggalMulai}
+                onChange={(e) => setTanggalMulai(e.target.value)}
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+            <div>
+              <label htmlFor="tanggal_selesai" className="block text-xs text-muted-foreground">
+                Tanggal selesai
+              </label>
+              <input
+                id="tanggal_selesai"
+                type="date"
+                value={tanggalSelesai}
+                onChange={(e) => setTanggalSelesai(e.target.value)}
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+          </div>
+          {periodeBerubah && (
+            <p className="mt-2 text-xs text-amber-600">
+              Periode diubah dari {formatTanggal(pendaftar.tanggal_mulai)} &ndash;{" "}
+              {formatTanggal(pendaftar.tanggal_selesai)}. Pertimbangkan isi kolom catatan di
+              bawah dengan alasannya (misal diperpanjang, atau berhenti lebih awal), supaya ada
+              jejaknya.
+            </p>
+          )}
         </div>
 
         <div className="mt-5">
@@ -587,19 +655,34 @@ function ModalDetail({
 
         <div className="mt-6 flex flex-wrap gap-3">
           <button
-            disabled={menyimpan}
+            disabled={menyimpan || pendaftar.status === "diverifikasi"}
             onClick={() => simpan("diverifikasi")}
+            title={
+              pendaftar.status === "diverifikasi"
+                ? "Sudah berstatus Diterima -- pakai tombol \"Simpan periode\" kalau cuma mau ubah tanggal/bidang/catatan"
+                : undefined
+            }
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {menyimpan ? "Menyimpan..." : "Terima"}
           </button>
           <button
-            disabled={menyimpan}
+            disabled={menyimpan || pendaftar.status === "ditolak"}
             onClick={() => simpan("ditolak")}
+            title={pendaftar.status === "ditolak" ? "Sudah berstatus Ditolak" : undefined}
             className="inline-flex items-center justify-center rounded-md border border-red-300 px-4 py-2.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Tolak
           </button>
+          {pendaftar.status === "diverifikasi" && (
+            <button
+              disabled={menyimpan}
+              onClick={() => simpan()}
+              className="inline-flex items-center justify-center rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {menyimpan ? "Menyimpan..." : "Simpan periode"}
+            </button>
+          )}
         </div>
       </div>
     </div>

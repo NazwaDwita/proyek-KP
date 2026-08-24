@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useSesi } from "@/lib/useSesi";
+import { periodeSudahSelesai } from "@/lib/periodeMagang";
 
 type DetailSurat = {
   nomor_pendaftaran: string;
@@ -105,6 +106,7 @@ export default function SuratKeteranganPage() {
 
   const jenisProgram = detail.jenis_institusi === "kampus" ? "Kerja Praktek (KP)" : "Praktik Kerja Lapangan (PKL)";
   const sebutanInstitusi = detail.jenis_institusi === "kampus" ? "Perguruan Tinggi" : "Sekolah";
+  const sudahSelesai = periodeSudahSelesai(detail.tanggal_selesai);
 
   return (
     <div className="halaman-surat">
@@ -130,7 +132,9 @@ export default function SuratKeteranganPage() {
         </div>
         <hr className="kop-surat-garis" />
 
-        <h1 className="judul-surat">SURAT KETERANGAN</h1>
+        <h1 className="judul-surat">
+          {sudahSelesai ? "SURAT KETERANGAN SELESAI MAGANG" : "SURAT KETERANGAN"}
+        </h1>
         <p className="nomor-surat">Nomor: {detail.nomor_pendaftaran}</p>
 
         <p className="isi-surat">
@@ -160,8 +164,19 @@ export default function SuratKeteranganPage() {
         </table>
 
         <p className="isi-surat">
-          Benar telah <strong>DITERIMA</strong> untuk melaksanakan {jenisProgram}{" "}
-          di Dinas Komunikasi, Informatika dan Statistik Provinsi Riau, pada:
+          {sudahSelesai ? (
+            <>
+              Benar telah <strong>MELAKSANAKAN</strong> dan{" "}
+              <strong>MENYELESAIKAN</strong> {jenisProgram} di Dinas Komunikasi,
+              Informatika dan Statistik Provinsi Riau, terhitung sejak tanggal
+              diterima sampai dengan selesainya periode pelaksanaan, pada:
+            </>
+          ) : (
+            <>
+              Benar telah <strong>DITERIMA</strong> untuk melaksanakan {jenisProgram}{" "}
+              di Dinas Komunikasi, Informatika dan Statistik Provinsi Riau, pada:
+            </>
+          )}
         </p>
 
         <table className="tabel-surat">
