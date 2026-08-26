@@ -51,7 +51,7 @@ const menuItems = [
 
 export default function NavPill() {
   const pathname = usePathname();
-  const { sesi, sudahDiterima } = useSesiPendaftar();
+  const { sesi, punyaPendaftaranAktif } = useSesiPendaftar();
   const [terbuka, setTerbuka] = useState(false);
   const [pathnameSebelumnya, setPathnameSebelumnya] = useState(pathname);
 
@@ -60,14 +60,11 @@ export default function NavPill() {
     setTerbuka(false);
   }
 
-  // Link "Daftar magang" cuma disembunyikan kalau pendaftar sudah
-  // berstatus Diterima -- kalau masih Menunggu atau Ditolak, link ini
-  // tetap perlu tampil (Ditolak butuh jalan buat daftar ulang). Ikut
-  // syarat `sesi` di sini (bukan cuma reset state di effect) supaya
-  // begitu logout, link ini otomatis muncul lagi tanpa perlu setState
-  // tambahan yang bisa memicu cascading render.
+  // Link "Daftar magang" disembunyikan jika pendaftar berstatus
+  // Menunggu atau Diterima (diverifikasi). Jika Ditolak atau belum
+  // mendaftar, link ini tetap tampil.
   const itemTampil = menuItems.filter(
-    (item) => !(item.href === "/daftar" && sudahDiterima && sesi)
+    (item) => !(item.href === "/daftar" && punyaPendaftaranAktif && sesi)
   );
 
   return (

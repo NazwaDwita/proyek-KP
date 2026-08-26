@@ -1,51 +1,24 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CalendarClock, ClipboardCheck, LayoutGrid, ShieldCheck, Users } from "lucide-react";
-import HeaderSticky from "@/components/HeaderSticky";
-import Footer from "@/components/Footer";
-import { useSesi } from "@/lib/useSesi";
+import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useSesi } from "@/lib/useSesi";
 import { periodeSudahSelesai } from "@/lib/periodeMagang";
 
-const KUOTA_PER_BIDANG = 10;
-
-const DESKRIPSI_BIDANG: Record<string, string> = {
-  "Bidang Aplikasi & Informatika":
-    "Pengembangan aplikasi, sistem informasi, dan layanan digital pemerintah.",
-  "Bidang Infrastruktur Teknologi Informasi dan Komunikasi":
-    "Infrastruktur jaringan, keamanan sistem, dan dukungan teknis TIK.",
-  "Bidang Informasi dan Komunikasi Publik":
-    "Produksi konten, kehumasan, pengelolaan media sosial, dan layanan informasi publik.",
-  "Bidang Statistik":
-    "Pengolahan data sektoral dan penyediaan data statistik daerah (Satu Data Riau).",
-  "Bidang Persandian":
-    "Keamanan informasi, persandian, dan pengelolaan komunikasi rahasia pemerintah.",
-};
-
-const LABEL_STATUS: Record<string, string> = {
-  menunggu: "Menunggu",
-  diverifikasi: "Diterima",
-  ditolak: "Ditolak",
-};
-
-type StatistikBidang = {
-  bidang_nama: string;
-  jumlah_aktif: number;
-};
-
-type PendaftaranSaya = {
+type DetailSurat = {
   nomor_pendaftaran: string;
-  status: "menunggu" | "diverifikasi" | "ditolak";
-  catatan_admin: string | null;
+  nama_lengkap: string;
+  asal_institusi: string;
+  jenis_institusi: "kampus" | "sekolah";
+  jurusan_prodi: string | null;
   tanggal_mulai: string;
   tanggal_selesai: string;
-  dibuat_pada: string;
+  status: "menunggu" | "diverifikasi" | "ditolak";
   bidang: { nama: string } | null;
 };
 
-function formatTanggal(iso: string) {
+function formatTanggalPanjang(iso: string) {
   return new Date(iso).toLocaleDateString("id-ID", {
     day: "numeric",
     month: "long",
@@ -53,368 +26,197 @@ function formatTanggal(iso: string) {
   });
 }
 
-export default function Beranda() {
-  const { sesi, memuat } = useSesi();
+export default function SuratKeteranganPage() {
+  const params = useParams<{ nomor: string }>();
+  const router = useRouter();
+  const { sesi, memuat: memuatSesi } = useSesi();
 
-  if (memuat) {
+  const [detail, setDetail] = useState<DetailSurat | null>(null);
+  const [memuat, setMemuat] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (memuatSesi) return;
+
+    if (!sesi) {
+      router.replace("/");
+      return;
+    }
+
+    let masihTerpasang = true;
+
+    async function muat() {
+      const { data, error } = await supabase
+        .from("pendaftar")
+        .select(
+          "nomor_pendaftaran, nama_lengkap, asal_institusi, jenis_institusi, jurusan_prodi, tanggal_mulai, tanggal_selesai, status, bidang:bidang_id(nama)"
+        )
+        .eq("nomor_pendaftaran", params.nomor)
+        .maybeSingle();
+
+      if (!masihTerpasang) return;
+
+      if (error || !data) {
+        console.error("Gagal memuat data surat:", error);
+        setError("Data pendaftaran tidak ditemukan.");
+        setMemuat(false);
+        return;
+      }
+
+      const hasil = data as unknown as DetailSurat;
+
+      if (hasil.status !== "diverifikasi") {
+        setError(
+          "Surat keterangan cuma tersedia untuk pendaftaran yang sudah berstatus Diterima."
+        );
+        setMemuat(false);
+        return;
+      }
+
+      setDetail(hasil);
+      setMemuat(false);
+    }
+
+    muat();
+    return () => {
+      masihTerpasang = false;
+    };
+  }, [memuatSesi, sesi, params.nomor, router]);
+
+  if (memuatSesi || memuat) {
     return (
-      <div className="flex min-h-screen flex-col">
-        <HeaderSticky />
+      <div className="halaman-surat">
+        <p>Memuat...</p>
       </div>
     );
   }
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <HeaderSticky />
-      <main className="flex-1">
-        {sesi ? (
-          <div className="mx-auto max-w-6xl px-4 py-10">
-            <BerandaSudahLogin
-              userId={sesi.user.id}
-              nama={(sesi.user.user_metadata?.nama as string) || sesi.user.email || ""}
-            />
-          </div>
-        ) : (
-          <BerandaBelumLogin />
-        )}
-      </main>
-      <Footer />
-    </div>
-  );
-}
+  if (error || !detail) {
+    return (
+      <div className="halaman-surat">
+        <div className="tombol-baris-surat tanpa-cetak">
+          <button type="button" className="tombol sekunder" onClick={() => router.push("/")}>
+            &larr; Kembali ke Beranda
+          </button>
+        </div>
+        <p style={{ color: "#b3392e" }}>{error ?? "Data tidak ditemukan."}</p>
+      </div>
+    );
+  }
 
-const langkah = [
-  { icon: ShieldCheck, judul: "Buat akun", teks: "Registrasi menggunakan email aktif." },
-  {
-    icon: CalendarClock,
-    judul: "Ajukan periode",
-    teks: "Lengkapi data diri dan pilih periode magang 2 sampai 4 bulan.",
-  },
-  {
-    icon: ClipboardCheck,
-    judul: "Diperiksa admin",
-    teks: "Pengajuanmu masuk ke sistem admin. Staf Diskominfotik yang memeriksa dan menentukan pengajuan diterima atau ditolak.",
-  },
-  {
-    icon: LayoutGrid,
-    judul: "Penempatan bidang",
-    teks: "Kalau diterima, bidang penempatan ditentukan oleh admin, bukan dipilih sendiri saat mendaftar.",
-  },
-];
+  const jenisProgram = detail.jenis_institusi === "kampus" ? "Kerja Praktek (KP)" : "Praktik Kerja Lapangan (PKL)";
+  const sebutanInstitusi = detail.jenis_institusi === "kampus" ? "Perguruan Tinggi" : "Sekolah";
 
-function BerandaBelumLogin() {
-  const [statistik, setStatistik] = useState<StatistikBidang[]>([]);
-  const [memuatStatistik, setMemuatStatistik] = useState(true);
-
-  useEffect(() => {
-    let masihTerpasang = true;
-
-    async function muatStatistik() {
-      const { data, error } = await supabase.rpc("statistik_peserta_aktif");
-      if (!masihTerpasang) return;
-      if (error) {
-        console.error("Gagal memuat statistik:", error);
-      } else {
-        setStatistik(data ?? []);
-      }
-      setMemuatStatistik(false);
-    }
-
-    muatStatistik();
-    return () => {
-      masihTerpasang = false;
-    };
-  }, []);
-
-  const totalKuota = statistik.length > 0 ? statistik.length * KUOTA_PER_BIDANG : 5 * KUOTA_PER_BIDANG;
-  const totalAktif = statistik.reduce((jumlah, item) => jumlah + item.jumlah_aktif, 0);
-  const totalSisa = Math.max(totalKuota - totalAktif, 0);
+  // Suratnya otomatis berubah jadi "telah menyelesaikan" begitu tanggal
+  // selesai magangnya lewat dari hari ini -- ini sengaja disamakan dengan
+  // penanda "Sudah selesai" yang admin lihat di dashboard, jadi pendaftar
+  // tidak perlu menunggu admin melakukan aksi apa pun untuk bisa mencetak
+  // surat keterangan selesai magangnya begitu periodenya rampung.
+  const sudahSelesai = periodeSudahSelesai(detail.tanggal_selesai);
 
   return (
-    <>
-      <section className="relative overflow-hidden">
-        <img
-          src="/assets/hero-kominfotik.jpg"
-          alt="Kantor Diskominfotik Provinsi Riau"
-          className="absolute inset-0 size-full object-cover"
-        />
-        <div className="absolute inset-0 bg-hero-gradient" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 text-primary-foreground md:py-28">
-          <p className="inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
-            Diskominfotik Provinsi Riau
-          </p>
-          <h1 className="mt-5 max-w-2xl font-display text-4xl font-semibold leading-tight md:text-5xl">
-            Pendaftaran Magang &amp; PKL Dinas Kominfotik Provinsi Riau
-          </h1>
-          <p className="mt-4 max-w-xl text-base text-primary-foreground/85 md:text-lg">
-            Terbuka untuk siswa dan mahasiswa dari mana saja. Ajukan periode magang, dan
-            pantau status pendaftaranmu secara online.
-          </p>
-        </div>
-      </section>
+    <div className="halaman-surat">
+      <div className="tombol-baris-surat tanpa-cetak">
+        <button type="button" className="tombol sekunder" onClick={() => router.push("/")}>
+          &larr; Kembali ke Beranda
+        </button>
+        <button type="button" className="tombol" onClick={() => window.print()}>
+          Cetak / Simpan sebagai PDF
+        </button>
+      </div>
 
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <h2 className="font-display text-2xl font-semibold text-foreground">Alur pendaftaran</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {langkah.map((l, i) => (
-            <div key={l.judul} className="rounded-xl border border-border bg-card p-5 shadow-soft">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
-                <l.icon className="size-5" />
-              </div>
-              <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Langkah {i + 1}
-              </p>
-              <h3 className="mt-1 font-display text-base font-semibold text-foreground">
-                {l.judul}
-              </h3>
-              <p className="mt-1.5 text-sm text-muted-foreground">{l.teks}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="ketersediaan-slot" className="border-y border-border bg-secondary/40 py-16">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground">
-                Ketersediaan slot per bidang
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Data peserta magang yang sedang aktif hari ini.
-              </p>
-            </div>
-            <Link
-              href="/statistik"
-              className="inline-flex items-center justify-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-            >
-              Statistik lengkap
-            </Link>
-          </div>
-
-          <div className="mt-8">
-            {memuatStatistik ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-32 animate-pulse rounded-xl border border-border bg-card" />
-                ))}
-              </div>
-            ) : (
-              <>
-                <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-border bg-card p-5 shadow-soft">
-                  <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
-                    <Users className="size-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Total peserta magang aktif saat ini
-                    </p>
-                    <p className="text-2xl font-semibold text-foreground">
-                      {totalAktif}{" "}
-                      <span className="text-base font-normal text-muted-foreground">
-                        dari {totalKuota} slot
-                      </span>
-                    </p>
-                  </div>
-                  <span className="ml-auto rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-accent-foreground/90" style={{ color: "var(--emas-tua)" }}>
-                    {totalSisa} slot tersedia
-                  </span>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {statistik.map((item) => {
-                    const sisa = Math.max(KUOTA_PER_BIDANG - item.jumlah_aktif, 0);
-                    const persen = Math.min((item.jumlah_aktif / KUOTA_PER_BIDANG) * 100, 100);
-                    const penuh = sisa <= 0;
-                    return (
-                      <div
-                        key={item.bidang_nama}
-                        className="rounded-xl border border-border bg-card p-5 shadow-soft"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <h3 className="font-display text-base font-semibold text-foreground">
-                            {item.bidang_nama}
-                          </h3>
-                          <span
-                            className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-                              penuh
-                                ? "bg-red-100 text-red-700"
-                                : "border border-border text-muted-foreground"
-                            }`}
-                          >
-                            {penuh ? "Penuh" : `${sisa} slot`}
-                          </span>
-                        </div>
-                        <p className="mt-1.5 text-sm text-muted-foreground">
-                          {DESKRIPSI_BIDANG[item.bidang_nama] ?? "Penempatan magang pada bidang ini."}
-                        </p>
-                        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
-                          <div
-                            className={`h-full rounded-full ${penuh ? "bg-red-500" : "bg-primary"}`}
-                            style={{ width: `${persen}%` }}
-                          />
-                        </div>
-                        <p className="mt-1.5 text-xs text-muted-foreground">
-                          {item.jumlah_aktif} / {KUOTA_PER_BIDANG} peserta aktif
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
+      <div className="kertas-surat">
+        <div className="kop-surat">
+          <div className="kop-surat-lambang">SI</div>
+          <div className="kop-surat-teks">
+            <strong>DINAS KOMUNIKASI, INFORMATIKA DAN STATISTIK</strong>
+            <span>PROVINSI RIAU</span>
+            <span className="kop-surat-alamat">
+              Sistem Magang Diskominfotik Riau &mdash; SIMAKRI
+            </span>
           </div>
         </div>
-      </section>
-    </>
-  );
-}
+        <hr className="kop-surat-garis" />
 
-function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
-  const [daftarPendaftaran, setDaftarPendaftaran] = useState<PendaftaranSaya[]>([]);
-  const [memuat, setMemuat] = useState(true);
-  const [pesanError, setPesanError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let masihTerpasang = true;
-
-    async function muatPendaftaranSaya() {
-      const { data, error } = await supabase
-        .from("pendaftar")
-        .select(
-          "nomor_pendaftaran, status, catatan_admin, tanggal_mulai, tanggal_selesai, dibuat_pada, bidang:bidang_id(nama)"
-        )
-        .eq("user_id", userId)
-        .order("dibuat_pada", { ascending: false });
-
-      if (!masihTerpasang) return;
-
-      if (error) {
-        console.error("Gagal memuat pendaftaran:", error);
-        setPesanError("Gagal memuat data pendaftaran. Coba muat ulang halaman.");
-      } else {
-        setDaftarPendaftaran((data as unknown as PendaftaranSaya[]) ?? []);
-      }
-      setMemuat(false);
-    }
-
-    muatPendaftaranSaya();
-    return () => {
-      masihTerpasang = false;
-    };
-  }, [userId]);
-
-  const badgeKelas: Record<PendaftaranSaya["status"], string> = {
-    menunggu: "bg-muted text-muted-foreground border border-border",
-    diverifikasi: "bg-green-100 text-green-700 border border-green-200",
-    ditolak: "bg-red-100 text-red-700 border border-red-200",
-  };
-  const badgeKelasSelesai = "bg-sky-100 text-sky-700 border border-sky-200";
-
-  return (
-    <>
-      <div className="rounded-xl border border-border bg-card p-7 shadow-soft">
-        <h1 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
-          Selamat datang, {nama}
+        <h1 className="judul-surat">
+          {sudahSelesai ? "SURAT KETERANGAN SELESAI MAGANG" : "SURAT KETERANGAN"}
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Status pendaftaran magangmu ditampilkan otomatis di bawah ini.
-        </p>
-      </div>
+        <p className="nomor-surat">Nomor: {detail.nomor_pendaftaran}</p>
 
-      <div className="mt-6 rounded-xl border border-border bg-card p-7 shadow-soft">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Status pendaftaran
+        <p className="isi-surat">
+          Yang bertanda tangan di bawah ini menerangkan bahwa:
         </p>
 
-        {memuat && <p className="mt-3 text-sm text-muted-foreground">Memuat data...</p>}
+        <table className="tabel-surat">
+          <tbody>
+            <tr>
+              <td>Nama</td>
+              <td>:</td>
+              <td>{detail.nama_lengkap}</td>
+            </tr>
+            <tr>
+              <td>Asal {sebutanInstitusi}</td>
+              <td>:</td>
+              <td>{detail.asal_institusi}</td>
+            </tr>
+            {detail.jurusan_prodi && (
+              <tr>
+                <td>Jurusan / Program Studi</td>
+                <td>:</td>
+                <td>{detail.jurusan_prodi}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
 
-        {pesanError && (
-          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {pesanError}
-          </div>
-        )}
+        <p className="isi-surat">
+          {sudahSelesai ? (
+            <>
+              Benar telah <strong>MELAKSANAKAN</strong> dan{" "}
+              <strong>MENYELESAIKAN</strong> {jenisProgram} di Dinas Komunikasi,
+              Informatika dan Statistik Provinsi Riau, terhitung sejak tanggal
+              diterima sampai dengan selesainya periode pelaksanaan, pada:
+            </>
+          ) : (
+            <>
+              Benar telah <strong>DITERIMA</strong> untuk melaksanakan {jenisProgram}{" "}
+              di Dinas Komunikasi, Informatika dan Statistik Provinsi Riau, pada:
+            </>
+          )}
+        </p>
 
-        {!memuat && !pesanError && daftarPendaftaran.length === 0 && (
-          <>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Kamu belum pernah mendaftar magang menggunakan akun ini.
-            </p>
-            <Link
-              href="/daftar"
-              className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Daftar magang sekarang
-            </Link>
-          </>
-        )}
+        <table className="tabel-surat">
+          <tbody>
+            <tr>
+              <td>Bidang penempatan</td>
+              <td>:</td>
+              <td>{detail.bidang?.nama ?? "Akan ditentukan kemudian"}</td>
+            </tr>
+            <tr>
+              <td>Periode pelaksanaan</td>
+              <td>:</td>
+              <td>
+                {formatTanggalPanjang(detail.tanggal_mulai)} s.d.{" "}
+                {formatTanggalPanjang(detail.tanggal_selesai)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        {!memuat &&
-          daftarPendaftaran.map((p, i) => {
-            // Sama seperti label tombol surat -- kalau statusnya Diterima
-            // DAN periode magangnya sudah lewat, badge-nya ikut berubah
-            // jadi "Selesai" biar nggak nyangkut selamanya di "Diterima"
-            // walau orangnya udah lulus magang sejak lama.
-            const magangSelesai =
-              p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai);
+        <p className="isi-surat">
+          Demikian surat keterangan ini dibuat untuk dapat dipergunakan
+          sebagaimana mestinya.
+        </p>
 
-            return (
-              <div
-                key={p.nomor_pendaftaran}
-                className={`${i > 0 ? "mt-6 border-t border-border pt-6" : "mt-4"}`}
-              >
-                <span
-                  className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
-                    magangSelesai ? badgeKelasSelesai : badgeKelas[p.status]
-                  }`}
-                >
-                  {magangSelesai ? "Selesai" : LABEL_STATUS[p.status]}
-                </span>
-
-                <div className="mt-3 divide-y divide-border text-sm">
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Nomor pendaftaran</span>
-                    <span className="font-medium text-foreground">{p.nomor_pendaftaran}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Bidang penempatan</span>
-                    <span className="font-medium text-foreground">{p.bidang?.nama ?? "-"}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Periode magang</span>
-                    <span className="font-medium text-foreground">
-                      {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Tanggal daftar</span>
-                    <span className="font-medium text-foreground">
-                      {formatTanggal(p.dibuat_pada)}
-                    </span>
-                  </div>
-                </div>
-
-                {p.status === "diverifikasi" && (
-                  <Link
-                    href={`/surat-keterangan/${p.nomor_pendaftaran}`}
-                    className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                  >
-                    {periodeSudahSelesai(p.tanggal_selesai)
-                      ? "Cetak surat keterangan selesai magang"
-                      : "Cetak surat keterangan diterima"}
-                  </Link>
-                )}
-
-                {p.status === "ditolak" && p.catatan_admin && (
-                  <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                    <strong>Catatan dari staf:</strong> {p.catatan_admin}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="tanda-tangan-surat">
+          <p>Pekanbaru, {formatTanggalPanjang(new Date().toISOString())}</p>
+          <p>Kepala Bidang Aplikasi Informatika,</p>
+          <div className="tanda-tangan-ruang" />
+          <p>
+            <strong>(.......................................)</strong>
+          </p>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

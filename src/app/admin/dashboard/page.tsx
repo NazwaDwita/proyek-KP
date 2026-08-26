@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, X } from "lucide-react";
+import { CheckCircle2, Eye, Filter, RotateCw, Search, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import { periodeSudahSelesai } from "@/lib/periodeMagang";
@@ -50,9 +50,9 @@ const LABEL_STATUS: Record<StatusPendaftaran, string> = {
 };
 
 const BADGE_STATUS: Record<StatusPendaftaran, string> = {
-  menunggu: "bg-muted text-muted-foreground border border-border",
-  diverifikasi: "bg-green-100 text-green-700 border border-green-200",
-  ditolak: "bg-red-100 text-red-700 border border-red-200",
+  menunggu: "bg-amber-100 text-amber-800 border border-amber-200",
+  diverifikasi: "bg-emerald-100 text-emerald-800 border border-emerald-200",
+  ditolak: "bg-rose-100 text-rose-800 border border-rose-200",
 };
 
 function formatTanggal(iso: string) {
@@ -70,15 +70,13 @@ export default function AdminDashboardPage() {
   const [daftarBidang, setDaftarBidang] = useState<Bidang[]>([]);
   const [errorMuat, setErrorMuat] = useState<string | null>(null);
 
-  const [filterStatus, setFilterStatus] = useState<
-    "semua" | StatusPendaftaran | "selesai"
-  >("semua");
+  const [filterStatus, setFilterStatus] = useState<"semua" | StatusPendaftaran | "selesai">(
+    "semua"
+  );
   const [pencarian, setPencarian] = useState("");
 
   const [dipilih, setDipilih] = useState<Pendaftar | null>(null);
-  const [terakhirDiperbarui, setTerakhirDiperbarui] = useState<Date | null>(
-    null
-  );
+  const [terakhirDiperbarui, setTerakhirDiperbarui] = useState<Date | null>(null);
 
   async function muatUlangData() {
     setErrorMuat(null);
@@ -134,12 +132,7 @@ export default function AdminDashboardPage() {
   const daftarTersaring = useMemo(() => {
     return daftar.filter((p) => {
       if (filterStatus === "selesai") {
-        if (
-          !(
-            p.status === "diverifikasi" &&
-            periodeSudahSelesai(p.tanggal_selesai)
-          )
-        ) {
+        if (!(p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai))) {
           return false;
         }
       } else if (filterStatus !== "semua" && p.status !== filterStatus) {
@@ -192,113 +185,139 @@ export default function AdminDashboardPage() {
     <div className="min-h-screen bg-background">
       <AdminNav onKeluar={keluar} />
 
-      <main className="w-full px-4 py-8 md:px-8">
-        <h1 className="mb-5 font-display text-2xl font-semibold text-foreground md:text-3xl">
-          Data pendaftar magang
-        </h1>
+      <main className="w-full px-4 py-8 md:px-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">
+                Data Pendaftar Magang
+              </h1>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Verifikasi status, tentukan bidang penempatan, dan kelola pendaftaran magang Diskominfotik Riau.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {terakhirDiperbarui && (
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground font-mono">
+                <RotateCw className="size-3.5 animate-spin text-primary" style={{ animationDuration: '6s' }} />
+                <span>Diperbarui {terakhirDiperbarui.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}</span>
+              </span>
+            )}
+          </div>
+        </div>
 
         {errorMuat && (
-          <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {errorMuat}
           </div>
         )}
 
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          <input
-            placeholder="Cari nama atau nomor pendaftaran..."
-            value={pencarian}
-            onChange={(e) => setPencarian(e.target.value)}
-            className="w-full max-w-xs rounded-md border border-border bg-card px-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
-            className="rounded-md border border-border bg-card px-3.5 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-          >
-            <option value="semua">Semua status</option>
-            <option value="menunggu">Menunggu</option>
-            <option value="diverifikasi">Diterima</option>
-            <option value="selesai">Sudah selesai</option>
-            <option value="ditolak">Ditolak</option>
-          </select>
+        {/* Filter Controls Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <input
+              placeholder="Cari nama, nomor pendaftaran, atau instansi..."
+              value={pencarian}
+              onChange={(e) => setPencarian(e.target.value)}
+              className="w-full rounded-lg border border-border bg-card pl-9 pr-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs"
+            />
+          </div>
 
-          <span className="ml-auto text-xs text-muted-foreground">
-            {terakhirDiperbarui
-              ? `Diperbarui otomatis tiap 30 detik · terakhir ${terakhirDiperbarui.toLocaleTimeString(
-                  "id-ID",
-                  { hour: "2-digit", minute: "2-digit" }
-                )}`
-              : ""}
-          </span>
+          <div className="flex items-center gap-2">
+            <div className="relative flex items-center">
+              <Filter className="absolute left-3 size-3.5 text-muted-foreground pointer-events-none" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
+                className="rounded-lg border border-border bg-card pl-8 pr-8 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs font-medium cursor-pointer"
+              >
+                <option value="semua">Semua Status</option>
+                <option value="menunggu">Menunggu</option>
+                <option value="diverifikasi">Diterima</option>
+                <option value="selesai">Sudah Selesai</option>
+                <option value="ditolak">Ditolak</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-soft">
-          <div className="max-h-[65vh] overflow-y-auto">
+        {/* Table View */}
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-soft">
+          <div className="overflow-x-auto max-h-[65vh]">
             <table className="w-full text-sm">
               <thead>
-                <tr className="sticky top-0 z-[1] bg-primary text-primary-foreground">
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
-                    Nomor
+                <tr className="sticky top-0 z-10 bg-primary text-primary-foreground border-b border-border">
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                    Nomor Pendaftaran
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
-                    Nama
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                    Nama &amp; Instansi
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
                     Bidang
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
                     Periode
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-4 py-3"></th>
+                  <th className="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {daftarTersaring.map((p) => (
-                  <tr key={p.id} className="transition-colors hover:bg-secondary/40">
-                    <td className="px-4 py-3 text-foreground">{p.nomor_pendaftaran}</td>
-                    <td className="px-4 py-3 text-foreground">{p.nama_lengkap}</td>
-                    <td className="px-4 py-3 text-foreground">{p.bidang?.nama ?? "-"}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-foreground">
-                      {formatTanggal(p.tanggal_mulai)} &ndash;{" "}
-                      {formatTanggal(p.tanggal_selesai)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${BADGE_STATUS[p.status]}`}
+                {daftarTersaring.map((p) => {
+                  const isSelesai = p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai);
+                  return (
+                    <tr key={p.id} className="transition-colors hover:bg-secondary/40">
+                      <td className="px-4 py-3.5 font-mono text-xs font-medium text-foreground">
+                        {p.nomor_pendaftaran}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <p className="font-semibold text-foreground">{p.nama_lengkap}</p>
+                        <p className="text-xs text-muted-foreground">{p.asal_institusi}</p>
+                      </td>
+                      <td className="px-4 py-3.5 text-foreground font-medium">
+                        {p.bidang?.nama ?? <span className="text-muted-foreground italic">Belum ditentukan</span>}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-xs text-foreground">
+                        {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                              isSelesai
+                                ? "bg-sky-100 text-sky-800 border border-sky-200"
+                                : BADGE_STATUS[p.status]
+                            }`}
+                          >
+                            {isSelesai ? "Selesai" : LABEL_STATUS[p.status]}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5 text-right">
+                        <button
+                          onClick={() => setDipilih(p)}
+                          className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-colors hover:bg-secondary"
                         >
-                          {LABEL_STATUS[p.status]}
-                        </span>
-                        {p.status === "diverifikasi" &&
-                          periodeSudahSelesai(p.tanggal_selesai) && (
-                            <span
-                              title="Periode magangnya sudah lewat dari hari ini"
-                            >
-                              <CheckCircle2 className="size-4 shrink-0 text-sky-600" />
-                            </span>
-                          )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => setDipilih(p)}
-                        className="inline-flex items-center justify-center rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
-                      >
-                        Detail
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                          <Eye className="size-3.5 text-primary" />
+                          Detail
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
                 {daftarTersaring.length === 0 && (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 py-8 text-center text-sm text-muted-foreground"
-                    >
-                      Tidak ada data yang cocok.
+                    <td colSpan={6} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                      Tidak ada data pendaftar yang cocok.
                     </td>
                   </tr>
                 )}
@@ -348,16 +367,7 @@ function ModalDetail({
   >([]);
 
   const periodeBerubah =
-    tanggalMulai !== pendaftar.tanggal_mulai ||
-    tanggalSelesai !== pendaftar.tanggal_selesai;
-
-  // Peserta yang sudah diterima dan periode magangnya benar-benar
-  // sudah selesai tidak boleh lagi mengubah keputusan Terima/Tolak.
-  // Kondisi memakai data tersimpan di pendaftar, bukan nilai input
-  // yang sedang diedit di modal.
-  const sudahSelesai =
-    pendaftar.status === "diverifikasi" &&
-    periodeSudahSelesai(pendaftar.tanggal_selesai);
+    tanggalMulai !== pendaftar.tanggal_mulai || tanggalSelesai !== pendaftar.tanggal_selesai;
 
   useEffect(() => {
     async function muatDokumen() {
@@ -571,23 +581,19 @@ function ModalDetail({
             <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Periode magang
             </span>
-            {pendaftar.status === "diverifikasi" &&
-              periodeSudahSelesai(tanggalSelesai) && (
-                <span
-                  className="inline-flex items-center gap-1 text-xs font-medium text-sky-600"
-                  title="Periode magangnya sudah lewat dari hari ini"
-                >
-                  <CheckCircle2 className="size-3.5 shrink-0" />
-                  Sudah selesai
-                </span>
-              )}
+            {pendaftar.status === "diverifikasi" && periodeSudahSelesai(tanggalSelesai) && (
+              <span
+                className="inline-flex items-center gap-1 text-xs font-medium text-sky-600"
+                title="Periode magangnya sudah lewat dari hari ini"
+              >
+                <CheckCircle2 className="size-3.5 shrink-0" />
+                Sudah selesai
+              </span>
+            )}
           </div>
           <div className="mt-2 grid grid-cols-2 gap-3">
             <div>
-              <label
-                htmlFor="tanggal_mulai"
-                className="block text-xs text-muted-foreground"
-              >
+              <label htmlFor="tanggal_mulai" className="block text-xs text-muted-foreground">
                 Tanggal mulai
               </label>
               <input
@@ -599,10 +605,7 @@ function ModalDetail({
               />
             </div>
             <div>
-              <label
-                htmlFor="tanggal_selesai"
-                className="block text-xs text-muted-foreground"
-              >
+              <label htmlFor="tanggal_selesai" className="block text-xs text-muted-foreground">
                 Tanggal selesai
               </label>
               <input
@@ -629,9 +632,7 @@ function ModalDetail({
             Dokumen surat pengantar
           </label>
           {dokumen.length === 0 && (
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              Tidak ada dokumen ditemukan.
-            </p>
+            <p className="mt-1.5 text-sm text-muted-foreground">Tidak ada dokumen ditemukan.</p>
           )}
           <div className="mt-2 flex flex-wrap gap-2">
             {dokumen.map((d) =>
@@ -655,9 +656,7 @@ function ModalDetail({
         </div>
 
         <div className="mt-5">
-          <label className="block text-sm font-medium text-foreground">
-            Riwayat status
-          </label>
+          <label className="block text-sm font-medium text-foreground">Riwayat status</label>
           {riwayat.length === 0 && (
             <p className="mt-1.5 text-sm text-muted-foreground">
               Belum ada perubahan status tercatat.
@@ -666,15 +665,11 @@ function ModalDetail({
           {riwayat.length > 0 && (
             <ul className="mt-2 space-y-1.5 text-sm">
               {riwayat.map((r) => (
-                <li
-                  key={r.id}
-                  className="flex items-baseline justify-between gap-3"
-                >
+                <li key={r.id} className="flex items-baseline justify-between gap-3">
                   <span className="text-foreground">
                     {r.status_lama ? (
                       <>
-                        {LABEL_STATUS[r.status_lama]} &rarr;{" "}
-                        {LABEL_STATUS[r.status_baru]}
+                        {LABEL_STATUS[r.status_lama]} &rarr; {LABEL_STATUS[r.status_baru]}
                       </>
                     ) : (
                       <>Pendaftaran dibuat ({LABEL_STATUS[r.status_baru]})</>
@@ -696,10 +691,7 @@ function ModalDetail({
         </div>
 
         <div className="mt-5">
-          <label
-            htmlFor="bidang_id"
-            className="block text-sm font-medium text-foreground"
-          >
+          <label htmlFor="bidang_id" className="block text-sm font-medium text-foreground">
             Bidang penempatan
           </label>
           <select
@@ -727,18 +719,13 @@ function ModalDetail({
             })}
           </select>
           {(() => {
-            const kuotaTerpilih = kuotaBidang.find(
-              (k) => k.bidang_id === bidangId
-            );
-            if (
-              kuotaTerpilih &&
-              kuotaTerpilih.terisi >= kuotaTerpilih.kuota
-            ) {
+            const kuotaTerpilih = kuotaBidang.find((k) => k.bidang_id === bidangId);
+            if (kuotaTerpilih && kuotaTerpilih.terisi >= kuotaTerpilih.kuota) {
               return (
                 <div className="mt-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700">
-                  Bidang ini sudah penuh untuk periode tersebut (
-                  {kuotaTerpilih.terisi}/{kuotaTerpilih.kuota}). Kamu tetap bisa
-                  memilihnya kalau memang ingin melonggarkan kuota.
+                  Bidang ini sudah penuh untuk periode tersebut ({kuotaTerpilih.terisi}/
+                  {kuotaTerpilih.kuota}). Kamu tetap bisa memilihnya kalau memang ingin
+                  melonggarkan kuota.
                 </div>
               );
             }
@@ -747,10 +734,7 @@ function ModalDetail({
         </div>
 
         <div className="mt-5">
-          <label
-            htmlFor="catatan_admin"
-            className="block text-sm font-medium text-foreground"
-          >
+          <label htmlFor="catatan_admin" className="block text-sm font-medium text-foreground">
             Catatan (wajib diisi kalau menolak)
           </label>
           <textarea
@@ -764,43 +748,27 @@ function ModalDetail({
 
         <div className="mt-6 flex flex-wrap gap-3">
           <button
-            disabled={
-              menyimpan ||
-              pendaftar.status === "diverifikasi" ||
-              sudahSelesai
-            }
+            disabled={menyimpan || pendaftar.status !== "menunggu"}
             onClick={() => simpan("diverifikasi")}
             title={
-              sudahSelesai
-                ? "Periode magang sudah selesai -- keputusan tidak dapat diubah"
-                : pendaftar.status === "diverifikasi"
-                ? 'Sudah berstatus Diterima -- pakai tombol "Simpan periode" kalau cuma mau ubah tanggal/bidang/catatan'
-                : undefined
+              pendaftar.status === "diverifikasi"
+                ? "Sudah berstatus Diterima -- pakai tombol \"Simpan periode\" kalau cuma mau ubah tanggal/bidang/catatan"
+                : pendaftar.status === "ditolak"
+                  ? "Pendaftaran yang sudah ditolak tidak bisa langsung diterima. Kalau pesertanya daftar ulang, pendaftaran barunya otomatis berstatus Menunggu dan bisa diproses dari situ."
+                  : undefined
             }
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {menyimpan ? "Menyimpan..." : "Terima"}
           </button>
-
           <button
-            disabled={
-              menyimpan ||
-              pendaftar.status === "ditolak" ||
-              sudahSelesai
-            }
+            disabled={menyimpan || pendaftar.status === "ditolak"}
             onClick={() => simpan("ditolak")}
-            title={
-              sudahSelesai
-                ? "Periode magang sudah selesai -- keputusan tidak dapat diubah"
-                : pendaftar.status === "ditolak"
-                ? "Sudah berstatus Ditolak"
-                : undefined
-            }
+            title={pendaftar.status === "ditolak" ? "Sudah berstatus Ditolak" : undefined}
             className="inline-flex items-center justify-center rounded-md border border-red-300 px-4 py-2.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Tolak
           </button>
-
           {pendaftar.status === "diverifikasi" && (
             <button
               disabled={menyimpan}

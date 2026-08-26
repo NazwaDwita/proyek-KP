@@ -20,7 +20,7 @@ const menuItems = [
 export default function HeaderSticky() {
   const pathname = usePathname();
   const { sesi, memuat } = useSesi();
-  const { sudahDiterima } = useSesiPendaftar();
+  const { punyaPendaftaranAktif } = useSesiPendaftar();
   const { bukaModalMasuk } = useModalMasuk();
   const router = useRouter();
   const [menuTerbuka, setMenuTerbuka] = useState(false);
@@ -32,7 +32,7 @@ export default function HeaderSticky() {
   }
 
   const itemTampil = menuItems.filter((item) => {
-    if (item.href === "/daftar" && sudahDiterima && sesi) return false;
+    if (item.href === "/daftar" && punyaPendaftaranAktif && sesi) return false;
     if (item.href === "/statistik" && !sesi) return false;
     return true;
   });

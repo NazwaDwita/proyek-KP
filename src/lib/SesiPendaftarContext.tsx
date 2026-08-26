@@ -8,18 +8,21 @@ type SesiPendaftarContextValue = {
   sesi: Session | null;
   memuat: boolean;
   sudahDiterima: boolean;
+  punyaPendaftaranAktif: boolean;
 };
 
 const SesiPendaftarContext = createContext<SesiPendaftarContextValue>({
   sesi: null,
   memuat: true,
   sudahDiterima: false,
+  punyaPendaftaranAktif: false,
 });
 
 export function SesiPendaftarProvider({ children }: { children: ReactNode }) {
   const [sesi, setSesi] = useState<Session | null>(null);
   const [memuat, setMemuat] = useState(true);
   const [sudahDiterima, setSudahDiterima] = useState(false);
+  const [punyaPendaftaranAktif, setPunyaPendaftaranAktif] = useState(false);
 
   useEffect(() => {
     let masihTerpasang = true;
@@ -39,7 +42,10 @@ export function SesiPendaftarProvider({ children }: { children: ReactNode }) {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, sesiBaru) => {
         setSesi(sesiBaru);
-        if (!sesiBaru) setSudahDiterima(false);
+        if (!sesiBaru) {
+          setSudahDiterima(false);
+          setPunyaPendaftaranAktif(false);
+        }
       }
     );
 
@@ -54,31 +60,33 @@ export function SesiPendaftarProvider({ children }: { children: ReactNode }) {
 
     let masihTerpasang = true;
 
-    async function cekStatusDiterima() {
+    async function cekStatusPendaftar() {
       const { data, error } = await supabase
         .from("pendaftar")
-        .select("id")
+        .select("status")
         .eq("user_id", sesi!.user.id)
-        .eq("status", "diverifikasi")
-        .limit(1)
-        .maybeSingle();
+        .in("status", ["menunggu", "diverifikasi"]);
 
       if (!masihTerpasang) return;
       if (error) {
         console.error("Gagal memeriksa status pendaftaran:", error);
         return;
       }
-      setSudahDiterima(!!data);
+      const daftarStatus = data ? data.map((d) => d.status) : [];
+      setSudahDiterima(daftarStatus.includes("diverifikasi"));
+      setPunyaPendaftaranAktif(daftarStatus.length > 0);
     }
 
-    cekStatusDiterima();
+    cekStatusPendaftar();
     return () => {
       masihTerpasang = false;
     };
   }, [sesi]);
 
   return (
-    <SesiPendaftarContext.Provider value={{ sesi, memuat, sudahDiterima }}>
+    <SesiPendaftarContext.Provider
+      value={{ sesi, memuat, sudahDiterima, punyaPendaftaranAktif }}
+    >
       {children}
     </SesiPendaftarContext.Provider>
   );

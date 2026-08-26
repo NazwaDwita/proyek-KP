@@ -2,7 +2,19 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CalendarClock, ClipboardCheck, LayoutGrid, ShieldCheck, Users } from "lucide-react";
+import {
+  Calendar,
+  CalendarClock,
+  CheckCircle2,
+  ClipboardCheck,
+  Clock,
+  FileCheck,
+  FileText,
+  LayoutGrid,
+  ShieldCheck,
+  Users,
+  XCircle,
+} from "lucide-react";
 import HeaderSticky from "@/components/HeaderSticky";
 import Footer from "@/components/Footer";
 import { useSesi } from "@/lib/useSesi";
@@ -69,12 +81,10 @@ export default function Beranda() {
       <HeaderSticky />
       <main className="flex-1">
         {sesi ? (
-          <div className="mx-auto max-w-6xl px-4 py-10">
-            <BerandaSudahLogin
-              userId={sesi.user.id}
-              nama={(sesi.user.user_metadata?.nama as string) || sesi.user.email || ""}
-            />
-          </div>
+          <BerandaSudahLogin
+            userId={sesi.user.id}
+            nama={(sesi.user.user_metadata?.nama as string) || sesi.user.email || ""}
+          />
         ) : (
           <BerandaBelumLogin />
         )}
@@ -140,14 +150,14 @@ function BerandaBelumLogin() {
           className="absolute inset-0 size-full object-cover"
         />
         <div className="absolute inset-0 bg-hero-gradient" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 text-primary-foreground md:py-28">
-          <p className="inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 py-20 text-center text-primary-foreground md:py-28">
+          <p className="inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest">
             Diskominfotik Provinsi Riau
           </p>
-          <h1 className="mt-5 max-w-2xl font-display text-4xl font-semibold leading-tight md:text-5xl">
+          <h1 className="mt-6 max-w-3xl font-display text-4xl font-semibold leading-tight md:text-5xl">
             Pendaftaran Magang &amp; PKL Dinas Kominfotik Provinsi Riau
           </h1>
-          <p className="mt-4 max-w-xl text-base text-primary-foreground/85 md:text-lg">
+          <p className="mt-4 max-w-2xl text-base text-primary-foreground/85 md:text-lg">
             Terbuka untuk siswa dan mahasiswa dari mana saja. Ajukan periode magang, dan
             pantau status pendaftaranmu secara online.
           </p>
@@ -300,117 +310,162 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
     }
 
     muatPendaftaranSaya();
+
     return () => {
       masihTerpasang = false;
     };
   }, [userId]);
 
-  const badgeKelas: Record<PendaftaranSaya["status"], string> = {
-    menunggu: "bg-muted text-muted-foreground border border-border",
-    diverifikasi: "bg-green-100 text-green-700 border border-green-200",
-    ditolak: "bg-red-100 text-red-700 border border-red-200",
-  };
-  const badgeKelasSelesai = "bg-sky-100 text-sky-700 border border-sky-200";
+  const pendaftaranTerbaru = daftarPendaftaran[0];
 
   return (
     <>
-      <div className="rounded-xl border border-border bg-card p-7 shadow-soft">
-        <h1 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
-          Selamat Datang, {nama}
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Status pendaftaran magangmu ditampilkan otomatis di bawah ini.
-        </p>
-      </div>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-hero-gradient bg-[#064E3B] py-16 text-primary-foreground md:py-24">
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 text-center">
+          <p className="inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary-foreground">
+            Portal Peserta Magang &bull; Diskominfotik Riau
+          </p>
+          <h1 className="mt-6 font-display text-3xl font-semibold leading-tight text-primary-foreground md:text-5xl">
+            Selamat datang, {nama}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base text-primary-foreground/85 md:text-lg">
+            Pantau perkembangan status pengajuan magang dan kelengkapan dokumenmu secara langsung di portal ini.
+          </p>
+        </div>
+      </section>
 
-      <div className="mt-6 rounded-xl border border-border bg-card p-7 shadow-soft">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Status pendaftaran
-        </p>
-
-        {memuat && <p className="mt-3 text-sm text-muted-foreground">Memuat data...</p>}
-
-        {pesanError && (
-          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {pesanError}
+      {/* Status Pendaftaran Section (Full-Width Section Band) */}
+      <section className="border-b border-border bg-background py-12 md:py-16">
+        <div className="mx-auto max-w-5xl px-4">
+          <div className="flex items-center justify-between border-b border-border pb-4">
+            <h2 className="font-display text-2xl font-semibold text-foreground">
+              Status Pendaftaran
+            </h2>
+            {daftarPendaftaran.length > 0 && (
+              <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-amber-800 dark:text-amber-400">
+                {daftarPendaftaran.length} Pengajuan
+              </span>
+            )}
           </div>
-        )}
 
-        {!memuat && !pesanError && daftarPendaftaran.length === 0 && (
-          <>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Kamu belum pernah mendaftar magang menggunakan akun ini.
-            </p>
-            <Link
-              href="/daftar"
-              className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Daftar magang sekarang
-            </Link>
-          </>
-        )}
-
-        {!memuat &&
-          daftarPendaftaran.map((p, i) => {
-            const magangSelesai =
-              p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai);
-
-            return (
-              <div
-                key={p.nomor_pendaftaran}
-                className={`${i > 0 ? "mt-6 border-t border-border pt-6" : "mt-4"}`}
-              >
-                <span
-                  className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
-                    magangSelesai ? badgeKelasSelesai : badgeKelas[p.status]
-                  }`}
-                >
-                  {magangSelesai ? "Selesai" : LABEL_STATUS[p.status]}
-                </span>
-
-                <div className="mt-3 divide-y divide-border text-sm">
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Nomor pendaftaran</span>
-                    <span className="font-medium text-foreground">{p.nomor_pendaftaran}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Bidang penempatan</span>
-                    <span className="font-medium text-foreground">{p.bidang?.nama ?? "-"}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Periode magang</span>
-                    <span className="font-medium text-foreground">
-                      {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Tanggal daftar</span>
-                    <span className="font-medium text-foreground">
-                      {formatTanggal(p.dibuat_pada)}
-                    </span>
-                  </div>
-                </div>
-
-                {p.status === "diverifikasi" && (
-                  <Link
-                    href={`/surat-keterangan/${p.nomor_pendaftaran}`}
-                    className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                  >
-                    {periodeSudahSelesai(p.tanggal_selesai)
-                      ? "Cetak surat keterangan selesai magang"
-                      : "Cetak surat keterangan diterima"}
-                  </Link>
-                )}
-
-                {p.status === "ditolak" && p.catatan_admin && (
-                  <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                    <strong>Catatan dari staf:</strong> {p.catatan_admin}
-                  </div>
-                )}
+          <div className="mt-6 space-y-6">
+            {memuat && (
+              <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+                Memuat data pendaftaran...
               </div>
-            );
-          })}
-      </div>
+            )}
+
+            {pesanError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                {pesanError}
+              </div>
+            )}
+
+            {!memuat && !pesanError && daftarPendaftaran.length === 0 && (
+              <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
+                <p className="text-base font-semibold text-foreground">
+                  Kamu belum pernah mendaftar magang
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Silakan ajukan pendaftaran magang dengan mengisi formulir pendaftaran online.
+                </p>
+                <Link
+                  href="/daftar"
+                  className="mt-5 inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Daftar magang sekarang
+                </Link>
+              </div>
+            )}
+
+            {!memuat &&
+              daftarPendaftaran.map((p) => {
+                const magangSelesai =
+                  p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai);
+
+                const statusColor = magangSelesai
+                  ? { border: "border-t-sky-500", badge: "bg-sky-100 text-sky-800 border-sky-200", icon: CheckCircle2, text: "Selesai Magang" }
+                  : p.status === "diverifikasi"
+                  ? { border: "border-t-emerald-500", badge: "bg-emerald-100 text-emerald-800 border-emerald-200", icon: CheckCircle2, text: "Diterima / Diverifikasi" }
+                  : p.status === "menunggu"
+                  ? { border: "border-t-amber-500", badge: "bg-amber-100 text-amber-800 border-amber-200", icon: Clock, text: "Menunggu Verifikasi" }
+                  : { border: "border-t-rose-500", badge: "bg-rose-100 text-rose-800 border-rose-200", icon: XCircle, text: "Ditolak" };
+
+                const StatusIcon = statusColor.icon;
+
+                return (
+                  <div
+                    key={p.nomor_pendaftaran}
+                    className={`overflow-hidden rounded-xl border border-border border-t-4 ${statusColor.border} bg-card p-6 shadow-soft transition-all`}
+                  >
+                    {/* Header: Status Badge & Nomor Accent Pill */}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${statusColor.badge}`}>
+                        <StatusIcon className="size-3.5" />
+                        {statusColor.text}
+                      </span>
+
+                      <span className="inline-flex items-center gap-1 rounded-md bg-secondary px-3 py-1 text-xs font-mono font-medium text-secondary-foreground border border-border/50">
+                        No: {p.nomor_pendaftaran}
+                      </span>
+                    </div>
+
+                    {/* Main Info Box */}
+                    <div className="mt-5 space-y-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                          Bidang Penempatan
+                        </p>
+                        <p className="mt-0.5 font-display text-lg font-bold text-foreground">
+                          {p.bidang?.nama ?? "Belum Ditentukan (diisi saat verifikasi)"}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground pt-1">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="size-4 text-primary" />
+                          <span>Periode: <strong className="text-foreground font-medium">{formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}</strong></span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="size-4 text-amber-600" />
+                          <span>Mendaftar: <strong className="text-foreground font-medium">{formatTanggal(p.dibuat_pada)}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Catatan Admin Jika Ditolak */}
+                    {p.status === "ditolak" && p.catatan_admin && (
+                      <div className="mt-5 rounded-lg border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-800">
+                        <p className="font-semibold text-rose-900">Catatan dari staf:</p>
+                        <p className="mt-0.5">{p.catatan_admin}</p>
+                      </div>
+                    )}
+
+                    {/* Action Button jika Diverifikasi */}
+                    {p.status === "diverifikasi" && (
+                      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between gap-4 flex-wrap">
+                        <p className="text-xs text-muted-foreground">
+                          Surat keterangan resmi dari Diskominfotik Riau sudah siap dicetak.
+                        </p>
+                        <Link
+                          href={`/surat-keterangan/${p.nomor_pendaftaran}`}
+                          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                        >
+                          <FileCheck className="size-4 text-accent" />
+                          {periodeSudahSelesai(p.tanggal_selesai)
+                            ? "Cetak Surat Selesai Magang"
+                            : "Cetak Surat Keterangan Diterima"}
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      </section>
     </>
   );
 }
