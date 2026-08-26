@@ -338,12 +338,12 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
       {/* Status Pendaftaran Section (Full-Width Section Band) */}
       <section className="border-b border-border bg-background py-12 md:py-16">
         <div className="mx-auto max-w-5xl px-4">
-          <div className="flex items-center justify-between border-b border-border pb-4">
-            <h2 className="font-display text-2xl font-semibold text-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-4">
+            <h2 className="font-display text-xl sm:text-2xl font-semibold text-foreground">
               Status Pendaftaran
             </h2>
             {daftarPendaftaran.length > 0 && (
-              <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-amber-800 dark:text-amber-400">
+              <span className="shrink-0 rounded-full bg-accent/15 px-3.5 py-1 text-xs font-semibold whitespace-nowrap text-amber-800 dark:text-amber-400">
                 {daftarPendaftaran.length} Pengajuan
               </span>
             )}

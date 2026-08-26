@@ -1245,6 +1245,97 @@ select.form-input option {
   height: 70px;
 }
 
+@media (max-width: 639px) {
+  .halaman-surat {
+    padding: 1rem 0.6rem;
+  }
+  .tombol-baris-surat {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .tombol-baris-surat .tombol {
+    width: 100%;
+    justify-content: center;
+  }
+  .kertas-surat {
+    padding: 16px 14px;
+    min-height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+  }
+  .kop-surat {
+    gap: 10px;
+  }
+  .kop-surat-lambang {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+  .kop-surat-teks strong {
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  .kop-surat-teks span {
+    font-size: 10.5px;
+  }
+  .kop-surat-alamat {
+    font-size: 9.5px;
+  }
+  .kop-surat-garis {
+    margin: 10px 0 16px;
+    border-top-width: 2px;
+  }
+  .judul-surat {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  .nomor-surat {
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+  .isi-surat {
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+  .tabel-surat {
+    margin: 0 0 14px 0;
+    font-size: 12px;
+    width: 100%;
+    table-layout: fixed;
+  }
+  .tabel-surat td {
+    padding: 3px 2px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .tabel-surat td:first-child {
+    white-space: normal;
+    width: 38%;
+    color: var(--teks-muted);
+  }
+  .tabel-surat td:nth-child(2) {
+    width: 4%;
+    text-align: center;
+  }
+  .tabel-surat td:nth-child(3) {
+    width: 58%;
+    font-weight: 500;
+  }
+  .tanda-tangan-surat {
+    margin-top: 24px;
+    width: 100%;
+    font-size: 11.5px;
+    line-height: 1.5;
+    text-align: right;
+  }
+  .tanda-tangan-ruang {
+    height: 45px;
+  }
+}
+
 @media print {
   .tanpa-cetak {
     display: none !important;
