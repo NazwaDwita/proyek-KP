@@ -1564,11 +1564,75 @@ select.form-input option {
 @media (max-width: 900px) {
   .oc-wrap {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .oc-branch-5,
   .oc-branch-3,
   .oc-branch-2 {
     min-width: 760px;
+  }
+}
+
+@media (max-width: 639px) {
+  .oc-wrap {
+    padding-bottom: 0.5rem;
+  }
+  .oc-branch-5,
+  .oc-branch-3,
+  .oc-branch-2 {
+    min-width: 540px;
+    gap: 0.35rem;
+    padding-top: 18px;
+  }
+  .oc-col::before {
+    top: -18px;
+    height: 18px;
+  }
+  .oc-node {
+    min-width: 100px;
+    border-radius: 6px;
+  }
+  .oc-node-judul {
+    font-size: 8.5px;
+    padding: 4px 5px;
+    line-height: 1.25;
+  }
+  .oc-node-isi {
+    padding: 5px 5px 6px;
+  }
+  .oc-node-isi strong {
+    font-size: 9.5px;
+    line-height: 1.25;
+  }
+  .oc-node-isi span {
+    font-size: 8px;
+    margin-top: 1px;
+  }
+  .oc-node-kecil {
+    min-width: 90px;
+  }
+  .oc-node-kecil .oc-node-judul {
+    font-size: 8px;
+    padding: 3px 5px;
+  }
+  .oc-node-kecil .oc-node-isi {
+    padding: 4px 5px;
+  }
+  .oc-node-kecil .oc-node-isi strong {
+    font-size: 9px;
+  }
+  .oc-node-kecil .oc-node-isi span {
+    font-size: 7.5px;
+  }
+  .oc-node-kepala {
+    min-width: 125px;
+  }
+  .oc-foto-kepala {
+    padding: 6px 6px 0;
+  }
+  .oc-foto-kepala-img {
+    width: 44px !important;
+    height: 56px !important;
   }
 }
 
