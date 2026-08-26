@@ -53,11 +53,7 @@ export default function DaftarPage() {
   } | null>(null);
   const [memeriksaPendaftaranAktif, setMemeriksaPendaftaranAktif] = useState(true);
   const [diisiOtomatisDariPenolakan, setDiisiOtomatisDariPenolakan] = useState(false);
-  const [hariIni, setHariIni] = useState("");
-
-  useEffect(() => {
-    setHariIni(new Date().toLocaleDateString("sv-SE"));
-  }, []);
+  const [hariIni] = useState(() => new Date().toLocaleDateString("sv-SE"));
 
   const [form, setForm] = useState({
     nama_lengkap: "",

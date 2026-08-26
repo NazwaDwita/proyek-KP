@@ -9,8 +9,7 @@ type ModalMasukContextValue = {
 
 const ModalMasukContext = createContext<ModalMasukContextValue | null>(null);
 
-// Provider global supaya modal login/register bisa dipanggil dari
-// komponen mana pun (navbar, halaman Daftar, dll) tanpa pindah halaman.
+// Provider global untuk pemicu modal masuk/daftar.
 export function ModalMasukProvider({ children }: { children: ReactNode }) {
   const [terbuka, setTerbuka] = useState(false);
 

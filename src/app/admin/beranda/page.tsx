@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  BarChart3,
   CheckCircle2,
   Clock,
   FileSpreadsheet,
@@ -16,6 +15,8 @@ import {
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import AdminNav from "@/components/admin/AdminNav";
+import { KUOTA_PER_BIDANG } from "@/lib/konstanta";
+import { formatTanggalSingkat as formatTanggal } from "@/lib/formatters";
 
 type Ringkasan = {
   menunggu: number;
@@ -35,20 +36,10 @@ type PendaftarTerbaru = {
 };
 
 type StatistikBidang = {
-  bidang_id: string;
+  bidang_id?: string;
   bidang_nama: string;
   jumlah_aktif: number;
 };
-
-const KUOTA_PER_BIDANG = 10;
-
-function formatTanggal(iso: string) {
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export default function AdminBerandaPage() {
   const { memuat, ditolakAkses, keluar } = useAdminAkses();
@@ -413,7 +404,7 @@ export default function AdminBerandaPage() {
                     const sisa = Math.max(KUOTA_PER_BIDANG - b.jumlah_aktif, 0);
                     const persen = Math.min((b.jumlah_aktif / KUOTA_PER_BIDANG) * 100, 100);
                     return (
-                      <div key={b.bidang_id} className="space-y-1">
+                      <div key={b.bidang_id || b.bidang_nama} className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-medium text-foreground truncate max-w-[180px]">
                             {b.bidang_nama.replace("Bidang ", "")}

@@ -80,10 +80,7 @@ export default function ModalMasuk({
   const [lihatSandiDaftar, setLihatSandiDaftar] = useState(false);
   const [lihatKonfirmasi, setLihatKonfirmasi] = useState(false);
 
-  // Sama seperti di halaman /akun/masuk: reset tombol Google kalau
-  // halaman ini muncul lagi dari bfcache browser (mis. user menekan back
-  // setelah proses di Google dibatalkan/gagal), supaya nggak kejebak di
-  // teks "Mengalihkan ke Google...".
+  // Reset status Google jika halaman dimuat ulang dari cache browser (bfcache).
   useEffect(() => {
     function tanganiPageshow(e: PageTransitionEvent) {
       if (e.persisted) {
@@ -202,8 +199,7 @@ export default function ModalMasuk({
       }
 
       if (!data.session) {
-        // Ini terjadi kalau "Confirm email" di Supabase masih aktif.
-        // Seharusnya sudah dimatikan supaya bisa langsung login.
+        // Penanganan jika verifikasi email Supabase diaktifkan.
         setPesanError(
           "Akun berhasil dibuat, tapi belum bisa langsung masuk. Hubungi admin untuk memeriksa pengaturan verifikasi email."
         );

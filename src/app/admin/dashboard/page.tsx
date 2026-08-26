@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import { periodeSudahSelesai } from "@/lib/periodeMagang";
 import AdminNav from "@/components/admin/AdminNav";
+import { LABEL_STATUS } from "@/lib/konstanta";
+import { formatTanggalSingkat as formatTanggal } from "@/lib/formatters";
 
 type StatusPendaftaran = "menunggu" | "diverifikasi" | "ditolak";
 
@@ -43,25 +45,11 @@ type Pendaftar = {
   dibuat_pada: string;
 };
 
-const LABEL_STATUS: Record<StatusPendaftaran, string> = {
-  menunggu: "Menunggu",
-  diverifikasi: "Diterima",
-  ditolak: "Ditolak",
-};
-
 const BADGE_STATUS: Record<StatusPendaftaran, string> = {
   menunggu: "bg-amber-100 text-amber-800 border border-amber-200",
   diverifikasi: "bg-emerald-100 text-emerald-800 border border-emerald-200",
   ditolak: "bg-rose-100 text-rose-800 border border-rose-200",
 };
-
-function formatTanggal(iso: string) {
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export default function AdminDashboardPage() {
   const { memuat, ditolakAkses, keluar } = useAdminAkses();
@@ -501,9 +489,7 @@ function ModalDetail({
     }
 
     if (!baruDisimpan || baruDisimpan.length === 0) {
-      // Tidak ada error, tapi juga tidak ada baris yang benar-benar
-      // berubah -- biasanya tanda RLS (is_admin()) diam-diam menolak
-      // update ini. Daripada pura-pura berhasil, tampilkan errornya.
+      // Baris tidak berubah karena otorisasi RLS diblokir.
       console.error(
         "Update pendaftar tidak mengubah baris manapun (kemungkinan diblokir RLS/is_admin())."
       );

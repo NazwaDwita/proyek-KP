@@ -8,7 +8,6 @@ export default function StrukturOrganisasi() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      {/* Gambar utama di halaman */}
       <div 
         onClick={() => setBukaModal(true)}
         className="group relative w-full overflow-hidden rounded-xl border border-border bg-card p-2 shadow-soft md:p-5 cursor-pointer transition-all hover:border-primary/40 hover:shadow-md"
@@ -27,13 +26,11 @@ export default function StrukturOrganisasi() {
         </button>
       </p>
 
-      {/* Pop-up 1 Halaman Murni Gambar saat diklik */}
       {bukaModal && (
         <div 
           onClick={() => setBukaModal(false)}
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-2 sm:p-4 backdrop-blur-md cursor-zoom-out"
         >
-          {/* Tombol Tutup Melayang di Kanan Atas */}
           <button
             type="button"
             onClick={() => setBukaModal(false)}
@@ -43,7 +40,6 @@ export default function StrukturOrganisasi() {
             <X className="size-6" />
           </button>
 
-          {/* Hanya 1 Gambar Penuh Layar */}
           <img
             onClick={(e) => e.stopPropagation()}
             src="/assets/struktur-organisasi.png"

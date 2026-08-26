@@ -9,7 +9,6 @@ import {
   ClipboardCheck,
   Clock,
   FileCheck,
-  FileText,
   LayoutGrid,
   ShieldCheck,
   Users,
@@ -20,27 +19,8 @@ import Footer from "@/components/Footer";
 import { useSesi } from "@/lib/useSesi";
 import { supabase } from "@/lib/supabase";
 import { periodeSudahSelesai } from "@/lib/periodeMagang";
-
-const KUOTA_PER_BIDANG = 10;
-
-const DESKRIPSI_BIDANG: Record<string, string> = {
-  "Bidang Aplikasi & Informatika":
-    "Pengembangan aplikasi, sistem informasi, dan layanan digital pemerintah.",
-  "Bidang Infrastruktur Teknologi Informasi dan Komunikasi":
-    "Infrastruktur jaringan, keamanan sistem, dan dukungan teknis TIK.",
-  "Bidang Informasi dan Komunikasi Publik":
-    "Produksi konten, kehumasan, pengelolaan media sosial, dan layanan informasi publik.",
-  "Bidang Statistik":
-    "Pengolahan data sektoral dan penyediaan data statistik daerah (Satu Data Riau).",
-  "Bidang Persandian":
-    "Keamanan informasi, persandian, dan pengelolaan komunikasi rahasia pemerintah.",
-};
-
-const LABEL_STATUS: Record<string, string> = {
-  menunggu: "Menunggu",
-  diverifikasi: "Diterima",
-  ditolak: "Ditolak",
-};
+import { KUOTA_PER_BIDANG, DESKRIPSI_BIDANG } from "@/lib/konstanta";
+import { formatTanggal } from "@/lib/formatters";
 
 type StatistikBidang = {
   bidang_nama: string;
@@ -56,14 +36,6 @@ type PendaftaranSaya = {
   dibuat_pada: string;
   bidang: { nama: string } | null;
 };
-
-function formatTanggal(iso: string) {
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
 
 export default function Beranda() {
   const { sesi, memuat } = useSesi();
@@ -316,8 +288,6 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
     };
   }, [userId]);
 
-  const pendaftaranTerbaru = daftarPendaftaran[0];
-
   return (
     <>
       {/* Hero Section */}
@@ -326,8 +296,8 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
           <p className="inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary-foreground">
             Portal Peserta Magang &bull; Diskominfotik Riau
           </p>
-          <h1 className="mt-6 font-display text-3xl font-semibold leading-tight text-primary-foreground md:text-5xl">
-            Selamat datang, {nama}
+          <h1 className="mt-6 font-display text-3xl font-semibold leading-tight text-primary-foreground md:text-5xl capitalize">
+            Selamat Datang, {nama}
           </h1>
           <p className="mt-4 max-w-2xl text-base text-primary-foreground/85 md:text-lg">
             Pantau perkembangan status pengajuan magang dan kelengkapan dokumenmu secara langsung di portal ini.
@@ -399,7 +369,6 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
                     key={p.nomor_pendaftaran}
                     className={`overflow-hidden rounded-xl border border-border border-t-4 ${statusColor.border} bg-card p-6 shadow-soft transition-all`}
                   >
-                    {/* Header: Status Badge & Nomor Accent Pill */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${statusColor.badge}`}>
                         <StatusIcon className="size-3.5" />
@@ -411,7 +380,6 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
                       </span>
                     </div>
 
-                    {/* Main Info Box */}
                     <div className="mt-5 space-y-3">
                       <div>
                         <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
@@ -435,7 +403,6 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
                       </div>
                     </div>
 
-                    {/* Catatan Admin Jika Ditolak */}
                     {p.status === "ditolak" && p.catatan_admin && (
                       <div className="mt-5 rounded-lg border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-800">
                         <p className="font-semibold text-rose-900">Catatan dari staf:</p>
@@ -443,7 +410,6 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
                       </div>
                     )}
 
-                    {/* Action Button jika Diverifikasi */}
                     {p.status === "diverifikasi" && (
                       <div className="mt-6 pt-4 border-t border-border flex items-center justify-between gap-4 flex-wrap">
                         <p className="text-xs text-muted-foreground">

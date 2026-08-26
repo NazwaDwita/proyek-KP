@@ -5,10 +5,7 @@ import { Users } from "lucide-react";
 import HeaderSticky from "@/components/HeaderSticky";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
-
-// Kuota per bidang saat ini konstan (belum dari kolom `kuota` di tabel
-// bidang secara publik). Sesuaikan di sini kalau kuota tiap bidang beda.
-const KUOTA_PER_BIDANG = 10;
+import { KUOTA_PER_BIDANG } from "@/lib/konstanta";
 
 type Baris = {
   bidang_nama: string;

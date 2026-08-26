@@ -22,10 +22,7 @@
   --font-teks: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
 }
 
-/* Token Tailwind ala Lovable — supaya utility class seperti bg-primary,
-   text-muted-foreground, shadow-soft, font-display bisa langsung dipakai
-   di JSX, tanpa mengganggu class custom (panel-glass, dst) yang sudah ada
-   di bawah. */
+/* Token tema kustom Tailwind */
 @theme {
   --color-primary: var(--navy);
   --color-primary-foreground: #ffffff;

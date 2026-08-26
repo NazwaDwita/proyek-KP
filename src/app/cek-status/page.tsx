@@ -4,6 +4,8 @@ import { useState, FormEvent } from "react";
 import HeaderSticky from "@/components/HeaderSticky";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
+import { LABEL_STATUS } from "@/lib/konstanta";
+import { formatTanggal } from "@/lib/formatters";
 
 type HasilStatus = {
   nomor_pendaftaran: string;
@@ -14,25 +16,11 @@ type HasilStatus = {
   dibuat_pada: string;
 };
 
-const LABEL_STATUS: Record<HasilStatus["status"], string> = {
-  menunggu: "Menunggu",
-  diverifikasi: "Diterima",
-  ditolak: "Ditolak",
-};
-
 const BADGE_KELAS: Record<HasilStatus["status"], string> = {
   menunggu: "bg-muted text-muted-foreground border border-border",
   diverifikasi: "bg-green-100 text-green-700 border border-green-200",
   ditolak: "bg-red-100 text-red-700 border border-red-200",
 };
-
-function formatTanggal(iso: string) {
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
 
 export default function CekStatusPage() {
   const [nomorPendaftaran, setNomorPendaftaran] = useState("");

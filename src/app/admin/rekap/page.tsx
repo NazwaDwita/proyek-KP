@@ -6,6 +6,8 @@ import { ChevronDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAdminAkses } from "@/lib/useAdminAkses";
 import AdminNav from "@/components/admin/AdminNav";
+import { LABEL_STATUS } from "@/lib/konstanta";
+import { formatTanggal } from "@/lib/formatters";
 
 type StatusPendaftaran = "menunggu" | "diverifikasi" | "ditolak";
 
@@ -23,20 +25,6 @@ type BarisRekap = {
   dibuat_pada: string;
   bidang: { nama: string } | null;
 };
-
-const LABEL_STATUS: Record<StatusPendaftaran, string> = {
-  menunggu: "Menunggu",
-  diverifikasi: "Diterima",
-  ditolak: "Ditolak",
-};
-
-function formatTanggal(iso: string) {
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
 
 // Bikin 1 sel CSV aman -- bungkus tanda kutip kalau isinya ada koma,
 // tanda kutip, atau baris baru, sesuai standar format CSV (RFC 4180).

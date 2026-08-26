@@ -4,10 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-// Hook bersama untuk semua halaman /admin/*: memastikan ada sesi login
-// DAN akun itu terdaftar di admin_pengguna. Sesi Auth valid saja tidak
-// cukup -- RLS akan bikin query lain diam-diam kosong kalau bukan admin,
-// jadi lebih baik dicek eksplisit sekali di sini lalu dipakai bareng.
+// Hook verifikasi autentikasi dan otorisasi admin.
 export function useAdminAkses() {
   const router = useRouter();
   const [memuat, setMemuat] = useState(true);

@@ -107,11 +107,7 @@ export default function SuratKeteranganPage() {
   const jenisProgram = detail.jenis_institusi === "kampus" ? "Kerja Praktek (KP)" : "Praktik Kerja Lapangan (PKL)";
   const sebutanInstitusi = detail.jenis_institusi === "kampus" ? "Perguruan Tinggi" : "Sekolah";
 
-  // Suratnya otomatis berubah jadi "telah menyelesaikan" begitu tanggal
-  // selesai magangnya lewat dari hari ini -- ini sengaja disamakan dengan
-  // penanda "Sudah selesai" yang admin lihat di dashboard, jadi pendaftar
-  // tidak perlu menunggu admin melakukan aksi apa pun untuk bisa mencetak
-  // surat keterangan selesai magangnya begitu periodenya rampung.
+  // Otomatis berubah status menjadi selesai jika periode magang telah berakhir.
   const sudahSelesai = periodeSudahSelesai(detail.tanggal_selesai);
 
   return (
