@@ -7,8 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { useSesi } from "@/lib/useSesi";
 import { useModalMasuk } from "@/lib/ModalMasukContext";
 
-
-const UKURAN_MAKS_BYTE = 5 * 1024 * 1024; 
+const UKURAN_MAKS_BYTE = 5 * 1024 * 1024;
 const TIPE_FILE_DIIZINKAN = ["application/pdf"];
 
 const OPSI_LAINNYA = "__lainnya__";
@@ -40,18 +39,35 @@ const DAFTAR_SMK_PEKANBARU = [
   "SMKS Darel Hikmah Pekanbaru",
 ];
 
+function dapatkanTanggalHariIni(): string {
+  const sekarang = new Date();
+
+  const tahun = sekarang.getFullYear();
+  const bulan = String(sekarang.getMonth() + 1).padStart(2, "0");
+  const tanggal = String(sekarang.getDate()).padStart(2, "0");
+
+  return `${tahun}-${bulan}-${tanggal}`;
+}
+
 export default function DaftarPage() {
   const { sesi, memuat } = useSesi();
   const { bukaModalMasuk } = useModalMasuk();
+
   const [mengirim, setMengirim] = useState(false);
   const [pesanGagal, setPesanGagal] = useState<string | null>(null);
-  const [nomorPendaftaran, setNomorPendaftaran] = useState<string | null>(null);
+  const [nomorPendaftaran, setNomorPendaftaran] = useState<string | null>(
+    null
+  );
+
+  const [tanggalHariIni, setTanggalHariIni] = useState("");
 
   const [pendaftaranAktif, setPendaftaranAktif] = useState<{
     nomor_pendaftaran: string;
     status: string;
   } | null>(null);
-  const [memeriksaPendaftaranAktif, setMemeriksaPendaftaranAktif] = useState(true);
+
+  const [memeriksaPendaftaranAktif, setMemeriksaPendaftaranAktif] =
+    useState(true);
 
   const [form, setForm] = useState({
     nama_lengkap: "",
@@ -64,13 +80,13 @@ export default function DaftarPage() {
     tanggal_mulai: "",
     tanggal_selesai: "",
   });
+
   const [fileSurat, setFileSurat] = useState<File | null>(null);
   const [errorFile, setErrorFile] = useState<string | null>(null);
 
-  const opsiInstitusi =
-    form.jenis_institusi === "kampus"
-      ? DAFTAR_KAMPUS_PEKANBARU
-      : DAFTAR_SMK_PEKANBARU;
+  useEffect(() => {
+    setTanggalHariIni(dapatkanTanggalHariIni());
+  }, []);
 
   useEffect(() => {
     let masihTerpasang = true;
@@ -95,52 +111,96 @@ export default function DaftarPage() {
       } else {
         setPendaftaranAktif(data);
       }
+
       setMemeriksaPendaftaranAktif(false);
     }
 
     cekPendaftaranAktif();
+
     return () => {
       masihTerpasang = false;
     };
   }, [sesi]);
 
+  const opsiInstitusi =
+    form.jenis_institusi === "kampus"
+      ? DAFTAR_KAMPUS_PEKANBARU
+      : DAFTAR_SMK_PEKANBARU;
+
   function ubahField(field: keyof typeof form, nilai: string) {
-    setForm((f) => ({ ...f, [field]: nilai }));
+    setForm((f) => ({
+      ...f,
+      [field]: nilai,
+    }));
+
+    if (pesanGagal) {
+      setPesanGagal(null);
+    }
   }
 
   function pilihFile(f: File | null) {
     setErrorFile(null);
+
     if (!f) {
       setFileSurat(null);
       return;
     }
+
     if (!TIPE_FILE_DIIZINKAN.includes(f.type)) {
       setErrorFile("Format file harus PDF.");
       setFileSurat(null);
       return;
     }
+
     if (f.size > UKURAN_MAKS_BYTE) {
       setErrorFile("Ukuran file maksimum 5MB.");
       setFileSurat(null);
       return;
     }
+
     setFileSurat(f);
   }
 
   async function kirimForm(e: FormEvent) {
     e.preventDefault();
     setPesanGagal(null);
+    setErrorFile(null);
 
     if (!sesi) {
       setPesanGagal("Sesi kamu sudah berakhir, silakan masuk lagi.");
       return;
     }
+
     if (!fileSurat) {
       setErrorFile("Surat pengantar wajib diunggah.");
       return;
     }
+
+    // Ambil tanggal lokal browser saat submit.
+    // Ini lebih aman daripada toISOString() karena toISOString() menggunakan UTC.
+    const hariIni = tanggalHariIni || dapatkanTanggalHariIni();
+
+    if (!form.tanggal_mulai) {
+      setPesanGagal("Tanggal mulai magang wajib diisi.");
+      return;
+    }
+
+    if (!form.tanggal_selesai) {
+      setPesanGagal("Tanggal selesai magang wajib diisi.");
+      return;
+    }
+
+    if (form.tanggal_mulai < hariIni) {
+      setPesanGagal(
+        "Tanggal mulai magang tidak boleh sebelum hari ini."
+      );
+      return;
+    }
+
     if (form.tanggal_selesai < form.tanggal_mulai) {
-      setPesanGagal("Tanggal selesai tidak boleh sebelum tanggal mulai.");
+      setPesanGagal(
+        "Tanggal selesai tidak boleh sebelum tanggal mulai."
+      );
       return;
     }
 
@@ -155,6 +215,7 @@ export default function DaftarPage() {
     }
 
     setMengirim(true);
+
     try {
       const { data: hasilDaftar, error: errorInsert } = await supabase.rpc(
         "daftar_magang",
@@ -176,14 +237,22 @@ export default function DaftarPage() {
       const pendaftarBaru = hasilDaftar?.[0];
 
       if (errorInsert || !pendaftarBaru) {
-        console.error("Gagal memanggil daftar_magang:", errorInsert);
+        console.error(
+          "Gagal memanggil daftar_magang:",
+          errorInsert
+        );
+
         throw new Error(
           errorInsert?.message ??
             "Gagal menyimpan data pendaftaran. Periksa kembali isian formulir."
         );
       }
 
-      const namaFileAman = fileSurat.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+      const namaFileAman = fileSurat.name.replace(
+        /[^a-zA-Z0-9.\-_]/g,
+        "_"
+      );
+
       const pathFile = `${pendaftarBaru.id}/surat_pengantar-${Date.now()}-${namaFileAman}`;
 
       const { error: errorUpload } = await supabase.storage
@@ -192,19 +261,39 @@ export default function DaftarPage() {
 
       if (errorUpload) {
         setNomorPendaftaran(pendaftarBaru.nomor_pendaftaran);
+
         setPesanGagal(
           `Data pendaftaran tersimpan dengan nomor ${pendaftarBaru.nomor_pendaftaran}, namun dokumen gagal diunggah. ` +
             "Mohon hubungi staf Bidang Aptika dengan menyertakan nomor pendaftaran ini untuk mengirim dokumen secara manual."
         );
+
         return;
       }
 
-      await supabase.from("dokumen_pendaftar").insert({
-        pendaftar_id: pendaftarBaru.id,
-        jenis_dokumen: "surat_pengantar",
-        path_file: pathFile,
-        nama_file_asli: fileSurat.name,
-      });
+      const { error: errorDokumen } = await supabase
+        .from("dokumen_pendaftar")
+        .insert({
+          pendaftar_id: pendaftarBaru.id,
+          jenis_dokumen: "surat_pengantar",
+          path_file: pathFile,
+          nama_file_asli: fileSurat.name,
+        });
+
+      if (errorDokumen) {
+        console.error(
+          "Dokumen berhasil diunggah tetapi gagal dicatat:",
+          errorDokumen
+        );
+
+        setNomorPendaftaran(pendaftarBaru.nomor_pendaftaran);
+
+        setPesanGagal(
+          `Data pendaftaran dan file berhasil disimpan, tetapi pencatatan dokumen mengalami kendala. ` +
+            `Nomor pendaftaran kamu: ${pendaftarBaru.nomor_pendaftaran}.`
+        );
+
+        return;
+      }
 
       setNomorPendaftaran(pendaftarBaru.nomor_pendaftaran);
     } catch (err) {
@@ -223,15 +312,27 @@ export default function DaftarPage() {
       <div className="halaman">
         <div className="bungkus">
           <HeaderSticky />
+
           <div className="panel-glass panel-sukses">
             <p className="eyebrow">Pendaftaran berhasil</p>
-            <h1 className="judul-hero" style={{ fontSize: 24, maxWidth: "none" }}>
+
+            <h1
+              className="judul-hero"
+              style={{
+                fontSize: 24,
+                maxWidth: "none",
+              }}
+            >
               Simpan nomor pendaftaranmu untuk mengecek status
             </h1>
-            <div className="nomor-pendaftaran-box">{nomorPendaftaran}</div>
+
+            <div className="nomor-pendaftaran-box">
+              {nomorPendaftaran}
+            </div>
+
             <p className="sub-hero" style={{ margin: "0 auto" }}>
-              Gunakan nomor ini beserta email yang kamu daftarkan pada halaman
-              Cek Status untuk memantau perkembangan pendaftaranmu.
+              Gunakan nomor ini beserta email yang kamu daftarkan pada
+              halaman Cek Status untuk memantau perkembangan pendaftaranmu.
             </p>
           </div>
         </div>
@@ -254,17 +355,36 @@ export default function DaftarPage() {
       <div className="halaman">
         <div className="bungkus">
           <HeaderSticky />
+
           <div className="panel-glass">
             <p className="eyebrow">Masuk diperlukan</p>
-            <h1 className="judul-hero" style={{ fontSize: 26, maxWidth: "none" }}>
+
+            <h1
+              className="judul-hero"
+              style={{
+                fontSize: 26,
+                maxWidth: "none",
+              }}
+            >
               Masuk dulu untuk mendaftar magang
             </h1>
-            <p className="sub-hero" style={{ marginBottom: "1.75rem" }}>
+
+            <p
+              className="sub-hero"
+              style={{
+                marginBottom: "1.75rem",
+              }}
+            >
               Supaya kamu bisa memantau status pendaftaran langsung dari
               Beranda, pendaftaran magang mengharuskan kamu masuk terlebih
               dahulu menggunakan email.
             </p>
-            <button type="button" className="tombol" onClick={bukaModalMasuk}>
+
+            <button
+              type="button"
+              className="tombol"
+              onClick={bukaModalMasuk}
+            >
               Masuk / Buat akun
             </button>
           </div>
@@ -288,17 +408,35 @@ export default function DaftarPage() {
       <div className="halaman">
         <div className="bungkus">
           <HeaderSticky />
+
           <div className="panel-glass">
             <p className="eyebrow">Sudah ada pendaftaran</p>
-            <h1 className="judul-hero" style={{ fontSize: 26, maxWidth: "none" }}>
+
+            <h1
+              className="judul-hero"
+              style={{
+                fontSize: 26,
+                maxWidth: "none",
+              }}
+            >
               Kamu sudah punya pendaftaran aktif
             </h1>
-            <p className="sub-hero" style={{ marginBottom: "1.75rem" }}>
+
+            <p
+              className="sub-hero"
+              style={{
+                marginBottom: "1.75rem",
+              }}
+            >
               Akun ini sudah mendaftar dengan nomor{" "}
               <strong>{pendaftaranAktif.nomor_pendaftaran}</strong>, status
-              saat ini: {LABEL_STATUS[pendaftaranAktif.status] ?? pendaftaranAktif.status}. Kamu bisa mendaftar lagi
-              nanti kalau pendaftaran ini ditolak.
+              saat ini:{" "}
+              {LABEL_STATUS[pendaftaranAktif.status] ??
+                pendaftaranAktif.status}
+              . Kamu bisa mendaftar lagi nanti kalau pendaftaran ini
+              ditolak.
             </p>
+
             <Link href="/" className="tombol">
               Lihat status di Beranda
             </Link>
@@ -315,20 +453,38 @@ export default function DaftarPage() {
 
         <form className="panel-glass" onSubmit={kirimForm}>
           <p className="eyebrow">Formulir pendaftaran</p>
-          <h1 className="judul-hero" style={{ fontSize: 26, maxWidth: "none" }}>
+
+          <h1
+            className="judul-hero"
+            style={{
+              fontSize: 26,
+              maxWidth: "none",
+            }}
+          >
             Daftar magang / Kerja Praktek
           </h1>
-          <p className="sub-hero" style={{ marginBottom: "1.75rem" }}>
+
+          <p
+            className="sub-hero"
+            style={{
+              marginBottom: "1.75rem",
+            }}
+          >
             Lengkapi data berikut dan unggah surat pengantar dari
             sekolah/kampus. Data yang sudah dikirim akan diverifikasi oleh
             staf Bidang Aptika.
           </p>
 
-          {pesanGagal && <div className="form-pesan-gagal">{pesanGagal}</div>}
+          {pesanGagal && (
+            <div className="form-pesan-gagal">
+              {pesanGagal}
+            </div>
+          )}
 
           <div className="form-baris">
             <div className="form-grup">
               <label htmlFor="nama_lengkap">Nama lengkap</label>
+
               <input
                 id="nama_lengkap"
                 className="form-input"
@@ -338,72 +494,108 @@ export default function DaftarPage() {
                   (sesi.user.user_metadata?.nama as string) ||
                   ""
                 }
-                onChange={(e) => ubahField("nama_lengkap", e.target.value)}
+                onChange={(e) =>
+                  ubahField("nama_lengkap", e.target.value)
+                }
               />
             </div>
+
             <div className="form-grup">
               <label htmlFor="email">Email aktif</label>
+
               <input
                 id="email"
                 type="email"
                 className="form-input"
                 required
                 value={form.email || sesi.user.email || ""}
-                onChange={(e) => ubahField("email", e.target.value)}
+                onChange={(e) =>
+                  ubahField("email", e.target.value)
+                }
               />
             </div>
           </div>
 
           <div className="form-baris">
             <div className="form-grup">
-              <label htmlFor="no_hp">Nomor HP/WhatsApp Aktif</label>
+              <label htmlFor="no_hp">
+                Nomor HP/WhatsApp Aktif
+              </label>
+
               <input
                 id="no_hp"
                 type="tel"
                 className="form-input"
                 required
                 value={form.no_hp}
-                onChange={(e) => ubahField("no_hp", e.target.value)}
+                onChange={(e) =>
+                  ubahField("no_hp", e.target.value)
+                }
               />
             </div>
+
             <div className="form-grup">
-              <label htmlFor="jenis_institusi">Jenjang pendidikan</label>
+              <label htmlFor="jenis_institusi">
+                Jenjang pendidikan
+              </label>
+
               <select
                 id="jenis_institusi"
                 className="form-input"
                 value={form.jenis_institusi}
                 onChange={(e) => {
-                  ubahField("jenis_institusi", e.target.value);
+                  ubahField(
+                    "jenis_institusi",
+                    e.target.value
+                  );
                   ubahField("asal_institusi", "");
                   ubahField("asal_institusi_lainnya", "");
                 }}
               >
-                <option value="kampus">Perguruan tinggi</option>
-                <option value="sekolah">SMK/Sekolah</option>
+                <option value="kampus">
+                  Perguruan tinggi
+                </option>
+
+                <option value="sekolah">
+                  SMK/Sekolah
+                </option>
               </select>
             </div>
           </div>
 
           <div className="form-baris">
             <div className="form-grup">
-              <label htmlFor="asal_institusi">Asal sekolah/kampus</label>
+              <label htmlFor="asal_institusi">
+                Asal sekolah/kampus
+              </label>
+
               <select
                 id="asal_institusi"
                 className="form-input"
                 required
                 value={form.asal_institusi}
-                onChange={(e) => ubahField("asal_institusi", e.target.value)}
+                onChange={(e) =>
+                  ubahField(
+                    "asal_institusi",
+                    e.target.value
+                  )
+                }
               >
                 <option value="" disabled>
                   Pilih salah satu
                 </option>
+
                 {opsiInstitusi.map((nama) => (
                   <option key={nama} value={nama}>
                     {nama}
                   </option>
                 ))}
-                <option value={OPSI_LAINNYA}>Lainnya (isi manual)</option>
+
+                <option value={OPSI_LAINNYA}>
+                  Lainnya (isi manual)
+                </option>
               </select>
+
               {form.asal_institusi === OPSI_LAINNYA && (
                 <input
                   className="form-input"
@@ -412,62 +604,121 @@ export default function DaftarPage() {
                   required
                   value={form.asal_institusi_lainnya}
                   onChange={(e) =>
-                    ubahField("asal_institusi_lainnya", e.target.value)
+                    ubahField(
+                      "asal_institusi_lainnya",
+                      e.target.value
+                    )
                   }
                 />
               )}
             </div>
+
             <div className="form-grup">
-              <label htmlFor="jurusan_prodi">Jurusan/program studi</label>
+              <label htmlFor="jurusan_prodi">
+                Jurusan/program studi
+              </label>
+
               <input
                 id="jurusan_prodi"
                 className="form-input"
                 placeholder="Opsional"
                 value={form.jurusan_prodi}
-                onChange={(e) => ubahField("jurusan_prodi", e.target.value)}
+                onChange={(e) =>
+                  ubahField(
+                    "jurusan_prodi",
+                    e.target.value
+                  )
+                }
               />
             </div>
           </div>
 
           <div className="form-baris">
             <div className="form-grup">
-              <label htmlFor="tanggal_mulai">Tanggal mulai magang</label>
+              <label htmlFor="tanggal_mulai">
+                Tanggal mulai magang
+              </label>
+
               <input
                 id="tanggal_mulai"
                 type="date"
                 className="form-input"
                 required
+                min={tanggalHariIni || undefined}
                 value={form.tanggal_mulai}
-                onChange={(e) => ubahField("tanggal_mulai", e.target.value)}
+                onChange={(e) =>
+                  ubahField(
+                    "tanggal_mulai",
+                    e.target.value
+                  )
+                }
               />
+
+              <p className="form-keterangan">
+                Tanggal mulai tidak boleh sebelum hari ini.
+              </p>
             </div>
+
             <div className="form-grup">
-              <label htmlFor="tanggal_selesai">Tanggal selesai (perkiraan)</label>
+              <label htmlFor="tanggal_selesai">
+                Tanggal selesai (perkiraan)
+              </label>
+
               <input
                 id="tanggal_selesai"
                 type="date"
                 className="form-input"
                 required
+                min={
+                  form.tanggal_mulai ||
+                  tanggalHariIni ||
+                  undefined
+                }
                 value={form.tanggal_selesai}
-                onChange={(e) => ubahField("tanggal_selesai", e.target.value)}
+                onChange={(e) =>
+                  ubahField(
+                    "tanggal_selesai",
+                    e.target.value
+                  )
+                }
               />
+
+              <p className="form-keterangan">
+                Tanggal selesai tidak boleh sebelum tanggal mulai.
+              </p>
             </div>
           </div>
 
           <div className="form-grup">
-            <label htmlFor="surat_pengantar">Surat pengantar (PDF, maks 5MB)</label>
+            <label htmlFor="surat_pengantar">
+              Surat pengantar (PDF, maks 5MB)
+            </label>
+
             <input
               id="surat_pengantar"
               type="file"
               className="form-input"
-              accept=".pdf"
-              onChange={(e) => pilihFile(e.target.files?.[0] ?? null)}
+              accept=".pdf,application/pdf"
+              onChange={(e) =>
+                pilihFile(e.target.files?.[0] ?? null)
+              }
             />
-            {errorFile && <p className="form-error-teks">{errorFile}</p>}
+
+            {errorFile && (
+              <p className="form-error-teks">
+                {errorFile}
+              </p>
+            )}
           </div>
 
-          <button type="submit" className="tombol" disabled={mengirim}>
-            {mengirim ? "Mengirim..." : "Kirim pendaftaran"}
+          <button
+            type="submit"
+            className="tombol"
+            disabled={mengirim}
+          >
+            {mengirim
+              ? "Mengirim..."
+              : "Kirim pendaftaran"}
           </button>
         </form>
       </div>
