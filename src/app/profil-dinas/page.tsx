@@ -93,17 +93,10 @@ export default function ProfilDinasPage() {
 
         <section className="border-t border-border py-14">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-display text-xl sm:text-2xl font-semibold text-foreground">
-                Struktur organisasi
-              </h2>
-              <span className="text-xs font-medium text-muted-foreground bg-secondary px-3 py-1 rounded-full md:hidden">
-                Geser ke samping &rarr;
-              </span>
-            </div>
-            <div className="mt-6">
-              <StrukturOrganisasi />
-            </div>
+            <h2 className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-6">
+              Struktur Organisasi
+            </h2>
+            <StrukturOrganisasi />
           </div>
         </section>
       </main>

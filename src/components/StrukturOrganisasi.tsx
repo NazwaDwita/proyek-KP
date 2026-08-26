@@ -1,117 +1,57 @@
 "use client";
 
-import Image from "next/image";
-import {
-  stafAhli,
-  subbagianSekretariat,
-  daftarBidang,
-} from "@/lib/strukturOrganisasiData";
-
-function NodeKartu({
-  judul,
-  nama,
-  pangkat,
-  kecil = false,
-}: {
-  judul: string;
-  nama: string;
-  pangkat: string;
-  kecil?: boolean;
-}) {
-  return (
-    <div className={`oc-node${kecil ? " oc-node-kecil" : ""}`}>
-      <div className="oc-node-judul">{judul}</div>
-      <div className="oc-node-isi">
-        <strong>{nama}</strong>
-        <span>{pangkat}</span>
-      </div>
-    </div>
-  );
-}
+import { useState } from "react";
+import { X } from "lucide-react";
 
 export default function StrukturOrganisasi() {
+  const [bukaModal, setBukaModal] = useState(false);
+
   return (
-    <div className="oc-wrap">
-      {/* Kepala Dinas */}
-      <div className="oc-center">
-        <div className="oc-node oc-node-kepala">
-          <div className="oc-foto-kepala">
-            <Image
-              src="/assets/kepala-dinas.png"
-              alt="Foto Kepala Dinas"
-              width={72}
-              height={90}
-              className="oc-foto-kepala-img"
-            />
-          </div>
-          <div className="oc-node-judul">Kepala Dinas</div>
-          <div className="oc-node-isi">
-            <strong>Drs. Supriyadi, M.Si.</strong>
-            <span>Pembina Utama Muda (IV/c)</span>
-          </div>
-        </div>
+    <div className="w-full flex flex-col items-center">
+      {/* Gambar utama di halaman */}
+      <div 
+        onClick={() => setBukaModal(true)}
+        className="group relative w-full overflow-hidden rounded-xl border border-border bg-card p-2 shadow-soft md:p-5 cursor-pointer transition-all hover:border-primary/40 hover:shadow-md"
+      >
+        <img
+          src="/assets/struktur-organisasi.png"
+          alt="Bagan Struktur Organisasi Diskominfotik Provinsi Riau"
+          className="w-full h-auto rounded-lg object-contain transition-transform duration-200 group-hover:scale-[1.005]"
+        />
       </div>
 
-      <div className="oc-trunk" />
+      <p className="mt-3 text-xs text-muted-foreground text-center">
+        Bagan Resmi Struktur Organisasi Dinas Komunikasi, Informatika dan Statistik Provinsi Riau &bull;{" "}
+        <button type="button" onClick={() => setBukaModal(true)} className="text-primary underline font-medium">
+          Klik untuk perbesar
+        </button>
+      </p>
 
-      {/* Cabang 1: Staf Ahli & Sekretaris */}
-      <div className="oc-branch oc-branch-2">
-        <div className="oc-col">
-          <div className="oc-stack">
-            {stafAhli.map((s) => {
-              const [jabatan, golongan] = s.pangkat.split(" — ");
-              return (
-                <NodeKartu
-                  key={s.nama}
-                  judul={jabatan ?? s.pangkat}
-                  nama={s.nama}
-                  pangkat={golongan ?? ""}
-                  kecil
-                />
-              );
-            })}
-          </div>
-        </div>
+      {/* Pop-up 1 Halaman Murni Gambar saat diklik */}
+      {bukaModal && (
+        <div 
+          onClick={() => setBukaModal(false)}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-2 sm:p-4 backdrop-blur-md cursor-zoom-out"
+        >
+          {/* Tombol Tutup Melayang di Kanan Atas */}
+          <button
+            type="button"
+            onClick={() => setBukaModal(false)}
+            className="fixed top-4 right-4 z-[10000] flex items-center justify-center size-10 rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors backdrop-blur-md shadow-lg"
+            title="Tutup gambar"
+          >
+            <X className="size-6" />
+          </button>
 
-        <div className="oc-col">
-          <NodeKartu
-            judul="Sekretaris"
-            nama="Ridho Adriansyah, S.S.T.P."
-            pangkat="Pembina Tk. I (IV/b)"
+          {/* Hanya 1 Gambar Penuh Layar */}
+          <img
+            onClick={(e) => e.stopPropagation()}
+            src="/assets/struktur-organisasi.png"
+            alt="Bagan Struktur Organisasi Diskominfotik Riau"
+            className="max-w-[98vw] max-h-[98vh] w-auto h-auto object-contain rounded-lg shadow-2xl cursor-default"
           />
-          <div className="oc-trunk oc-trunk-pendek" />
-          <div className="oc-branch oc-branch-3 oc-branch-dalam">
-            {subbagianSekretariat.map((s) => (
-              <div className="oc-col" key={s.peran}>
-                <NodeKartu judul={s.peran} nama={s.nama} pangkat={s.pangkat} kecil />
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
-
-      <div className="oc-trunk oc-trunk-panjang" />
-
-      {/* Cabang 2: 5 Bidang */}
-      <div className="oc-branch oc-branch-5">
-        {daftarBidang.map((b) => (
-          <div className="oc-col" key={b.nama}>
-            <NodeKartu
-              judul={b.nama}
-              nama={b.kepala.nama}
-              pangkat={b.kepala.pangkat}
-            />
-            <div className="oc-trunk oc-trunk-pendek" />
-            <div className="oc-stack oc-stack-tim">
-              {b.timList.map((t) => (
-                <NodeKartu key={t.peran} judul={t.peran} nama={t.nama} pangkat={t.pangkat} kecil />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <p className="oc-catatan">Catatan: struktur mengikuti bagan resmi per 9 Juli 2026</p>
+      )}
     </div>
   );
 }
