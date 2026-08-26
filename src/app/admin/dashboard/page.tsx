@@ -18,6 +18,13 @@ type Dokumen = {
   nama_file_asli: string | null;
 };
 
+type Riwayat = {
+  id: string;
+  status_lama: StatusPendaftaran | null;
+  status_baru: StatusPendaftaran;
+  diubah_pada: string;
+};
+
 type Pendaftar = {
   id: string;
   nomor_pendaftaran: string;
@@ -321,6 +328,7 @@ function ModalDetail({
   const [pesanError, setPesanError] = useState<string | null>(null);
   const [dokumen, setDokumen] = useState<Dokumen[]>([]);
   const [linkDokumen, setLinkDokumen] = useState<Record<string, string>>({});
+  const [riwayat, setRiwayat] = useState<Riwayat[]>([]);
   const [kuotaBidang, setKuotaBidang] = useState<
     { bidang_id: string; kuota: number; terisi: number }[]
   >([]);
@@ -348,6 +356,23 @@ function ModalDetail({
       setLinkDokumen(link);
     }
     muatDokumen();
+  }, [pendaftar.id]);
+
+  useEffect(() => {
+    async function muatRiwayat() {
+      const { data, error } = await supabase
+        .from("riwayat_status_pendaftar")
+        .select("id, status_lama, status_baru, diubah_pada")
+        .eq("pendaftar_id", pendaftar.id)
+        .order("diubah_pada", { ascending: false });
+
+      if (error) {
+        console.error("Gagal memuat riwayat status:", error);
+        return;
+      }
+      setRiwayat(data ?? []);
+    }
+    muatRiwayat();
   }, [pendaftar.id]);
 
   useEffect(() => {
@@ -595,6 +620,41 @@ function ModalDetail({
               )
             )}
           </div>
+        </div>
+
+        <div className="mt-5">
+          <label className="block text-sm font-medium text-foreground">Riwayat status</label>
+          {riwayat.length === 0 && (
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Belum ada perubahan status tercatat.
+            </p>
+          )}
+          {riwayat.length > 0 && (
+            <ul className="mt-2 space-y-1.5 text-sm">
+              {riwayat.map((r) => (
+                <li key={r.id} className="flex items-baseline justify-between gap-3">
+                  <span className="text-foreground">
+                    {r.status_lama ? (
+                      <>
+                        {LABEL_STATUS[r.status_lama]} &rarr; {LABEL_STATUS[r.status_baru]}
+                      </>
+                    ) : (
+                      <>Pendaftaran dibuat ({LABEL_STATUS[r.status_baru]})</>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {new Date(r.diubah_pada).toLocaleString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="mt-5">

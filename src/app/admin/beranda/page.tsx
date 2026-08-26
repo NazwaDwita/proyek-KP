@@ -93,9 +93,6 @@ export default function AdminBerandaPage() {
           <h1 className="mt-1 font-display text-2xl font-semibold text-foreground md:text-3xl">
             Ringkasan pendaftaran magang
           </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            Pantauan singkat status pendaftar sebelum masuk ke data lengkap.
-          </p>
         </div>
 
         {errorRingkasan && (

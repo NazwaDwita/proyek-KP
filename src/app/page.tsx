@@ -310,12 +310,13 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
     diverifikasi: "bg-green-100 text-green-700 border border-green-200",
     ditolak: "bg-red-100 text-red-700 border border-red-200",
   };
+  const badgeKelasSelesai = "bg-sky-100 text-sky-700 border border-sky-200";
 
   return (
     <>
       <div className="rounded-xl border border-border bg-card p-7 shadow-soft">
         <h1 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
-          Selamat datang, {nama}
+          Selamat Datang, {nama}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Status pendaftaran magangmu ditampilkan otomatis di bawah ini.
@@ -350,58 +351,65 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
         )}
 
         {!memuat &&
-          daftarPendaftaran.map((p, i) => (
-            <div
-              key={p.nomor_pendaftaran}
-              className={`${i > 0 ? "mt-6 border-t border-border pt-6" : "mt-4"}`}
-            >
-              <span
-                className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${badgeKelas[p.status]}`}
+          daftarPendaftaran.map((p, i) => {
+            const magangSelesai =
+              p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai);
+
+            return (
+              <div
+                key={p.nomor_pendaftaran}
+                className={`${i > 0 ? "mt-6 border-t border-border pt-6" : "mt-4"}`}
               >
-                {LABEL_STATUS[p.status]}
-              </span>
-
-              <div className="mt-3 divide-y divide-border text-sm">
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-muted-foreground">Nomor pendaftaran</span>
-                  <span className="font-medium text-foreground">{p.nomor_pendaftaran}</span>
-                </div>
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-muted-foreground">Bidang penempatan</span>
-                  <span className="font-medium text-foreground">{p.bidang?.nama ?? "-"}</span>
-                </div>
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-muted-foreground">Periode magang</span>
-                  <span className="font-medium text-foreground">
-                    {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-muted-foreground">Tanggal daftar</span>
-                  <span className="font-medium text-foreground">
-                    {formatTanggal(p.dibuat_pada)}
-                  </span>
-                </div>
-              </div>
-
-              {p.status === "diverifikasi" && (
-                <Link
-                  href={`/surat-keterangan/${p.nomor_pendaftaran}`}
-                  className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                <span
+                  className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
+                    magangSelesai ? badgeKelasSelesai : badgeKelas[p.status]
+                  }`}
                 >
-                  {periodeSudahSelesai(p.tanggal_selesai)
-                    ? "Cetak surat keterangan selesai magang"
-                    : "Cetak surat keterangan diterima"}
-                </Link>
-              )}
+                  {magangSelesai ? "Selesai" : LABEL_STATUS[p.status]}
+                </span>
 
-              {p.status === "ditolak" && p.catatan_admin && (
-                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                  <strong>Catatan dari staf:</strong> {p.catatan_admin}
+                <div className="mt-3 divide-y divide-border text-sm">
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-muted-foreground">Nomor pendaftaran</span>
+                    <span className="font-medium text-foreground">{p.nomor_pendaftaran}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-muted-foreground">Bidang penempatan</span>
+                    <span className="font-medium text-foreground">{p.bidang?.nama ?? "-"}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-muted-foreground">Periode magang</span>
+                    <span className="font-medium text-foreground">
+                      {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-muted-foreground">Tanggal daftar</span>
+                    <span className="font-medium text-foreground">
+                      {formatTanggal(p.dibuat_pada)}
+                    </span>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
+
+                {p.status === "diverifikasi" && (
+                  <Link
+                    href={`/surat-keterangan/${p.nomor_pendaftaran}`}
+                    className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
+                    {periodeSudahSelesai(p.tanggal_selesai)
+                      ? "Cetak surat keterangan selesai magang"
+                      : "Cetak surat keterangan diterima"}
+                  </Link>
+                )}
+
+                {p.status === "ditolak" && p.catatan_admin && (
+                  <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                    <strong>Catatan dari staf:</strong> {p.catatan_admin}
+                  </div>
+                )}
+              </div>
+            );
+          })}
       </div>
     </>
   );
