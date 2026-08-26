@@ -203,58 +203,60 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Filter Controls Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <input
-              placeholder="Cari nama, nomor pendaftaran, atau instansi..."
-              value={pencarian}
-              onChange={(e) => setPencarian(e.target.value)}
-              className="w-full rounded-lg border border-border bg-card pl-9 pr-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs"
-            />
-          </div>
+        {/* Filter Controls Bar Sticky Pas di Garis Bawah Navbar */}
+        <div className="sticky top-[61px] z-30 bg-background/95 backdrop-blur pb-2 pt-1">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                placeholder="Cari nama, nomor pendaftaran, atau instansi..."
+                value={pencarian}
+                onChange={(e) => setPencarian(e.target.value)}
+                className="w-full rounded-lg border border-border bg-card pl-9 pr-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs"
+              />
+            </div>
 
-          <div className="flex items-center gap-2">
-            <div className="relative flex items-center">
-              <Filter className="absolute left-3 size-3.5 text-muted-foreground pointer-events-none" />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
-                className="rounded-lg border border-border bg-card pl-8 pr-8 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs font-medium cursor-pointer"
-              >
-                <option value="semua">Semua Status</option>
-                <option value="menunggu">Menunggu</option>
-                <option value="diverifikasi">Diterima</option>
-                <option value="selesai">Sudah Selesai</option>
-                <option value="ditolak">Ditolak</option>
-              </select>
+            <div className="flex items-center gap-2">
+              <div className="relative flex items-center">
+                <Filter className="absolute left-3 size-3.5 text-muted-foreground pointer-events-none" />
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
+                  className="rounded-lg border border-border bg-card pl-8 pr-8 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs font-medium cursor-pointer"
+                >
+                  <option value="semua">Semua Status</option>
+                  <option value="menunggu">Menunggu</option>
+                  <option value="diverifikasi">Diterima</option>
+                  <option value="selesai">Sudah Selesai</option>
+                  <option value="ditolak">Ditolak</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Table View */}
         <div className="overflow-hidden rounded-xl border border-border bg-card shadow-soft">
-          <div className="overflow-x-auto max-h-[65vh]">
+          <div className="overflow-auto max-h-[calc(100vh-175px)] min-h-[500px]">
             <table className="w-full text-sm">
               <thead>
-                <tr className="sticky top-0 z-10 bg-primary text-primary-foreground border-b border-border">
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                <tr className="sticky top-0 z-20 bg-primary text-primary-foreground border-b border-border shadow-xs">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Nomor Pendaftaran
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Nama &amp; Instansi
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Bidang
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Periode
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider">
                     Aksi
                   </th>
                 </tr>
@@ -264,20 +266,20 @@ export default function AdminDashboardPage() {
                   const isSelesai = p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai);
                   return (
                     <tr key={p.id} className="transition-colors hover:bg-secondary/40">
-                      <td className="px-4 py-3.5 font-mono text-xs font-medium text-foreground">
+                      <td className="px-4 py-2.5 font-mono text-xs font-medium text-foreground">
                         {p.nomor_pendaftaran}
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-2.5">
                         <p className="font-semibold text-foreground">{p.nama_lengkap}</p>
                         <p className="text-xs text-muted-foreground">{p.asal_institusi}</p>
                       </td>
-                      <td className="px-4 py-3.5 text-foreground font-medium">
+                      <td className="px-4 py-2.5 text-foreground font-medium">
                         {p.bidang?.nama ?? <span className="text-muted-foreground italic">Belum ditentukan</span>}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-xs text-foreground">
+                      <td className="px-4 py-2.5 whitespace-nowrap text-xs text-foreground">
                         {formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-2.5">
                         <div className="flex items-center gap-1.5">
                           <span
                             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
@@ -290,7 +292,7 @@ export default function AdminDashboardPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-right">
+                      <td className="px-4 py-2.5 text-right">
                         <button
                           onClick={() => setDipilih(p)}
                           className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-colors hover:bg-secondary"
