@@ -64,11 +64,11 @@ export default function StatistikPage() {
               Data per hari ini
             </p>
             <h1 className="mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight md:text-4xl">
-              Statistik peserta magang aktif
+              Statistik Peserta Magang Aktif Hari Ini
             </h1>
             <p className="mt-3 max-w-xl text-primary-foreground/85">
-              Jumlah peserta magang yang sedang aktif di setiap bidang Diskominfotik Provinsi
-              Riau, dihitung otomatis dari periode magang yang berjalan hari ini.
+              Jumlah peserta magang yang sedang aktif bertugas di setiap bidang Diskominfotik Provinsi
+              Riau, dihitung otomatis dari tanggal periode magang yang berjalan hari ini.
             </p>
           </div>
         </section>
@@ -95,11 +95,11 @@ export default function StatistikPage() {
                   <Users className="size-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total peserta magang aktif saat ini</p>
+                  <p className="text-sm text-muted-foreground">Total peserta magang aktif bertugas hari ini</p>
                   <p className="text-2xl font-semibold text-foreground">
                     {total}{" "}
                     <span className="text-base font-normal text-muted-foreground">
-                      dari {kuotaTotal} slot
+                      dari {kuotaTotal} total kapasitas
                     </span>
                   </p>
                 </div>
@@ -109,7 +109,7 @@ export default function StatistikPage() {
                   }`}
                   style={total >= kuotaTotal ? undefined : { color: "var(--emas-tua)" }}
                 >
-                  {kuotaTotal - total} slot tersisa
+                  {kuotaTotal - total} slot tersisa hari ini
                 </span>
               </div>
 
@@ -153,6 +153,10 @@ export default function StatistikPage() {
                   );
                 })}
               </div>
+
+              <p className="mt-6 text-xs text-muted-foreground italic">
+                * Catatan: Data ketersediaan di atas mencerminkan peserta yang sedang bertugas hari ini. Kepastian ketersediaan slot untuk periode bulan mendatang akan diverifikasi oleh Staf Diskominfotik Riau saat berkas diproses.
+              </p>
             </>
           )}
         </div>

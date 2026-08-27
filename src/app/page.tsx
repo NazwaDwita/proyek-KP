@@ -158,21 +158,13 @@ function BerandaBelumLogin() {
 
       <section id="ketersediaan-slot" className="border-y border-border bg-secondary/40 py-16">
         <div className="mx-auto max-w-6xl px-4">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground">
-                Ketersediaan slot per bidang
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Data peserta magang yang sedang aktif hari ini.
-              </p>
-            </div>
-            <Link
-              href="/statistik"
-              className="inline-flex items-center justify-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-            >
-              Statistik lengkap
-            </Link>
+          <div>
+            <h2 className="font-display text-2xl font-semibold text-foreground">
+              Kapasitas &amp; Peserta Magang Aktif Hari Ini
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Data real-time peserta magang yang sedang bertugas hari ini di Diskominfotik Riau.
+            </p>
           </div>
 
           <div className="mt-8">
@@ -190,17 +182,17 @@ function BerandaBelumLogin() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      Total peserta magang aktif saat ini
+                      Total peserta magang yang sedang aktif bertugas hari ini
                     </p>
                     <p className="text-2xl font-semibold text-foreground">
                       {totalAktif}{" "}
                       <span className="text-base font-normal text-muted-foreground">
-                        dari {totalKuota} slot
+                        dari {totalKuota} total kapasitas
                       </span>
                     </p>
                   </div>
                   <span className="ml-auto rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-accent-foreground/90" style={{ color: "var(--emas-tua)" }}>
-                    {totalSisa} slot tersedia
+                    {totalSisa} slot tersedia hari ini
                   </span>
                 </div>
 
@@ -244,6 +236,10 @@ function BerandaBelumLogin() {
                     );
                   })}
                 </div>
+
+                <p className="mt-4 text-xs text-muted-foreground italic">
+                  * Catatan: Data ketersediaan di atas mencerminkan peserta yang sedang bertugas hari ini. Kepastian ketersediaan slot untuk periode bulan mendatang akan diverifikasi oleh Staf Diskominfotik Riau saat berkas diproses.
+                </p>
               </>
             )}
           </div>
@@ -354,72 +350,72 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
                 const magangSelesai =
                   p.status === "diverifikasi" && periodeSudahSelesai(p.tanggal_selesai);
 
-                const statusColor = magangSelesai
-                  ? { border: "border-t-sky-500", badge: "bg-sky-100 text-sky-800 border-sky-200", icon: CheckCircle2, text: "Selesai Magang" }
+                const statusConfig = magangSelesai
+                  ? { badge: "bg-sky-50 text-sky-700 border-sky-200", icon: CheckCircle2, text: "Selesai Magang" }
                   : p.status === "diverifikasi"
-                  ? { border: "border-t-emerald-500", badge: "bg-emerald-100 text-emerald-800 border-emerald-200", icon: CheckCircle2, text: "Diterima / Diverifikasi" }
+                  ? { badge: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle2, text: "Diterima / Diverifikasi" }
                   : p.status === "menunggu"
-                  ? { border: "border-t-amber-500", badge: "bg-amber-100 text-amber-800 border-amber-200", icon: Clock, text: "Menunggu Verifikasi" }
-                  : { border: "border-t-rose-500", badge: "bg-rose-100 text-rose-800 border-rose-200", icon: XCircle, text: "Ditolak" };
+                  ? { badge: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock, text: "Menunggu Verifikasi" }
+                  : { badge: "bg-rose-50 text-rose-700 border-rose-200", icon: XCircle, text: "Ditolak" };
 
-                const StatusIcon = statusColor.icon;
+                const StatusIcon = statusConfig.icon;
 
                 return (
                   <div
                     key={p.nomor_pendaftaran}
-                    className={`overflow-hidden rounded-xl border border-border border-t-4 ${statusColor.border} bg-card p-6 shadow-soft transition-all`}
+                    className="rounded-xl border border-border bg-card p-6 shadow-xs transition-all hover:border-border/80"
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${statusColor.badge}`}>
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3.5">
+                      <span className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold ${statusConfig.badge}`}>
                         <StatusIcon className="size-3.5" />
-                        {statusColor.text}
+                        {statusConfig.text}
                       </span>
 
-                      <span className="inline-flex items-center gap-1 rounded-md bg-secondary px-3 py-1 text-xs font-mono font-medium text-secondary-foreground border border-border/50">
-                        No: {p.nomor_pendaftaran}
+                      <span className="text-xs font-mono font-medium text-muted-foreground">
+                        No. Registrasi: <strong className="text-foreground">{p.nomor_pendaftaran}</strong>
                       </span>
                     </div>
 
-                    <div className="mt-5 space-y-3">
+                    <div className="mt-4 space-y-3">
                       <div>
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                           Bidang Penempatan
                         </p>
-                        <p className="mt-0.5 font-display text-lg font-bold text-foreground">
+                        <p className="mt-1 font-display text-lg font-semibold text-foreground">
                           {p.bidang?.nama ?? "Belum Ditentukan (diisi saat verifikasi)"}
                         </p>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground pt-1">
+                      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground pt-0.5">
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="size-4 text-primary" />
+                          <Calendar className="size-4 text-muted-foreground" />
                           <span>Periode: <strong className="text-foreground font-medium">{formatTanggal(p.tanggal_mulai)} &ndash; {formatTanggal(p.tanggal_selesai)}</strong></span>
                         </div>
 
                         <div className="flex items-center gap-1.5">
-                          <Clock className="size-4 text-amber-600" />
+                          <Clock className="size-4 text-muted-foreground" />
                           <span>Mendaftar: <strong className="text-foreground font-medium">{formatTanggal(p.dibuat_pada)}</strong></span>
                         </div>
                       </div>
                     </div>
 
                     {p.status === "ditolak" && p.catatan_admin && (
-                      <div className="mt-5 rounded-lg border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-800">
-                        <p className="font-semibold text-rose-900">Catatan dari staf:</p>
-                        <p className="mt-0.5">{p.catatan_admin}</p>
+                      <div className="mt-4 rounded-lg border border-rose-200/80 bg-rose-50/50 p-3.5 text-sm text-rose-900">
+                        <p className="font-semibold text-xs uppercase tracking-wider text-rose-700">Catatan dari Staf:</p>
+                        <p className="mt-1 font-medium">{p.catatan_admin}</p>
                       </div>
                     )}
 
                     {p.status === "diverifikasi" && (
-                      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between gap-4 flex-wrap">
+                      <div className="mt-5 pt-4 border-t border-border flex items-center justify-between gap-4 flex-wrap">
                         <p className="text-xs text-muted-foreground">
                           Surat keterangan resmi dari Diskominfotik Riau sudah siap dicetak.
                         </p>
                         <Link
                           href={`/surat-keterangan/${p.nomor_pendaftaran}`}
-                          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90"
                         >
-                          <FileCheck className="size-4 text-accent" />
+                          <FileCheck className="size-4" />
                           {periodeSudahSelesai(p.tanggal_selesai)
                             ? "Cetak Surat Selesai Magang"
                             : "Cetak Surat Keterangan Diterima"}
