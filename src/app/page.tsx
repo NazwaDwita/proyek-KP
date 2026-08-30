@@ -286,7 +286,7 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
 
   return (
     <>
-      {/* Hero Section */}
+      {/* Hero peserta */}
       <section className="relative overflow-hidden bg-hero-gradient bg-[#064E3B] py-16 text-primary-foreground md:py-24">
         <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 text-center">
           <p className="inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary-foreground">
@@ -301,7 +301,7 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
         </div>
       </section>
 
-      {/* Status Pendaftaran Section (Full-Width Section Band) */}
+      {/* Daftar status pendaftaran */}
       <section className="border-b border-border bg-background py-12 md:py-16">
         <div className="mx-auto max-w-5xl px-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-4">

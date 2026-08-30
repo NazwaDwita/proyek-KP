@@ -57,19 +57,19 @@ export default function AdminBerandaPage() {
     async function muatSemuaData() {
       setMemuatData(true);
 
-      // 1. Fetch Ringkasan Status
+      // 1. Ringkasan status
       const { data: dataRingkasan, error: errRingkasan } = await supabase
         .from("pendaftar")
         .select("status");
 
-      // 2. Fetch Pendaftar Terbaru (5 Terakhir)
+      // 2. Pendaftar terbaru (5 terakhir)
       const { data: dataTerbaru, error: errTerbaru } = await supabase
         .from("pendaftar")
         .select("id, nomor_pendaftaran, nama_lengkap, asal_institusi, status, dibuat_pada, bidang:bidang_id(nama)")
         .order("dibuat_pada", { ascending: false })
         .limit(5);
 
-      // 3. Fetch Kuota Bidang via RPC
+      // 3. Kuota bidang via RPC
       const { data: dataStatistik, error: errStatistik } = await supabase.rpc("statistik_peserta_aktif");
 
       if (!masihTerpasang) return;
@@ -143,7 +143,7 @@ export default function AdminBerandaPage() {
       <AdminNav onKeluar={keluar} />
 
       <main className="w-full px-4 py-8 md:px-8 max-w-7xl mx-auto space-y-8">
-        {/* Banner Hero Pengelolaan Admin */}
+        {/* Banner admin */}
         <section className="relative overflow-hidden rounded-2xl bg-hero-gradient bg-[#064E3B] p-8 md:p-12 text-primary-foreground shadow-md text-center">
           <div className="relative z-10 flex flex-col items-center mx-auto max-w-3xl space-y-3">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary-foreground">
@@ -165,7 +165,7 @@ export default function AdminBerandaPage() {
           </div>
         )}
 
-        {/* 4 Cards Key Performance Indicators (KPI) */}
+        {/* Ringkasan angka per status */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-5 shadow-soft transition-all hover:shadow-md">
             <div className="flex items-center justify-between">
@@ -236,9 +236,8 @@ export default function AdminBerandaPage() {
           </div>
         </section>
 
-        {/* Section Fitur & Akses Cepat + Pendaftar Terbaru (Grid 2 Kolom) */}
+        {/* Kolom kiri: pendaftar terbaru | Kolom kanan: navigasi cepat */}
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Main Column (2/3): Pendaftar Terbaru */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
@@ -325,7 +324,7 @@ export default function AdminBerandaPage() {
             )}
           </div>
 
-          {/* Sidebar Column (1/3): Quick Links & Slot Monitor */}
+          {/* Navigasi cepat & monitor slot */}
           <div className="space-y-6">
             <div className="border-b border-border pb-3">
               <h2 className="font-display text-xl font-semibold text-foreground">
@@ -389,7 +388,7 @@ export default function AdminBerandaPage() {
               </Link>
             </div>
 
-            {/* Monitoring Slot Kuota Magang */}
+            {/* Monitor kuota slot tiap bidang */}
             {statistikBidang.length > 0 && (
               <div className="rounded-2xl border border-border bg-card p-5 shadow-soft space-y-4">
                 <div className="flex items-center justify-between border-b border-border pb-3">

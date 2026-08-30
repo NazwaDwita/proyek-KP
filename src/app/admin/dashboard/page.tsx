@@ -174,7 +174,7 @@ export default function AdminDashboardPage() {
       <AdminNav onKeluar={keluar} />
 
       <main className="w-full px-4 py-8 md:px-8 space-y-6">
-        {/* Header */}
+        {/* Judul halaman */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
           <div>
             <div className="flex items-center gap-2">
@@ -203,7 +203,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Filter Controls Bar Sticky Pas di Garis Bawah Navbar */}
+        {/* Filter & pencarian (sticky) */}
         <div className="sticky top-[61px] z-30 bg-background/95 backdrop-blur pb-2 pt-1">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div className="relative flex-1 max-w-md">
@@ -235,7 +235,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Table View */}
+        {/* Tabel data pendaftar */}
         <div className="overflow-hidden rounded-xl border border-border bg-card shadow-soft">
           <div className="overflow-auto max-h-[calc(100vh-175px)] min-h-[500px]">
             <table className="w-full text-sm">
@@ -399,10 +399,7 @@ function ModalDetail({
   }, [pendaftar.id]);
 
   useEffect(() => {
-    // Sengaja pakai tanggalMulai/tanggalSelesai (state yang sedang diedit
-    // admin), bukan pendaftar.tanggal_mulai/tanggal_selesai (nilai asli) --
-    // supaya kalau admin lagi mengetik periode baru, info kuota yang
-    // ditampilkan langsung menyesuaikan periode barunya, bukan periode lama.
+    // Muat ulang kuota saat periode berubah (real-time)
     if (!tanggalMulai || !tanggalSelesai || tanggalSelesai < tanggalMulai) return;
 
     async function muatKuota() {
@@ -426,11 +423,8 @@ function ModalDetail({
     muatKuota();
   }, [pendaftar.id, tanggalMulai, tanggalSelesai]);
 
-  // statusBaru diisi cuma kalau ini aksi Terima/Tolak. Kalau kosong,
-  // artinya admin cuma menyimpan perubahan periode/bidang/catatan tanpa
-  // mengubah keputusan -- makanya status, diverifikasi_oleh, dan
-  // diverifikasi_pada sengaja TIDAK ikut ditimpa, biar jejak kapan
-  // pendaftaran ini pertama kali diputuskan tetap utuh.
+  // statusBaru diisi kalau ini aksi Terima/Tolak.
+  // Kalau kosong, hanya simpan perubahan periode/bidang/catatan.
   async function simpan(statusBaru?: StatusPendaftaran) {
     const statusUntukDicek = statusBaru ?? pendaftar.status;
 
