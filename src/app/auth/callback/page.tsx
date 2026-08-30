@@ -14,20 +14,12 @@ function terjemahkanErrorOAuth(kode: string | null, deskripsi: string | null): s
   return "Gagal masuk dengan Google. Kemungkinan provider Google belum diaktifkan di pengaturan Supabase, atau Redirect URL belum cocok.";
 }
 
-// Halaman transit setelah pengguna kembali dari Google. Dengan flow
-// "implicit", token sesi sudah ada langsung di fragment URL
-// (#access_token=...) begitu Google mengarahkan kembali ke sini -- client
-// Supabase otomatis membacanya (detectSessionInUrl) tanpa perlu kode
-// tambahan dari kita. Yang perlu dilakukan di sini cuma menunggu event
-// itu selesai lalu mengarahkan pengguna ke Beranda. Kalau Google/Supabase
-// menolak proses ini (mis. provider belum aktif), mereka mengirim balik
-// ?error=...&error_description=... -- itu ditampilkan apa adanya.
+// Halaman transit setelah login Google. Supabase otomatis membaca token
+// dari fragment URL; kita cuma tunggu sesi tersedia lalu redirect ke Beranda.
 export default function AuthCallback() {
   const router = useRouter();
 
-  // Dihitung sekali saat render pertama (bukan lewat setState di dalam
-  // effect) supaya tidak memicu "cascading render" yang diperingatkan
-  // aturan react-hooks/set-state-in-effect.
+  // Baca error dari query string (kalau ada) sekali saat render pertama.
   const [pesanError, setPesanError] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
     const url = new URL(window.location.href);
@@ -43,9 +35,7 @@ export default function AuthCallback() {
   useEffect(() => {
     if (pesanError) return;
 
-    // Sesi biasanya sudah langsung tersedia begitu client Supabase
-    // selesai membaca fragment URL -- tapi untuk jaga-jaga (timing di
-    // browser bisa berbeda-beda), dengarkan juga event auth-nya.
+    // Dengarkan event auth untuk berjaga-jaga kalau sesi belum langsung tersedia.
     const { data: pelanggan } = supabase.auth.onAuthStateChange((event, sesi) => {
       if (sesi) {
         router.replace("/");

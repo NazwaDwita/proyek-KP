@@ -95,7 +95,7 @@ async function unduhExcelPro(daftar: BarisRekap[], labelPeriode: string) {
   workbook.creator = "Diskominfotik Provinsi Riau";
   workbook.created = new Date();
 
-  // Sheet 1: Detail Pendaftar
+  // Sheet 1: detail pendaftar
   const sheetDetail = workbook.addWorksheet("Rekap Detail Pendaftar");
 
   sheetDetail.mergeCells("A1:N1");
@@ -178,7 +178,7 @@ async function unduhExcelPro(daftar: BarisRekap[], labelPeriode: string) {
     column.width = maxLen + 3;
   });
 
-  // Sheet 2: Ringkasan Status & Bidang
+  // Sheet 2: ringkasan status & bidang
   const sheetStat = workbook.addWorksheet("Ringkasan Data");
   sheetStat.addRow(["RINGKASAN REKAPITULASI MAGANG"]);
   sheetStat.getCell("A1").font = { name: "Arial", size: 12, bold: true, color: { argb: "FF064E3B" } };
@@ -271,7 +271,7 @@ export default function AdminRekapPage() {
   const [memuatData, setMemuatData] = useState(true);
   const [pesanError, setPesanError] = useState<string | null>(null);
 
-  // Filters
+  // Filter
   const [bulanPilihan, setBulanPilihan] = useState<string>("semua");
   const [tahunPilihan, setTahunPilihan] = useState<string>("semua");
   const [statusPilihan, setStatusPilihan] = useState<string>("semua");
@@ -424,7 +424,7 @@ export default function AdminRekapPage() {
       <AdminNav onKeluar={keluar} />
 
       <main className="mx-auto max-w-7xl px-4 py-8 md:px-8 space-y-6">
-        {/* Banner Header Gaya Lama */}
+        {/* Judul & tombol ekspor */}
         <section className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">
@@ -495,7 +495,7 @@ export default function AdminRekapPage() {
           </div>
         )}
 
-        {/* Filter Bar Gaya Lama + Filter Bulan & Tahun */}
+        {/* Filter pencarian, bulan, tahun, status */}
         <section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-soft">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
@@ -509,7 +509,7 @@ export default function AdminRekapPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {/* Filter Bulan */}
+
             <select
               value={bulanPilihan}
               onChange={(e) => setBulanPilihan(e.target.value)}
@@ -523,7 +523,7 @@ export default function AdminRekapPage() {
               ))}
             </select>
 
-            {/* Filter Tahun */}
+
             <select
               value={tahunPilihan}
               onChange={(e) => setTahunPilihan(e.target.value)}
@@ -537,7 +537,7 @@ export default function AdminRekapPage() {
               ))}
             </select>
 
-            {/* Filter Status */}
+
             <select
               value={statusPilihan}
               onChange={(e) => setStatusPilihan(e.target.value)}
@@ -552,7 +552,7 @@ export default function AdminRekapPage() {
           </div>
         </section>
 
-        {/* Tabel Rekap Pendaftar Gaya Lama */}
+        {/* Tabel rekap pendaftar */}
         <section className="overflow-hidden rounded-xl border border-border bg-card shadow-soft">
           <div className="overflow-auto max-h-[calc(100vh-140px)] min-h-[500px]">
             <table className="w-full text-left text-sm">

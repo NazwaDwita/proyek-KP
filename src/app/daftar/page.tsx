@@ -105,12 +105,8 @@ export default function DaftarPage() {
         return;
       }
 
-      // Nggak ada pendaftaran aktif -- cek apakah user ini punya
-      // pendaftaran yang PERNAH ditolak sebelumnya. Kalau ada, auto-isi
-      // form dari data itu, supaya nggak perlu ngetik ulang dari nol pas
-      // daftar lagi. Ini bikin baris LAMA (yang ditolak) sekali sengaja
-      // TIDAK disentuh -- cuma dibaca buat ngisi form, submit-nya tetap
-      // bikin baris baru lewat daftar_magang() seperti biasa.
+      // Kalau pernah ditolak sebelumnya, auto-isi form dari data terakhir
+      // supaya tidak perlu mengetik ulang.
       const { data: ditolak, error: errorDitolak } = await supabase
         .from("pendaftar")
         .select("nama_lengkap, email, no_hp, jenis_institusi, asal_institusi, jurusan_prodi")
