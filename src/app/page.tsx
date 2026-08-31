@@ -70,18 +70,18 @@ const langkah = [
   { icon: ShieldCheck, judul: "Buat akun", teks: "Registrasi menggunakan email aktif." },
   {
     icon: CalendarClock,
-    judul: "Ajukan periode",
-    teks: "Lengkapi data diri dan pilih periode magang 2 sampai 4 bulan.",
+    judul: "Ajukan pendaftaran",
+    teks: "Lengkapi data diri dan pilih periode magang pada form yang tersedia.",
   },
   {
     icon: ClipboardCheck,
     judul: "Diperiksa admin",
-    teks: "Pengajuanmu masuk ke sistem admin. Staf Diskominfotik yang memeriksa dan menentukan pengajuan diterima atau ditolak.",
+    teks: "Staf Diskominfotik akan memeriksa dan menentukan pengajuan diterima atau ditolak.",
   },
   {
     icon: LayoutGrid,
-    judul: "Penempatan bidang",
-    teks: "Kalau diterima, bidang penempatan ditentukan oleh admin, bukan dipilih sendiri saat mendaftar.",
+    judul: "Cetak surat keterangan diterima",
+    teks: "Kalau diterima, cetak surat keterangan diterima magang.",
   },
 ];
 
@@ -129,7 +129,7 @@ function BerandaBelumLogin() {
           <h1 className="mt-6 max-w-3xl font-display text-4xl font-semibold leading-tight md:text-5xl">
             Pendaftaran Magang &amp; PKL Dinas Kominfotik Provinsi Riau
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-primary-foreground/85 md:text-lg">
+          <p className="mt-4 max-w-2xl text-base text-primary-foreground/95 md:text-lg">
             Terbuka untuk siswa dan mahasiswa dari mana saja. Ajukan periode magang, dan
             pantau status pendaftaranmu secara online.
           </p>
@@ -290,12 +290,12 @@ function BerandaSudahLogin({ userId, nama }: { userId: string; nama: string }) {
       <section className="relative overflow-hidden bg-hero-gradient bg-[#064E3B] py-16 text-primary-foreground md:py-24">
         <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 text-center">
           <p className="inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary-foreground">
-            Portal Peserta Magang &bull; Diskominfotik Riau
+            Peserta Magang &bull; Diskominfotik Riau
           </p>
           <h1 className="mt-6 font-display text-3xl font-semibold leading-tight text-primary-foreground md:text-5xl capitalize">
             Selamat Datang, {nama}
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-primary-foreground/85 md:text-lg">
+          <p className="mt-4 max-w-2xl text-base text-primary-foreground/95 md:text-lg">
             Pantau perkembangan status pengajuan magang dan kelengkapan dokumenmu secara langsung di portal ini.
           </p>
         </div>

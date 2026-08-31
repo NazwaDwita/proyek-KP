@@ -14,9 +14,9 @@
   --tombol-teks: #ffffff;
   --tombol-hover-bg: var(--navy-sekunder);
   --teks-utama: #1C2E27;
-  --teks-muted: rgb(from var(--teks-utama) r g b / 0.78);
+  --teks-muted: #2D4038;
   --teks-terang: #ECFDF5;
-  --teks-muted-terang: rgb(from var(--teks-terang) r g b / 0.65);
+  --teks-muted-terang: rgb(from var(--teks-terang) r g b / 0.80);
   --radius: 16px;
   --font-judul: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-teks: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
@@ -31,12 +31,12 @@
   --color-accent: var(--emas);
   --color-accent-foreground: #ffffff;
   --color-muted: #EEF6F1;
-  --color-muted-foreground: rgb(28 46 39 / 0.65);
+  --color-muted-foreground: #2D4038;
   --color-card: var(--kartu-bg);
   --color-card-foreground: var(--teks-utama);
   --color-background: var(--dasar);
   --color-foreground: var(--teks-utama);
-  --color-border: rgb(28 46 39 / 0.12);
+  --color-border: rgb(28 46 39 / 0.16);
 
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
@@ -326,7 +326,6 @@ input, select, textarea {
 .form-grup .keterangan-field {
   font-size: 12px;
   color: var(--teks-muted);
-  opacity: 0.75;
   margin-top: 4px;
 }
 .form-input {
@@ -340,7 +339,7 @@ input, select, textarea {
   font-size: 14px;
 }
 .form-input::placeholder {
-  color: rgb(from var(--teks-utama) r g b / 0.35);
+  color: rgb(from var(--teks-utama) r g b / 0.48);
 }
 .form-input:focus {
   outline: none;

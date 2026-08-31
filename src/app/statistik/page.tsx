@@ -66,7 +66,7 @@ export default function StatistikPage() {
             <h1 className="mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight md:text-4xl">
               Statistik Peserta Magang Aktif Hari Ini
             </h1>
-            <p className="mt-3 max-w-xl text-primary-foreground/85">
+            <p className="mt-3 max-w-xl text-primary-foreground/95">
               Jumlah peserta magang yang sedang aktif bertugas di setiap bidang Diskominfotik Provinsi
               Riau, dihitung otomatis dari tanggal periode magang yang berjalan hari ini.
             </p>

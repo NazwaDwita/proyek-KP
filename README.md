@@ -118,6 +118,43 @@ Buka [http://localhost:3000](http://localhost:3000) di browser untuk mengakses a
 
 ---
 
+## Akses Admin (Panel Staf)
+
+Panel admin dapat diakses lewat [`/admin/login`](http://localhost:3000/admin/login) — khusus staf Bidang Aptika yang mengelola data pendaftaran magang.
+
+### Kredensial Default (Demo)
+
+| Email | Password |
+|---|---|
+| `admin123@mail.com` | `Admin123` |
+
+### Cara Kerja Akses Admin
+
+Status "admin" ditentukan oleh **dua syarat sekaligus**, bukan cuma login berhasil:
+1. Akun harus terdaftar di **Supabase Auth** (Authentication → Users).
+2. **UID** akun tersebut harus ada sebagai baris di tabel `admin_pengguna`.
+
+Kalau cuma syarat 1 yang terpenuhi (akun bisa login tapi belum didaftarkan sebagai admin), pengguna akan ditolak masuk ke dashboard dengan pesan *"Akun ini tidak memiliki akses admin."* — akses sebenarnya dijaga oleh Row Level Security (RLS) di database, bukan cuma pengecekan di sisi tampilan.
+
+### Menambahkan Admin Baru
+
+1. Supabase Dashboard → **Authentication → Users → Add user**, isi email & password, centang **Auto Confirm User**.
+2. Salin **User UID** dari akun yang baru dibuat.
+3. Jalankan di **SQL Editor**:
+   ```sql
+   insert into admin_pengguna (id, nama)
+   values ('UUID-USER', 'Nama Admin');
+   ```
+
+### Mencabut Akses Admin
+
+Hapus baris yang sesuai dari tabel `admin_pengguna` (akun di Auth tidak perlu ikut dihapus, kecuali memang ingin akun itu tidak bisa login sama sekali):
+```sql
+delete from admin_pengguna where id = 'UUID-USER';
+```
+
+---
+
 ## Skrip yang Tersedia
 
 - `npm run dev` — Menjalankan server pengembang Next.js (Local Development).

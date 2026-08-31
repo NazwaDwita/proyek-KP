@@ -153,7 +153,7 @@ export default function AdminBerandaPage() {
             <h1 className="font-display text-2xl font-bold md:text-4xl text-primary-foreground">
               Pengelolaan Pendaftaran Magang
             </h1>
-            <p className="text-sm md:text-base text-primary-foreground/85 max-w-xl">
+            <p className="text-sm md:text-base text-primary-foreground/95 max-w-xl">
               Diskominfotik Provinsi Riau &bull; Pantau statistik pengajuan, verifikasi pendaftar, dan kelola dokumen jawaban secara terpusat.
             </p>
           </div>
